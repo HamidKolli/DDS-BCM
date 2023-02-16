@@ -15,7 +15,6 @@ import fr.ddspstl.components.interfaces.IDDSNode;
 import fr.ddspstl.exceptions.DDSTopicNotFoundException;
 import fr.ddspstl.plugin.ConnectionPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
-import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 
