@@ -3,8 +3,8 @@ package fr.ddspstl.ports;
 import org.omg.dds.pub.DataWriter;
 import org.omg.dds.topic.Topic;
 
-import fr.ddspstl.components.DDSNode;
 import fr.ddspstl.interfaces.InWrite;
+import fr.ddspstl.plugin.ConnectionPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
@@ -22,7 +22,7 @@ public class InPortWrite extends AbstractInboundPort implements InWrite {
 		return getOwner().handleRequest(new AbstractComponent.AbstractService<DataWriter<T>>() {
 			@Override
 			public DataWriter<T> call() throws Exception {
-				return ((DDSNode) getOwner()).getDataWriter(topic);
+				return ((ConnectionPlugin)getServiceProviderReference()).getDataWriter(topic);
 			}
 		});
 	}
@@ -32,7 +32,7 @@ public class InPortWrite extends AbstractInboundPort implements InWrite {
 		return getOwner().handleRequest(new AbstractComponent.AbstractService<Void>() {
 			@Override
 			public Void call() throws Exception {
-				 ((DDSNode) getOwner()).write(reader,data);
+				((ConnectionPlugin)getServiceProviderReference()).write(reader,data);
 				 return null;
 			}
 		});

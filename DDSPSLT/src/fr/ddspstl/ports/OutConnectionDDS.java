@@ -15,8 +15,8 @@ public class OutConnectionDDS extends AbstractOutboundPort implements ConnectDDS
 	}
 
 	@Override
-	public void connect(String uri, int domainID) throws Exception {
-		((ConnectorConnectionDDS)getConnector()).connect(uri, domainID);
+	public String connect(String uri,String uriPropagation, int domainID) throws Exception {
+		return ((ConnectorConnectionDDS)getConnector()).connect(uri,uriPropagation, domainID);
 		
 	}
 

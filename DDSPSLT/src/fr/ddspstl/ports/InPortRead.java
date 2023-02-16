@@ -3,8 +3,8 @@ package fr.ddspstl.ports;
 import org.omg.dds.sub.DataReader;
 import org.omg.dds.topic.Topic;
 
-import fr.ddspstl.components.DDSNode;
 import fr.ddspstl.interfaces.InRead;
+import fr.ddspstl.plugin.ConnectionPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
@@ -23,7 +23,7 @@ public class InPortRead extends AbstractInboundPort implements InRead{
 		return getOwner().handleRequest(new AbstractComponent.AbstractService<DataReader<T>>() {
 			@Override
 			public DataReader<T> call() throws Exception {
-				return ((DDSNode)getOwner()).getDataReader(topic);
+				return ((ConnectionPlugin)getServiceProviderReference()).getDataReader(topic);
 			}
 		});
 	}
@@ -33,7 +33,7 @@ public class InPortRead extends AbstractInboundPort implements InRead{
 		return getOwner().handleRequest(new AbstractComponent.AbstractService<T>() {
 			@Override
 			public T call() throws Exception {
-				return ((DDSNode)getOwner()).read(reader);
+				return ((ConnectionPlugin)getServiceProviderReference()).read(reader);
 			}
 		});
 	}

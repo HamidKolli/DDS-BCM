@@ -4,8 +4,8 @@ package fr.ddspstl.ports;
 
 import org.omg.dds.topic.Topic;
 
-import fr.ddspstl.components.DDSNode;
 import fr.ddspstl.interfaces.Propagation;
+import fr.ddspstl.plugin.ConnectionPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
@@ -14,9 +14,9 @@ public class InPortPropagation extends AbstractInboundPort implements Propagatio
 
 	private static final long serialVersionUID = 1L;
 
-	public InPortPropagation(String uri,  ComponentI owner)
+	public InPortPropagation(  ComponentI owner)
 			throws Exception {
-		super(uri, Propagation.class, owner);
+		super( Propagation.class, owner);
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class InPortPropagation extends AbstractInboundPort implements Propagatio
 			@Override
 			public void run() {
 				try {
-					((DDSNode)getOwner()).propager(newObject,topic,id);
+					((ConnectionPlugin)getTaskProviderReference()).propager(newObject,topic,id);
 				} catch (Exception e) {
 				}
 				

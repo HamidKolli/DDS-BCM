@@ -2,8 +2,8 @@ package fr.ddspstl.ports;
 
 import org.omg.dds.topic.Topic;
 
-import fr.ddspstl.components.DDSNode;
 import fr.ddspstl.interfaces.ConnectInClient;
+import fr.ddspstl.plugin.ConnectionPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
@@ -21,7 +21,7 @@ public class InPortConnectClient<T> extends AbstractInboundPort implements Conne
 		return getOwner().handleRequest(new AbstractComponent.AbstractService<Topic<T>>() {
 			@Override
 			public Topic<T> call() throws Exception {
-				return ((DDSNode)getOwner()).connect(domainID,topicName);
+				return ((ConnectionPlugin)getServiceProviderReference()).connect(domainID,topicName);
 			}
 		});
 	}
@@ -31,7 +31,7 @@ public class InPortConnectClient<T> extends AbstractInboundPort implements Conne
 		return getOwner().handleRequest(new AbstractComponent.AbstractService<String>() {
 			@Override
 			public String call() throws Exception {
-				return ((DDSNode)getOwner()).getReaderURI();
+				return ((ConnectionPlugin)getServiceProviderReference()).getReaderURI();
 			}
 		});
 	}
@@ -41,7 +41,7 @@ public class InPortConnectClient<T> extends AbstractInboundPort implements Conne
 		return getOwner().handleRequest(new AbstractComponent.AbstractService<String>() {
 			@Override
 			public String call() throws Exception {
-				return ((DDSNode)getOwner()).getWriterURI();
+				return ((ConnectionPlugin)getServiceProviderReference()).getWriterURI();
 			}
 		});
 	}
@@ -51,7 +51,7 @@ public class InPortConnectClient<T> extends AbstractInboundPort implements Conne
 		getOwner().handleRequest(new AbstractComponent.AbstractService<Void>() {
 			@Override
 			public Void call() throws Exception {
-				((DDSNode)getOwner()).disconnectClient();
+				((ConnectionPlugin)getServiceProviderReference()).disconnectClient();
 				return null;
 			}
 		});

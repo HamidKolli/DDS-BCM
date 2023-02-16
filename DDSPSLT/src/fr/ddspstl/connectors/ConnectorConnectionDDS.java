@@ -6,8 +6,8 @@ import fr.sorbonne_u.components.connectors.AbstractConnector;
 public class ConnectorConnectionDDS extends AbstractConnector implements ConnectDDSNode{
 
 	@Override
-	public void connect(String uri, int domainID)throws Exception {
-		((ConnectDDSNode)this.offering).connect(uri, domainID);
+	public String connect(String uri,String uriPropagation, int domainID)throws Exception {
+		return ((ConnectDDSNode)this.offering).connect(uri, uriPropagation,domainID);
 		
 	}
 

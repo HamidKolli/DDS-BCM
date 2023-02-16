@@ -2,10 +2,25 @@ package fr.ddspstl.plugin;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
-import fr.ddspstl.components.DDSNode;
+import org.omg.dds.pub.DataWriter;
+import org.omg.dds.sub.DataReader;
+import org.omg.dds.topic.Topic;
+
+import fr.ddspstl.components.interfaces.IDDSNode;
 import fr.ddspstl.connectors.ConnectorConnectionDDS;
+import fr.ddspstl.exceptions.DDSTopicNotFoundException;
+import fr.ddspstl.interfaces.ConnectDDSNode;
+import fr.ddspstl.interfaces.ConnectInClient;
+import fr.ddspstl.interfaces.InRead;
+import fr.ddspstl.interfaces.InWrite;
+import fr.ddspstl.interfaces.Propagation;
 import fr.ddspstl.ports.InConnectionDDS;
+import fr.ddspstl.ports.InPortConnectClient;
+import fr.ddspstl.ports.InPortPropagation;
+import fr.ddspstl.ports.InPortRead;
+import fr.ddspstl.ports.InPortWrite;
 import fr.ddspstl.ports.OutConnectionDDS;
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
@@ -14,31 +29,58 @@ public class ConnectionPlugin extends AbstractPlugin {
 
 	private static final long serialVersionUID = 1L;
 
+	private InPortConnectClient<Object> inPortConnectClient;
+	private InPortRead inPortRead;
+	private InPortWrite inPortWrite;
+	private InPortPropagation inPortPropagation;
 	private InConnectionDDS connectionDDS;
-	private String uriConnection;
+	private String uriConnectInPort;
+	private String uriConnectDDSNode;
 	private Map<String, OutConnectionDDS> connectionOut;
-	
-	public ConnectionPlugin(String uriConnection) {
-		this.uriConnection = uriConnection;
-		connectionOut = new HashMap<>();
+
+	public ConnectionPlugin(String uriConnection, String uriConnectInPort) {
+		this.uriConnectInPort = uriConnectInPort;
+		this.uriConnectDDSNode = uriConnection;
+		this.connectionOut = new HashMap<>();
 	}
 
 	@Override
 	public void installOn(ComponentI owner) throws Exception {
-		connectionDDS = new InConnectionDDS(uriConnection, owner);
+		
+		// Owner doit respecter le contrat IDDSNode
+		assert owner instanceof IDDSNode;
+		
+		this.connectionDDS = new InConnectionDDS(uriConnectDDSNode, owner);
+		this.inPortConnectClient = new InPortConnectClient<Object>(uriConnectInPort, owner);
+		this.inPortRead = new InPortRead(owner);
+		this.inPortWrite = new InPortWrite(owner);
+		this.inPortPropagation = new InPortPropagation(owner);
+				
+		this.addOfferedInterface(InRead.class);
+		this.addOfferedInterface(InWrite.class);
+		this.addOfferedInterface(ConnectInClient.class);
+		this.addOfferedInterface(Propagation.class);
+		this.addOfferedInterface(ConnectDDSNode.class);
+		
+		this.addRequiredInterface(ConnectDDSNode.class);
+		this.addRequiredInterface(Propagation.class);
 		super.installOn(owner);
 	}
 
 	@Override
 	public void initialise() throws Exception {
 		connectionDDS.publishPort();
+		inPortConnectClient.publishPort();
+		inPortRead.publishPort();
+		inPortWrite.publishPort();
+		inPortPropagation.publishPort();
 		super.initialise();
 	}
 
 	@Override
 	public void finalise() throws Exception {
 		for (Map.Entry<String, OutConnectionDDS> cp : connectionOut.entrySet()) {
-			disconnect(cp.getKey(),cp.getValue());
+			disconnect(cp.getKey(), cp.getValue());
 		}
 		super.finalise();
 	}
@@ -46,7 +88,13 @@ public class ConnectionPlugin extends AbstractPlugin {
 	@Override
 	public void uninstall() throws Exception {
 		connectionDDS.unpublishPort();
+		inPortConnectClient.unpublishPort();
+		inPortRead.unpublishPort();
+		inPortWrite.unpublishPort();
 		connectionDDS.destroyPort();
+		inPortConnectClient.destroyPort();
+		inPortRead.destroyPort();
+		inPortWrite.destroyPort();
 		for (Map.Entry<String, OutConnectionDDS> cp : connectionOut.entrySet()) {
 			cp.getValue().unpublishPort();
 			cp.getValue().destroyPort();
@@ -54,23 +102,32 @@ public class ConnectionPlugin extends AbstractPlugin {
 		super.uninstall();
 	}
 
+	public String getReaderURI() throws Exception {
+		return inPortRead.getPortURI();
+	}
+
+	public String getWriterURI() throws Exception {
+		return inPortWrite.getPortURI();
+	}
+
 	public void connect(String uri, int domainID) throws Exception {
 		OutConnectionDDS cout = new OutConnectionDDS(this.getOwner());
 		this.getOwner().doPortConnection(cout.getPortURI(), uri, ConnectorConnectionDDS.class.getCanonicalName());
-		cout.connect(connectionDDS.getPortURI(), domainID);
+		cout.connect(connectionDDS.getPortURI(),inPortPropagation.getPortURI(), domainID);
 		connectionOut.put(uri, cout);
 	}
 
-	public void connectBack(String uri, int domainID) throws Exception{
-		if(((DDSNode)getOwner()).getDomainId() != domainID) {
+	public String connectBack(String uri,String uriPropagation, int domainID) throws Exception {
+		if (((IDDSNode) getOwner()).getDomainId() != domainID) {
 			throw new Exception("impossible de ce connecter, domaine different");
 		}
 		OutConnectionDDS cout = new OutConnectionDDS(this.getOwner());
 		this.getOwner().doPortConnection(cout.getPortURI(), uri, ConnectorConnectionDDS.class.getCanonicalName());
 		connectionOut.put(uri, cout);
+		return inPortPropagation.getPortURI();
 	}
 
-	public void disconnectBack(String uri)throws Exception {
+	public void disconnectBack(String uri) throws Exception {
 		OutConnectionDDS out = connectionOut.get(uri);
 		out.doDisconnection();
 		out.unpublishPort();
@@ -78,12 +135,45 @@ public class ConnectionPlugin extends AbstractPlugin {
 		connectionOut.remove(uri);
 	}
 
-	public void disconnect(String uri,OutConnectionDDS out) throws Exception{
+	public void disconnect(String uri, OutConnectionDDS out) throws Exception {
 		out.disconnect(uri);
 		out.doDisconnection();
 		out.unpublishPort();
 		out.destroyPort();
 		connectionOut.remove(uri);
+	}
+
+	public <T> Topic<T> connect(int domainID, String topicName) throws TimeoutException {
+
+		return ((IDDSNode) getOwner()).connect(domainID, topicName);
+	}
+
+	public int getDomainId() {
+		return ((IDDSNode) getOwner()).getDomainId();
+	}
+
+	public void disconnectClient() {
+		((IDDSNode) getOwner()).disconnectClient();
+	}
+
+	public <T> DataReader<T> getDataReader(Topic<T> topic) throws DDSTopicNotFoundException {
+		return ((IDDSNode) getOwner()).getDataReader(topic);
+	}
+
+	public <T> T read(DataReader<T> reader) {
+		return ((IDDSNode) getOwner()).read(reader);
+	}
+
+	public <T> DataWriter<T> getDataWriter(Topic<T> topic) {
+		return ((IDDSNode) getOwner()).getDataWriter(topic);
+	}
+
+	public <T> void write(DataWriter<T> reader, T data) throws TimeoutException {
+		((IDDSNode) getOwner()).write(reader, data);
+	}
+
+	public <T> void propager(T newObject, Topic<T> topic, String id) {
+		((IDDSNode) getOwner()).propager(newObject, topic, id);
 	}
 
 }

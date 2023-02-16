@@ -31,13 +31,12 @@ public class InConnectionDDS extends AbstractInboundPort implements ConnectDDSNo
 	}
 
 	@Override
-	public void connect(String uri, int domainID) throws Exception {
-		this.getOwner().handleRequest(new AbstractComponent.AbstractService<Void>(){
+	public String connect(String uri,String uriPropagation, int domainID) throws Exception {
+		return this.getOwner().handleRequest(new AbstractComponent.AbstractService<String>(){
 
 			@Override
-			public Void call() throws Exception {
-				((ConnectionPlugin)getServiceProviderReference()).connectBack(uri,domainID);
-				return null;
+			public String call() throws Exception {
+				return ((ConnectionPlugin)getServiceProviderReference()).connectBack(uri,uriPropagation,domainID);
 			}
 			
 		});
