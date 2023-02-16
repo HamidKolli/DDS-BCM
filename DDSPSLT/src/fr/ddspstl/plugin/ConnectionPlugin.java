@@ -10,6 +10,7 @@ import org.omg.dds.topic.Topic;
 
 import fr.ddspstl.components.interfaces.IDDSNode;
 import fr.ddspstl.connectors.ConnectorConnectionDDS;
+import fr.ddspstl.connectors.ConnectorPropagation;
 import fr.ddspstl.exceptions.DDSTopicNotFoundException;
 import fr.ddspstl.interfaces.ConnectDDSNode;
 import fr.ddspstl.interfaces.ConnectInClient;
@@ -22,6 +23,7 @@ import fr.ddspstl.ports.InPortPropagation;
 import fr.ddspstl.ports.InPortRead;
 import fr.ddspstl.ports.InPortWrite;
 import fr.ddspstl.ports.OutConnectionDDS;
+import fr.ddspstl.ports.OutPortPropagation;
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
 
@@ -37,12 +39,15 @@ public class ConnectionPlugin extends AbstractPlugin {
 	private String uriConnectInPort;
 	private String uriConnectDDSNode;
 	private Map<String, OutConnectionDDS> connectionOut;
+	private Map<String,OutPortPropagation> outPropagationPorts ;
 
 	public ConnectionPlugin(String uriConnection, String uriConnectInPort) {
 		this.uriConnectInPort = uriConnectInPort;
 		this.uriConnectDDSNode = uriConnection;
 		this.connectionOut = new HashMap<>();
+		this.outPropagationPorts = new HashMap<>();
 	}
+
 
 	@Override
 	public void installOn(ComponentI owner) throws Exception {
@@ -80,7 +85,7 @@ public class ConnectionPlugin extends AbstractPlugin {
 	@Override
 	public void finalise() throws Exception {
 		for (Map.Entry<String, OutConnectionDDS> cp : connectionOut.entrySet()) {
-			disconnect(cp.getKey(), cp.getValue());
+			disconnect(cp.getKey());
 		}
 		super.finalise();
 	}
@@ -99,6 +104,10 @@ public class ConnectionPlugin extends AbstractPlugin {
 			cp.getValue().unpublishPort();
 			cp.getValue().destroyPort();
 		}
+		for (Map.Entry<String, OutPortPropagation> cp : outPropagationPorts.entrySet()) {
+			cp.getValue().unpublishPort();
+			cp.getValue().destroyPort();
+		}
 		super.uninstall();
 	}
 
@@ -113,8 +122,11 @@ public class ConnectionPlugin extends AbstractPlugin {
 	public void connect(String uri, int domainID) throws Exception {
 		OutConnectionDDS cout = new OutConnectionDDS(this.getOwner());
 		this.getOwner().doPortConnection(cout.getPortURI(), uri, ConnectorConnectionDDS.class.getCanonicalName());
-		cout.connect(connectionDDS.getPortURI(),inPortPropagation.getPortURI(), domainID);
+		String uriPropagationVoisin = cout.connect(connectionDDS.getPortURI(),inPortPropagation.getPortURI(), domainID);
 		connectionOut.put(uri, cout);
+		OutPortPropagation outPropagation = new OutPortPropagation(getOwner());
+		this.getOwner().doPortConnection(outPropagation.getPortURI(), uriPropagationVoisin, ConnectorPropagation.class.getCanonicalName());
+		outPropagationPorts.put(uri, outPropagation);
 	}
 
 	public String connectBack(String uri,String uriPropagation, int domainID) throws Exception {
@@ -124,6 +136,10 @@ public class ConnectionPlugin extends AbstractPlugin {
 		OutConnectionDDS cout = new OutConnectionDDS(this.getOwner());
 		this.getOwner().doPortConnection(cout.getPortURI(), uri, ConnectorConnectionDDS.class.getCanonicalName());
 		connectionOut.put(uri, cout);
+		OutPortPropagation outPropagation = new OutPortPropagation(getOwner());
+		this.getOwner().doPortConnection(outPropagation.getPortURI(), uriPropagation, ConnectorPropagation.class.getCanonicalName());
+		outPropagationPorts.put(uri, outPropagation);
+		
 		return inPortPropagation.getPortURI();
 	}
 
@@ -135,11 +151,16 @@ public class ConnectionPlugin extends AbstractPlugin {
 		connectionOut.remove(uri);
 	}
 
-	public void disconnect(String uri, OutConnectionDDS out) throws Exception {
+	public void disconnect(String uri) throws Exception {
+		OutConnectionDDS out  =  connectionOut.get(uri);
 		out.disconnect(uri);
 		out.doDisconnection();
 		out.unpublishPort();
 		out.destroyPort();
+		OutPortPropagation pOut = outPropagationPorts.get(uri);
+		pOut.doDisconnection();
+		pOut.unpublishPort();
+		pOut.destroyPort();
 		connectionOut.remove(uri);
 	}
 
@@ -172,8 +193,11 @@ public class ConnectionPlugin extends AbstractPlugin {
 		((IDDSNode) getOwner()).write(reader, data);
 	}
 
-	public <T> void propager(T newObject, Topic<T> topic, String id) {
+	public <T> void propager(T newObject, Topic<T> topic, String id) throws Exception {
 		((IDDSNode) getOwner()).propager(newObject, topic, id);
+		for (OutPortPropagation cp : outPropagationPorts.values()) {
+			cp.propager(newObject, topic, id);
+		}
 	}
 
 }

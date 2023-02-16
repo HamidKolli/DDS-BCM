@@ -19,22 +19,21 @@ import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 
-
 public class DDSNode extends AbstractComponent implements IDDSNode {
 
 	// BCM
 	private String uriConnectDDSNode;
 	private String uriConnectInPort;
-	private String uriPluginConnection;
+
+	private ConnectionPlugin plugin;
 	// DDS
 	private ServiceEnvironment serviceEnvironment;
-
 	private DomainParticipant domainParticipant;
 	private Publisher publisher;
 	private Subscriber subscriber;
-	
 
-	protected DDSNode(int nbThreads, int nbSchedulableThreads, String uriConnectDDSNode,String uriConnectInPort,DomainParticipant domainParticipant,ServiceEnvironment serviceEnvironment) throws Exception {
+	protected DDSNode(int nbThreads, int nbSchedulableThreads, String uriConnectDDSNode, String uriConnectInPort,
+			DomainParticipant domainParticipant, ServiceEnvironment serviceEnvironment) throws Exception {
 		super(nbThreads, nbSchedulableThreads);
 		this.uriConnectInPort = uriConnectInPort;
 
@@ -49,28 +48,34 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 	@Override
 	public synchronized void start() throws ComponentStartException {
 		try {
-			
-			uriPluginConnection = AbstractPort.generatePortURI();
-			ConnectionPlugin plugin = new ConnectionPlugin(uriConnectDDSNode,uriConnectInPort);
-			plugin.setPluginURI(uriPluginConnection);
+			plugin = new ConnectionPlugin(uriConnectDDSNode, uriConnectInPort);
 			this.installPlugin(plugin);
-			
-			
 		} catch (Exception e) {
 			throw new ComponentStartException(e);
 		}
 		super.start();
 	}
 
-	public <T> Topic<T> connect(int domainID, String topicName) throws TimeoutException {
-		
-		return domainParticipant.findTopic(topicName, Duration.infiniteDuration(serviceEnvironment));
-		
+	@Override
+	public synchronized void finalise() throws Exception {
+		plugin.finalise();
+		super.finalise();
 	}
 
-	
-	
-	
+	@Override
+	public synchronized void shutdown() throws ComponentShutdownException {
+		try {
+			plugin.uninstall();
+		} catch (Exception e) {
+			throw new ComponentShutdownException(e);
+		}
+		super.shutdown();
+	}
+
+	public <T> Topic<T> connect(int domainID, String topicName) throws TimeoutException {
+		return domainParticipant.findTopic(topicName, Duration.infiniteDuration(serviceEnvironment));
+	}
+
 	public int getDomainId() {
 		return domainParticipant.getDomainId();
 	}
@@ -90,27 +95,12 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 		return publisher.createDataWriter(topic);
 	}
 
-	public <T> void write(DataWriter<T> reader,T data) throws TimeoutException {
+	public <T> void write(DataWriter<T> reader, T data) throws TimeoutException {
 		reader.write(data);
 	}
 
-	@Override
-	public synchronized void finalise() throws Exception {
-		super.finalise();
-	}
-
-	@Override
-	public synchronized void shutdown() throws ComponentShutdownException {
-		try {
-			
-		} catch (Exception e) {
-			throw new ComponentShutdownException(e);
-		}
-		super.shutdown();
-	}
-
 	public <T> void propager(T newObject, Topic<T> topic, String id) {
-		
+		// TODO
 	}
 
 }
