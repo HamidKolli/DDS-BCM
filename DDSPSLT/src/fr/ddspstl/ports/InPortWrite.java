@@ -28,11 +28,12 @@ public class InPortWrite extends AbstractInboundPort implements InWrite {
 	}
 
 	@Override
-	public <T> T write(DataWriter<T> reader) throws Exception {
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<T>() {
+	public <T> Void write(DataWriter<T> reader,T data) throws Exception {
+		return getOwner().handleRequest(new AbstractComponent.AbstractService<Void>() {
 			@Override
-			public T call() throws Exception {
-				return ((DDSNode) getOwner()).write(reader);
+			public Void call() throws Exception {
+				 ((DDSNode) getOwner()).write(reader,data);
+				 return null;
 			}
 		});
 	}

@@ -22,8 +22,8 @@ public class OutPortWrite extends AbstractOutboundPort implements OutWrite {
 	}
 
 	@Override
-	public <T> T write(DataWriter<T> reader) throws Exception  {
-		return ((ConnectorWrite)getConnector()).write(reader);
+	public <T> void write(DataWriter<T> reader,T data) throws Exception  {
+		 ((ConnectorWrite)getConnector()).write(reader,data);
 	}
 
 }

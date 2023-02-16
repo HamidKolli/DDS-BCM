@@ -1,7 +1,5 @@
 package fr.ddspstl.ports;
 
-import java.util.Set;
-
 import org.omg.dds.topic.Topic;
 
 import fr.ddspstl.components.DDSNode;
@@ -10,7 +8,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
-public class InPortConnectClient extends AbstractInboundPort implements ConnectInClient {
+public class InPortConnectClient<T> extends AbstractInboundPort implements ConnectInClient<T> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -19,11 +17,11 @@ public class InPortConnectClient extends AbstractInboundPort implements ConnectI
 	}
 
 	@Override
-	public Set<Topic<Object>> connect() throws Exception {
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<Set<Topic<Object>>>() {
+	public Topic<T> connect(int domainID, String topicName) throws Exception {
+		return getOwner().handleRequest(new AbstractComponent.AbstractService<Topic<T>>() {
 			@Override
-			public Set<Topic<Object>> call() throws Exception {
-				return ((DDSNode)getOwner()).connect();
+			public Topic<T> call() throws Exception {
+				return ((DDSNode)getOwner()).connect(domainID,topicName);
 			}
 		});
 	}

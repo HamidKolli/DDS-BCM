@@ -1,13 +1,11 @@
 package fr.ddspstl.interfaces;
 
-import java.util.Set;
-
 import org.omg.dds.topic.Topic;
 
 import fr.sorbonne_u.components.interfaces.OfferedCI;
 
-public interface ConnectInClient extends OfferedCI {
-	public Set<Topic<Object>> connect()throws Exception;
+public interface ConnectInClient<T> extends OfferedCI {
+	public Topic<T> connect(int domainID, String topic)throws Exception;
 
 	public String getReaderURI()throws Exception;
 

@@ -18,9 +18,10 @@ public class ConnectorWrite extends AbstractConnector implements OutWrite {
 	}
 
 	@Override
-	public <T> T write(DataWriter<T> reader) throws Exception {
+	public <T> void write(DataWriter<T> reader, T data) throws Exception {
 		
-		return ((InPortWrite)this.offering).write(reader);
+		((InPortWrite)this.offering).write(reader,data);
+		
 	}
 
 }
