@@ -4,9 +4,13 @@ import org.omg.dds.pub.DataWriter;
 import org.omg.dds.sub.DataReader;
 import org.omg.dds.topic.Topic;
 
+import fr.ddspstl.components.interfaces.IDDSNode;
 import fr.ddspstl.connectors.ConnectorClient;
 import fr.ddspstl.connectors.ConnectorRead;
 import fr.ddspstl.connectors.ConnectorWrite;
+import fr.ddspstl.interfaces.ConnectOutClient;
+import fr.ddspstl.interfaces.OutRead;
+import fr.ddspstl.interfaces.OutWrite;
 import fr.ddspstl.ports.OutPortConnectClient;
 import fr.ddspstl.ports.OutPortRead;
 import fr.ddspstl.ports.OutPortWrite;
@@ -34,6 +38,9 @@ public class ClientPlugin<T> extends AbstractPlugin{
 		this.outPortconnectClient = new OutPortConnectClient<T>(owner);
 		this.outPortRead = new OutPortRead(owner);
 		this.outPortWrite = new OutPortWrite(owner);
+		this.addRequiredInterface(ConnectOutClient.class);
+		this.addRequiredInterface(OutWrite.class);
+		this.addRequiredInterface(OutRead.class);
 		owner.doPortConnection(this.outPortconnectClient.getPortURI(), uriConnectPortDDS,
 				ConnectorClient.class.getCanonicalName());
 		
