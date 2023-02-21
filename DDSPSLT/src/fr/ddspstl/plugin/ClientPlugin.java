@@ -1,10 +1,7 @@
 package fr.ddspstl.plugin;
 
-import org.omg.dds.pub.DataWriter;
-import org.omg.dds.sub.DataReader;
-import org.omg.dds.topic.Topic;
+import org.omg.dds.sub.Sample.Iterator;
 
-import fr.ddspstl.components.interfaces.IDDSNode;
 import fr.ddspstl.connectors.ConnectorClient;
 import fr.ddspstl.connectors.ConnectorRead;
 import fr.ddspstl.connectors.ConnectorWrite;
@@ -20,43 +17,43 @@ import fr.sorbonne_u.components.ComponentI;
 public class ClientPlugin<T> extends AbstractPlugin{
 
 	private static final long serialVersionUID = 1L;
-	private String uriConnectPortDDS;
-	private OutPortConnectClient<T> outPortconnectClient;
+	private OutPortConnectClient outPortconnectClient;
 	private OutPortRead outPortRead;
 	private OutPortWrite outPortWrite;
 	private boolean isReader;
 	private boolean isWriter;
 	
-	public ClientPlugin(String uriConnectPortDDS) {
-		this.uriConnectPortDDS = uriConnectPortDDS;
+	public ClientPlugin() {
 		isReader = false;
 		isWriter = false;
 	}
 	
 	@Override
 	public void installOn(ComponentI owner) throws Exception {
-		this.outPortconnectClient = new OutPortConnectClient<T>(owner);
-		this.outPortRead = new OutPortRead(owner);
-		this.outPortWrite = new OutPortWrite(owner);
+		super.installOn(owner);
 		this.addRequiredInterface(ConnectOutClient.class);
 		this.addRequiredInterface(OutWrite.class);
 		this.addRequiredInterface(OutRead.class);
-		owner.doPortConnection(this.outPortconnectClient.getPortURI(), uriConnectPortDDS,
-				ConnectorClient.class.getCanonicalName());
-		
-		super.installOn(owner);
 	}
 	
 	@Override
 	public void initialise() throws Exception {
+		
+		super.initialise();
+		
+		this.outPortconnectClient = new OutPortConnectClient(getOwner());
+		this.outPortRead = new OutPortRead(getOwner());
+		this.outPortWrite = new OutPortWrite(getOwner());
+
 		this.outPortconnectClient.publishPort();
 		this.outPortRead.publishPort();
 		this.outPortWrite.publishPort();
-		super.initialise();
+		
 	}
 	
-	public Topic<T> connect(int domainID, String t) throws Exception {
-		 return this.outPortconnectClient.connect(domainID, t);
+	public void connect(String ddsNodeURI) throws Exception {
+		getOwner().doPortConnection(this.outPortconnectClient.getPortURI(), ddsNodeURI,
+				ConnectorClient.class.getCanonicalName());
 	}
 	
 	public void connectReader() throws Exception {
@@ -73,20 +70,20 @@ public class ClientPlugin<T> extends AbstractPlugin{
 	
 
 
-	public DataReader<T> getDataReader(Topic<T>  topic) throws Exception{
+	public String getDataReader(String topic) throws Exception{
 		return this.outPortRead.getDataReader(topic);
 	}
 
-	public DataWriter<T> getDataWriter(Topic<T>  topic) throws Exception{
+	public String getDataWriter(String  topic) throws Exception{
 		return this.outPortWrite.getDataWriter(topic);
 	}
 	
 	
-	public T read(DataReader<T> dataReader) throws Exception {
+	public Iterator<?> read(String dataReader) throws Exception {
 		return this.outPortRead.read(dataReader);
 	}
 
-	public void write(DataWriter<T> dataWriter,T Data) throws Exception {
+	public void write(String dataWriter,T Data) throws Exception {
 		this.outPortWrite.write(dataWriter, Data);
 	}
 

@@ -1,7 +1,6 @@
 package fr.ddspstl.ports;
 
-import org.omg.dds.sub.DataReader;
-import org.omg.dds.topic.Topic;
+import org.omg.dds.sub.Sample.Iterator;
 
 import fr.ddspstl.interfaces.InRead;
 import fr.ddspstl.plugin.ConnectionPlugin;
@@ -13,26 +12,26 @@ public class InPortRead extends AbstractInboundPort implements InRead{
 
 	private static final long serialVersionUID = 1L;
 
-	public InPortRead(ComponentI owner) throws Exception {
-		super(InRead.class, owner);
+	public InPortRead(ComponentI owner,String pluginURI) throws Exception {
+		super(InRead.class, owner,pluginURI,null);
 		
 	}
 
 	@Override
-	public <T> DataReader<T> getDataReader(Topic<T> topic) throws Exception{
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<DataReader<T>>() {
+	public String getDataReader(String topic) throws Exception{
+		return getOwner().handleRequest(new AbstractComponent.AbstractService<String>(getPluginURI()) {
 			@Override
-			public DataReader<T> call() throws Exception {
+			public String call() throws Exception {
 				return ((ConnectionPlugin)getServiceProviderReference()).getDataReader(topic);
 			}
 		});
 	}
 
 	@Override
-	public <T> T read(DataReader<T> reader) throws Exception{
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<T>() {
+	public Iterator<?> read(String reader) throws Exception{
+		return getOwner().handleRequest(new AbstractComponent.AbstractService<Iterator<?>>(getPluginURI()) {
 			@Override
-			public T call() throws Exception {
+			public Iterator<?> call() throws Exception {
 				return ((ConnectionPlugin)getServiceProviderReference()).read(reader);
 			}
 		});

@@ -1,8 +1,5 @@
 package fr.ddspstl.ports;
 
-import org.omg.dds.pub.DataWriter;
-import org.omg.dds.topic.Topic;
-
 import fr.ddspstl.connectors.ConnectorWrite;
 import fr.ddspstl.interfaces.OutWrite;
 import fr.sorbonne_u.components.ComponentI;
@@ -17,13 +14,13 @@ public class OutPortWrite extends AbstractOutboundPort implements OutWrite {
 	}
 
 	@Override
-	public <T> DataWriter<T> getDataWriter(Topic<T> topic) throws Exception {
+	public String getDataWriter(String topic) throws Exception {
 		return ((ConnectorWrite)getConnector()).getDataWriter(topic);
 	}
 
 	@Override
-	public <T> void write(DataWriter<T> reader,T data) throws Exception  {
-		 ((ConnectorWrite)getConnector()).write(reader,data);
+	public <T> void write(String writer,T data) throws Exception  {
+		 ((ConnectorWrite)getConnector()).write(writer,data);
 	}
 
 }

@@ -1,11 +1,10 @@
 package fr.ddspstl.interfaces;
 
-import org.omg.dds.sub.DataReader;
-import org.omg.dds.topic.Topic;
+import org.omg.dds.sub.Sample.Iterator;
 
 import fr.sorbonne_u.components.interfaces.RequiredCI;
 
 public interface OutRead extends RequiredCI{
-	public <T> DataReader<T> getDataReader(Topic<T> topic)throws Exception ;
-	public <T> T read(DataReader<T> reader)throws Exception ;
+	public String getDataReader(String topic)throws Exception ;
+	public Iterator<?> read(String reader)throws Exception ;
 }

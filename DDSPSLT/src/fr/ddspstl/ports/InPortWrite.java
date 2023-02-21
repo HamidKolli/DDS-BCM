@@ -1,8 +1,5 @@
 package fr.ddspstl.ports;
 
-import org.omg.dds.pub.DataWriter;
-import org.omg.dds.topic.Topic;
-
 import fr.ddspstl.interfaces.InWrite;
 import fr.ddspstl.plugin.ConnectionPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
@@ -13,26 +10,26 @@ public class InPortWrite extends AbstractInboundPort implements InWrite {
 
 	private static final long serialVersionUID = 1L;
 
-	public InPortWrite(ComponentI owner) throws Exception {
-		super(InWrite.class, owner);
+	public InPortWrite(ComponentI owner,String pluginURI) throws Exception {
+		super(InWrite.class, owner,pluginURI,null);
 	}
 
 	@Override
-	public <T> DataWriter<T> getDataWriter(Topic<T> topic) throws Exception {
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<DataWriter<T>>() {
+	public String getDataWriter(String topic) throws Exception {
+		return getOwner().handleRequest(new AbstractComponent.AbstractService<String>(getPluginURI()) {
 			@Override
-			public DataWriter<T> call() throws Exception {
+			public String call() throws Exception {
 				return ((ConnectionPlugin)getServiceProviderReference()).getDataWriter(topic);
 			}
 		});
 	}
 
 	@Override
-	public <T> Void write(DataWriter<T> reader,T data) throws Exception {
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<Void>() {
+	public <T> Void write(String writer,T data) throws Exception {
+		return getOwner().handleRequest(new AbstractComponent.AbstractService<Void>(getPluginURI()) {
 			@Override
 			public Void call() throws Exception {
-				((ConnectionPlugin)getServiceProviderReference()).write(reader,data);
+				((ConnectionPlugin)getServiceProviderReference()).write(writer,data);
 				 return null;
 			}
 		});

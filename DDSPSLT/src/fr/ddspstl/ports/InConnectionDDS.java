@@ -10,16 +10,16 @@ public class InConnectionDDS extends AbstractInboundPort implements ConnectDDSNo
 
 	private static final long serialVersionUID = 1L;
 
-	public InConnectionDDS(String uri, ComponentI owner)
+	public InConnectionDDS(String uri, ComponentI owner, String pluginURI)
 			throws Exception {
-		super(uri,ConnectDDSNode.class , owner);
+		super(uri,ConnectDDSNode.class , owner,pluginURI,null);
 	}
 
 
 
 	@Override
 	public void disconnect(String uri) throws Exception {
-		this.getOwner().handleRequest(new AbstractComponent.AbstractService<Void>(){
+		this.getOwner().handleRequest(new AbstractComponent.AbstractService<Void>(getPluginURI()){
 
 			@Override
 			public Void call() throws Exception {
@@ -32,7 +32,7 @@ public class InConnectionDDS extends AbstractInboundPort implements ConnectDDSNo
 
 	@Override
 	public String connect(String uri,String uriPropagation, int domainID) throws Exception {
-		return this.getOwner().handleRequest(new AbstractComponent.AbstractService<String>(){
+		return this.getOwner().handleRequest(new AbstractComponent.AbstractService<String>(getPluginURI()){
 
 			@Override
 			public String call() throws Exception {

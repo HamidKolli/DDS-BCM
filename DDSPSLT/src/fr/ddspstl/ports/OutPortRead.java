@@ -1,7 +1,6 @@
 package fr.ddspstl.ports;
 
-import org.omg.dds.sub.DataReader;
-import org.omg.dds.topic.Topic;
+import org.omg.dds.sub.Sample.Iterator;
 
 import fr.ddspstl.connectors.ConnectorRead;
 import fr.ddspstl.interfaces.OutRead;
@@ -17,12 +16,12 @@ public class OutPortRead extends AbstractOutboundPort implements OutRead {
 	}
 
 	@Override
-	public <T> DataReader<T> getDataReader(Topic<T> topic) throws Exception {
+	public String getDataReader(String topic) throws Exception {
 		return ((ConnectorRead)getConnector()).getDataReader(topic);
 	}
 
 	@Override
-	public <T> T read(DataReader<T> reader) throws Exception {
+	public Iterator<?> read(String reader) throws Exception {
 		return ((ConnectorRead)getConnector()).read(reader);
 	}
 

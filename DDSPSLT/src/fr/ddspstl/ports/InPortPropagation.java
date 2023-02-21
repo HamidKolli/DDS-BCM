@@ -14,14 +14,14 @@ public class InPortPropagation extends AbstractInboundPort implements Propagatio
 
 	private static final long serialVersionUID = 1L;
 
-	public InPortPropagation(  ComponentI owner)
+	public InPortPropagation(ComponentI owner,String pluginURI)
 			throws Exception {
-		super( Propagation.class, owner);
+		super(Propagation.class, owner,pluginURI,null);
 	}
 
 	@Override
 	public <T> void propager(T newObject, Topic<T> topic, String id) throws Exception {
-		getOwner().runTask(new AbstractComponent.AbstractTask() {
+		getOwner().runTask(new AbstractComponent.AbstractTask(getPluginURI()) {
 			
 			@Override
 			public void run() {

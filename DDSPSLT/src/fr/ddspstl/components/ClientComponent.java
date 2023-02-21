@@ -1,8 +1,6 @@
 package fr.ddspstl.components;
 
-import org.omg.dds.pub.DataWriter;
-import org.omg.dds.sub.DataReader;
-import org.omg.dds.topic.Topic;
+import org.omg.dds.sub.Sample.Iterator;
 
 import fr.ddspstl.plugin.ClientPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
@@ -24,10 +22,10 @@ public class ClientComponent<T> extends AbstractComponent {
 	@Override
 	public synchronized void start() throws ComponentStartException {
 		try {
-		ClientPlugin<T> plugin  = new ClientPlugin<>(uriConnectPortDDS);
+		ClientPlugin<T> plugin  = new ClientPlugin<>();
 		pluginURI = AbstractPort.generatePortURI();
 		plugin.setPluginURI(pluginURI);
-		plugin.installOn(this);
+		this.installPlugin(plugin);
 		} catch (Exception e) {
 			throw new ComponentStartException(e);
 		}
@@ -46,7 +44,7 @@ public class ClientComponent<T> extends AbstractComponent {
 		ClientPlugin<T> plugin = ((ClientPlugin<T>)getPlugin(pluginURI));
 		
 		// Connection
-		Topic<T> topic = plugin.connect(3, "TempTopic");
+		plugin.connect(uriConnectPortDDS);
 		
 		//How to read a data from a topic
 		/*
@@ -55,8 +53,9 @@ public class ClientComponent<T> extends AbstractComponent {
 		 * read the data 
 		 */
 		plugin.connectReader();
-		DataReader<T> dataReader  = plugin.getDataReader(topic);
-		T data = plugin.read(dataReader);
+		String dataReader  = plugin.getDataReader("myTopic");
+		
+		Iterator<?> data =  plugin.read(dataReader);
 		System.out.println(data);
 		
 		
@@ -67,8 +66,8 @@ public class ClientComponent<T> extends AbstractComponent {
 		 * write a data 
 		 */
 		plugin.connectWriter();
-		DataWriter<T> dataWriter = plugin.getDataWriter(topic);
-		plugin.write(dataWriter, data);
+		String dataWriter = plugin.getDataWriter("myTopic");
+		plugin.write(dataWriter, (T) data.next());
 		
 		
 		super.execute();
