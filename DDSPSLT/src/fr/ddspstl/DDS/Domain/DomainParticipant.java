@@ -1,7 +1,8 @@
-package fr.ddspstl.DDS.Demain;
+package fr.ddspstl.DDS.Domain;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -33,18 +34,23 @@ import org.omg.dds.topic.TopicQos;
 import org.omg.dds.type.TypeSupport;
 import org.omg.dds.type.dynamic.DynamicType;
 
+import fr.ddspstl.DDS.data.Datas;
+
 public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 
 	
 	private int domainId;
+	private Map<String, Topic<Object>> topics;
+	private ServiceEnvironment serviceEnvironment;
 	
 	
-	public DomainParticipant() {
-		this((new Random()).nextInt());
+	public DomainParticipant(ServiceEnvironment serviceEnvironment) {
+		this((new Random()).nextInt(),serviceEnvironment);
 	}
 
-	public DomainParticipant(int domainID) {
+	public DomainParticipant(int domainID,ServiceEnvironment serviceEnvironment) {
 		this.domainId = domainID;
+		this.serviceEnvironment = serviceEnvironment;
 	}
 
 	// Listener
@@ -122,21 +128,18 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 
 	@Override
 	public ServiceEnvironment getEnvironment() {
-		// TODO Auto-generated method stub
-		return null;
+		return serviceEnvironment;
 	}
 
 	// Publisher
 	
 	@Override
 	public Publisher createPublisher() {
-		// TODO Auto-generated method stub
-		return null;
+		return new fr.ddspstl.DDS.publishers.Publisher(this);
 	}
 
 	@Override
 	public Publisher createPublisher(PublisherQos qos) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -152,8 +155,7 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 	
 	@Override
 	public Subscriber createSubscriber() {
-		// TODO Auto-generated method stub
-		return null;
+		return new fr.ddspstl.DDS.subscribers.Subscriber(this);
 	}
 
 	@Override
@@ -191,8 +193,10 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 
 	@Override
 	public <TYPE> Topic<TYPE> createTopic(String topicName, TypeSupport<TYPE> type) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		Topic<TYPE> t =  new Datas<TYPE>(type, getEnvironment(), topicName, this);
+		topics.put(topicName, (Topic<Object>) t);
+		return t;
 	}
 
 	@Override
@@ -230,20 +234,17 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 
 	@Override
 	public <TYPE> Topic<TYPE> findTopic(String topicName, Duration timeout) throws TimeoutException {
-		// TODO Auto-generated method stub
-		return null;
+		return (Topic<TYPE>) topics.get(topicName);
 	}
 
 	@Override
 	public <TYPE> Topic<TYPE> findTopic(String topicName, long timeout, TimeUnit unit) throws TimeoutException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public <TYPE> TopicDescription<TYPE> lookupTopicDescription(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return (TopicDescription<TYPE>) topics.get(name);
 	}
 
 	@Override

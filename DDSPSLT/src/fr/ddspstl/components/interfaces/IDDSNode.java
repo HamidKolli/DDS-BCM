@@ -12,7 +12,7 @@ public interface IDDSNode {
 
 	public int getDomainId();
 
-	public void disconnectClient();
+	public void disconnectClient(String dataReader, String dataWriter);
 
 	public String getDataReader(String topic) throws DDSTopicNotFoundException;
 

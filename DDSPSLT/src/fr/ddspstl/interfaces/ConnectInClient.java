@@ -8,5 +8,5 @@ public interface ConnectInClient extends OfferedCI {
 
 	public String getWriterURI()throws Exception;
 
-	public void disconnectClient()throws Exception;
+	public void disconnectClient(String dataReader, String dataWriter)throws Exception;
 }

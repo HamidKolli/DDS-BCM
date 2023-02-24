@@ -37,11 +37,11 @@ public class InPortConnectClient extends AbstractInboundPort implements ConnectI
 	}
 
 	@Override
-	public void disconnectClient() throws Exception{
+	public void disconnectClient(String dataReader, String dataWriter) throws Exception{
 		getOwner().handleRequest(new AbstractComponent.AbstractService<Void>(getPluginURI()) {
 			@Override
 			public Void call() throws Exception {
-				((ConnectionPlugin)getServiceProviderReference()).disconnectClient();
+				((ConnectionPlugin)getServiceProviderReference()).disconnectClient( dataReader,  dataWriter);
 				return null;
 			}
 		});

@@ -1,4 +1,4 @@
-package fr.ddspstl.DDS.Demain;
+package fr.ddspstl.DDS.Domain;
 
 import java.util.Collection;
 
@@ -11,19 +11,28 @@ import org.omg.dds.domain.DomainParticipantQos;
 
 public class DomainParticipantFactory extends org.omg.dds.domain.DomainParticipantFactory{
 
+	private ServiceEnvironment serviceEnvironment;
+	
+	
+	
+	public DomainParticipantFactory(ServiceEnvironment serviceEnvironment) {
+		super();
+		this.serviceEnvironment = serviceEnvironment;
+	}
+
 	@Override
 	public ServiceEnvironment getEnvironment() {
-		return null;
+		return serviceEnvironment;
 	}
 
 	@Override
 	public DomainParticipant createParticipant() {
-		return new fr.ddspstl.DDS.Demain.DomainParticipant();
+		return new fr.ddspstl.DDS.Domain.DomainParticipant(getEnvironment());
 	}
 
 	@Override
 	public DomainParticipant createParticipant(int domainId) {
-		return new fr.ddspstl.DDS.Demain.DomainParticipant(domainId);
+		return new fr.ddspstl.DDS.Domain.DomainParticipant(domainId,getEnvironment());
 	}
 
 	@Override

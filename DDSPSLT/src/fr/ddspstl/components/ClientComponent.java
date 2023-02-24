@@ -68,6 +68,7 @@ public class ClientComponent<T> extends AbstractComponent {
 		plugin.connectWriter();
 		String dataWriter = plugin.getDataWriter("myTopic");
 		plugin.write(dataWriter, (T) data.next());
+		plugin.disconnect(dataReader,dataWriter);
 		
 		
 		super.execute();

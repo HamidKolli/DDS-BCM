@@ -176,8 +176,8 @@ public class ConnectionPlugin extends AbstractPlugin {
 		return ((IDDSNode) getOwner()).getDomainId();
 	}
 
-	public void disconnectClient() {
-		((IDDSNode) getOwner()).disconnectClient();
+	public void disconnectClient(String dataReader, String dataWriter) {
+		((IDDSNode) getOwner()).disconnectClient(dataReader, dataWriter);
 	}
 
 	public String getDataReader(String topic) throws DDSTopicNotFoundException {

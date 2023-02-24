@@ -23,38 +23,31 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 
 public class DDSNode extends AbstractComponent implements IDDSNode {
 
-	// BCM
-	private String uriConnectDDSNode;
-	private String uriConnectInPort;
-
 	private ConnectionPlugin plugin;
 	// DDS
-	private ServiceEnvironment serviceEnvironment;
 	private DomainParticipant domainParticipant;
 	private Publisher publisher;
 	private Subscriber subscriber;
-	private Map<String, DataReader<?>> dataReaders;
-	private Map<String, DataWriter<?>> dataWriters;
+	private Map<String, DataReader<Object>> dataReaders;
+	private Map<String, DataWriter<Object>> dataWriters;
 
 	protected DDSNode(int nbThreads, int nbSchedulableThreads, String uriConnectDDSNode, String uriConnectInPort,
 			DomainParticipant domainParticipant, ServiceEnvironment serviceEnvironment) throws Exception {
 		super(nbThreads, nbSchedulableThreads);
-		this.uriConnectInPort = uriConnectInPort;
 
-		this.serviceEnvironment = serviceEnvironment;
 		this.domainParticipant = domainParticipant;
 		publisher = domainParticipant.createPublisher();
 		subscriber = domainParticipant.createSubscriber();
-		this.uriConnectDDSNode = uriConnectDDSNode;
 		dataReaders = new HashMap<>();
 		dataWriters = new HashMap<>();
+		plugin = new ConnectionPlugin(uriConnectDDSNode, uriConnectInPort);
 
 	}
 
 	@Override
 	public synchronized void start() throws ComponentStartException {
 		try {
-			plugin = new ConnectionPlugin(uriConnectDDSNode, uriConnectInPort);
+
 			plugin.setPluginURI(AbstractPort.generatePortURI());
 			this.installPlugin(plugin);
 		} catch (Exception e) {
@@ -69,13 +62,17 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 	}
 
 	@Override
-	public void disconnectClient() {
+	public void disconnectClient(String dataReader, String dataWriter) {
+		if (dataReader != null)
+			dataReaders.remove(dataReader);
+		if (dataWriter != null)
+			dataWriters.remove(dataWriter);
 	}
 
 	@Override
 	public String getDataReader(String topic) throws DDSTopicNotFoundException {
 		String id = AbstractPort.generatePortURI();
-		DataReader<?> dataReader = null;
+		DataReader<Object> dataReader = null;
 		try {
 			dataReader = subscriber.createDataReader(domainParticipant.findTopic(topic, null));
 		} catch (TimeoutException e) {
@@ -86,14 +83,14 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 	}
 
 	@Override
-	public  Iterator<?> read(String reader) throws DDSTopicNotFoundException {
+	public Iterator<?> read(String reader) throws DDSTopicNotFoundException {
 		return dataReaders.get(reader).read();
 	}
 
 	@Override
 	public String getDataWriter(String topic) throws DDSTopicNotFoundException {
 		String id = AbstractPort.generatePortURI();
-		DataWriter<?> dataWriter;
+		DataWriter<Object> dataWriter;
 		try {
 			dataWriter = publisher.createDataWriter(domainParticipant.findTopic(topic, null));
 		} catch (TimeoutException e) {
@@ -105,7 +102,7 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 
 	@Override
 	public <T> void write(String writer, T data) throws TimeoutException, DDSTopicNotFoundException {
-
+		dataWriters.get(writer).write(data);
 	}
 
 	@Override
@@ -120,7 +117,6 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 
 	@Override
 	public synchronized void shutdown() throws ComponentShutdownException {
-
 		super.shutdown();
 	}
 

@@ -14,9 +14,6 @@ public class OutPortConnectClient extends AbstractOutboundPort implements Connec
 		super(ConnectOutClient.class, owner);
 		
 	}
-
-
-
 	@Override
 	public String getReaderURI() throws Exception{
 		return ((ConnectorClient)getConnector()).getReaderURI();
@@ -28,8 +25,8 @@ public class OutPortConnectClient extends AbstractOutboundPort implements Connec
 	}
 
 	@Override
-	public void disconnectClient() throws Exception{
-		((ConnectorClient)getConnector()).disconnectClient();
+	public void disconnectClient(String dataReader, String dataWriter) throws Exception{
+		((ConnectorClient)getConnector()).disconnectClient(dataReader,dataWriter);
 		
 	}
 

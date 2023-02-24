@@ -18,8 +18,8 @@ public class ConnectorClient extends AbstractConnector implements ConnectOutClie
 	}
 
 	@Override
-	public void disconnectClient() throws Exception{
-		((ConnectInClient)this.offering).disconnectClient();
+	public void disconnectClient(String dataReader, String dataWriter) throws Exception{
+		((ConnectInClient)this.offering).disconnectClient(dataReader, dataWriter);
 	}
 
 }

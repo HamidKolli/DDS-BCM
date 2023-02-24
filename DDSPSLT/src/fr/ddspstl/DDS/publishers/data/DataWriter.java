@@ -22,78 +22,95 @@ import org.omg.dds.pub.Publisher;
 import org.omg.dds.topic.SubscriptionBuiltinTopicData;
 import org.omg.dds.topic.Topic;
 
-public class DataWriter<T> implements org.omg.dds.pub.DataWriter<T>{
+import fr.ddspstl.DDS.data.Datas;
+
+public class DataWriter<T> implements org.omg.dds.pub.DataWriter<T> {
+
+	private Datas<T> datas;
+	private Publisher publisher;
+	private DataWriterQos qos;
+	private DataWriterListener<T> listener;
+	private Collection<Class<? extends Status>> statuses;
+
+	public DataWriter(Topic<T> datas, Publisher publisher) {
+		super();
+		this.datas = (Datas<T>) datas;
+		this.publisher = publisher;
+	}
+
+	public DataWriter(Topic<T> datas, Publisher publisher, DataWriterQos qos, DataWriterListener<T> listener,
+			Collection<Class<? extends Status>> statuses) {
+		this(datas, publisher, qos);
+
+		this.listener = listener;
+		this.statuses = statuses;
+	}
+
+	public DataWriter(Topic<T> datas, Publisher publisher, DataWriterQos qos) {
+		this(datas, publisher);
+		this.qos = qos;
+	}
 
 	@Override
 	public DataWriterListener<T> getListener() {
-		// TODO Auto-generated method stub
-		return null;
+		return listener;
 	}
 
 	@Override
 	public void setListener(DataWriterListener<T> listener) {
-		// TODO Auto-generated method stub
-		
+		this.listener = listener;
+
 	}
 
 	@Override
 	public void setListener(DataWriterListener<T> listener, Collection<Class<? extends Status>> statuses) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public DataWriterQos getQos() {
-		// TODO Auto-generated method stub
-		return null;
+		return qos;
 	}
 
 	@Override
 	public void setQos(DataWriterQos qos) {
-		// TODO Auto-generated method stub
-		
+		this.qos = qos;
 	}
 
 	@Override
 	public void setQos(String qosLibraryName, String qosProfileName) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void enable() {
-		// TODO Auto-generated method stub
-		
+		datas.enable();
 	}
 
 	@Override
 	public Set<Class<? extends Status>> getStatusChanges() {
-		// TODO Auto-generated method stub
-		return null;
+		return datas.getStatusChanges();
 	}
 
 	@Override
 	public InstanceHandle getInstanceHandle() {
-		// TODO Auto-generated method stub
-		return null;
+		return datas.getInstanceHandle();
 	}
 
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void retain() {
-		// TODO Auto-generated method stub
-		
+		datas.retain();
 	}
 
 	@Override
 	public ServiceEnvironment getEnvironment() {
-		// TODO Auto-generated method stub
-		return null;
+		return getParent().getEnvironment();
 	}
 
 	@Override
@@ -104,20 +121,19 @@ public class DataWriter<T> implements org.omg.dds.pub.DataWriter<T>{
 
 	@Override
 	public Topic<T> getTopic() {
-		// TODO Auto-generated method stub
-		return null;
+		return datas;
 	}
 
 	@Override
 	public void waitForAcknowledgments(Duration maxWait) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void waitForAcknowledgments(long maxWait, TimeUnit unit) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -147,7 +163,7 @@ public class DataWriter<T> implements org.omg.dds.pub.DataWriter<T>{
 	@Override
 	public void assertLiveliness() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -184,89 +200,88 @@ public class DataWriter<T> implements org.omg.dds.pub.DataWriter<T>{
 	@Override
 	public void unregisterInstance(InstanceHandle handle) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void unregisterInstance(InstanceHandle handle, T instanceData) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void unregisterInstance(InstanceHandle handle, T instanceData, Time sourceTimestamp)
 			throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void unregisterInstance(InstanceHandle handle, T instanceData, long sourceTimestamp, TimeUnit unit)
 			throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void write(T instanceData) throws TimeoutException {
-		// TODO Auto-generated method stub
-		
+		datas.write(instanceData);
 	}
 
 	@Override
 	public void write(T instanceData, Time sourceTimestamp) throws TimeoutException {
-		// TODO Auto-generated method stub
-		
+		datas.write(instanceData, sourceTimestamp);
+
 	}
 
 	@Override
 	public void write(T instanceData, long sourceTimestamp, TimeUnit unit) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void write(T instanceData, InstanceHandle handle) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void write(T instanceData, InstanceHandle handle, Time sourceTimestamp) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void write(T instanceData, InstanceHandle handle, long sourceTimestamp, TimeUnit unit)
 			throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void dispose(InstanceHandle instanceHandle) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void dispose(InstanceHandle instanceHandle, T instanceData) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void dispose(InstanceHandle instanceHandle, T instanceData, Time sourceTimestamp) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void dispose(InstanceHandle instanceHandle, T instanceData, long sourceTimestamp, TimeUnit unit)
 			throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -295,14 +310,12 @@ public class DataWriter<T> implements org.omg.dds.pub.DataWriter<T>{
 
 	@Override
 	public StatusCondition<org.omg.dds.pub.DataWriter<T>> getStatusCondition() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Publisher getParent() {
-		// TODO Auto-generated method stub
-		return null;
+		return publisher;
 	}
 
 }

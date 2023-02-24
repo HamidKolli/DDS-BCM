@@ -1,6 +1,8 @@
 package fr.ddspstl.DDS.subscribers;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.omg.dds.core.InstanceHandle;
@@ -8,7 +10,7 @@ import org.omg.dds.core.ServiceEnvironment;
 import org.omg.dds.core.StatusCondition;
 import org.omg.dds.core.status.Status;
 import org.omg.dds.domain.DomainParticipant;
-import org.omg.dds.sub.DataReader;
+
 import org.omg.dds.sub.DataReaderListener;
 import org.omg.dds.sub.DataReaderQos;
 import org.omg.dds.sub.SubscriberListener;
@@ -16,7 +18,19 @@ import org.omg.dds.sub.SubscriberQos;
 import org.omg.dds.topic.TopicDescription;
 import org.omg.dds.topic.TopicQos;
 
-public class Subscriber implements org.omg.dds.sub.Subscriber{
+import fr.ddspstl.DDS.subscribers.data.DataReader;
+
+public class Subscriber implements org.omg.dds.sub.Subscriber {
+
+	private DomainParticipant domainParticipant;
+	private Map<String, org.omg.dds.sub.DataReader<Object>> dataReaders;
+	
+
+	public Subscriber(DomainParticipant domainParticipant) {
+		super();
+		this.domainParticipant = domainParticipant;
+		this.dataReaders = new HashMap<>();
+	}
 
 	@Override
 	public SubscriberListener getListener() {
@@ -27,13 +41,13 @@ public class Subscriber implements org.omg.dds.sub.Subscriber{
 	@Override
 	public void setListener(SubscriberListener listener) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setListener(SubscriberListener listener, Collection<Class<? extends Status>> statuses) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -45,19 +59,19 @@ public class Subscriber implements org.omg.dds.sub.Subscriber{
 	@Override
 	public void setQos(SubscriberQos qos) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setQos(String qosLibraryName, String qosProfileName) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void enable() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -75,66 +89,67 @@ public class Subscriber implements org.omg.dds.sub.Subscriber{
 	@Override
 	public void close() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void retain() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public ServiceEnvironment getEnvironment() {
-		// TODO Auto-generated method stub
-		return null;
+		return domainParticipant.getEnvironment();
 	}
 
 	@Override
-	public <TYPE> DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic) {
-		// TODO Auto-generated method stub
-		return null;
+	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic) {
+		DataReader<TYPE> d = new DataReader<TYPE>(topic, this);
+		dataReaders.put(topic.getName(), (DataReader<Object>) d);
+		return d;
 	}
 
 	@Override
-	public <TYPE> DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic, DataReaderQos qos,
+	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic, DataReaderQos qos,
 			DataReaderListener<TYPE> listener, Collection<Class<? extends Status>> statuses) {
-		// TODO Auto-generated method stub
-		return null;
+		DataReader<TYPE> d = new DataReader<TYPE>(topic, this, qos, listener, statuses);
+		dataReaders.put(topic.getName(), (DataReader<Object>) d);
+		return d;
 	}
 
 	@Override
-	public <TYPE> DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic, DataReaderQos qos) {
-		// TODO Auto-generated method stub
-		return null;
+	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic, DataReaderQos qos) {
+		DataReader<TYPE> d = new DataReader<TYPE>(topic, this, qos);
+		dataReaders.put(topic.getName(), (DataReader<Object>) d);
+		return d;
 	}
 
 	@Override
-	public <TYPE> DataReader<TYPE> lookupDataReader(String topicName) {
-		// TODO Auto-generated method stub
-		return null;
+	public <TYPE> org.omg.dds.sub.DataReader<TYPE> lookupDataReader(String topicName) {
+		return (org.omg.dds.sub.DataReader<TYPE>) dataReaders.get(topicName);
 	}
 
 	@Override
-	public <TYPE> DataReader<TYPE> lookupDataReader(TopicDescription<TYPE> topicName) {
-		// TODO Auto-generated method stub
-		return null;
+	public <TYPE> org.omg.dds.sub.DataReader<TYPE> lookupDataReader(TopicDescription<TYPE> topicName) {
+		return lookupDataReader(topicName.getName());
 	}
 
 	@Override
 	public void closeContainedEntities() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public Collection<DataReader<?>> getDataReaders(Collection<DataReader<?>> readers) {
+	public Collection<org.omg.dds.sub.DataReader<?>> getDataReaders(Collection<org.omg.dds.sub.DataReader<?>> readers) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Collection<DataReader<?>> getDataReaders(Collection<DataReader<?>> readers, DataState dataState) {
+	public Collection<org.omg.dds.sub.DataReader<?>> getDataReaders(Collection<org.omg.dds.sub.DataReader<?>> readers,
+			DataState dataState) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -142,19 +157,19 @@ public class Subscriber implements org.omg.dds.sub.Subscriber{
 	@Override
 	public void notifyDataReaders() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void beginAccess() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void endAccess() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -166,7 +181,7 @@ public class Subscriber implements org.omg.dds.sub.Subscriber{
 	@Override
 	public void setDefaultDataReaderQos(DataReaderQos qos) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -183,8 +198,7 @@ public class Subscriber implements org.omg.dds.sub.Subscriber{
 
 	@Override
 	public DomainParticipant getParent() {
-		// TODO Auto-generated method stub
-		return null;
+		return domainParticipant;
 	}
 
 	@Override

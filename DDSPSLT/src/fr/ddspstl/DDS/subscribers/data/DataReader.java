@@ -29,48 +29,74 @@ import org.omg.dds.sub.Subscriber.DataState;
 import org.omg.dds.topic.PublicationBuiltinTopicData;
 import org.omg.dds.topic.TopicDescription;
 
-public class DataReader<T> implements org.omg.dds.sub.DataReader<T>{
+import fr.ddspstl.DDS.data.Datas;
+
+public class DataReader<T> implements org.omg.dds.sub.DataReader<T> {
+
+	private Datas<T> datas;
+	private Subscriber subscriber;
+	private DataReaderQos qos;
+	private DataReaderListener<T> listener;
+	private Collection<Class<? extends Status>> statuses;
+
+	public DataReader(TopicDescription<T> topic, Subscriber subscriber, DataReaderQos qos,
+			DataReaderListener<T> listener, Collection<Class<? extends Status>> statuses) {
+		this(topic, subscriber, qos);
+
+		this.listener = listener;
+		this.statuses = statuses;
+	}
+
+	public DataReader(TopicDescription<T> topic, Subscriber subscriber) {
+		this.datas = (Datas<T>) topic;
+		this.subscriber = subscriber;
+	}
+
+	public DataReader(TopicDescription<T> topic, Subscriber subscriber, DataReaderQos qos) {
+		this(topic, subscriber);
+		this.qos = qos;
+
+	}
 
 	@Override
 	public DataReaderListener<T> getListener() {
-		// TODO Auto-generated method stub
-		return null;
+		return listener;
 	}
 
 	@Override
 	public void setListener(DataReaderListener<T> listener) {
-		// TODO Auto-generated method stub
-		
+		this.listener = listener;
+
 	}
 
 	@Override
 	public void setListener(DataReaderListener<T> listener, Collection<Class<? extends Status>> statuses) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public DataReaderQos getQos() {
 		// TODO Auto-generated method stub
-		return null;
+		return qos;
 	}
 
 	@Override
 	public void setQos(DataReaderQos qos) {
-		// TODO Auto-generated method stub
-		
+		this.qos = qos;
+
 	}
 
 	@Override
 	public void setQos(String qosLibraryName, String qosProfileName) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void enable() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -88,19 +114,18 @@ public class DataReader<T> implements org.omg.dds.sub.DataReader<T>{
 	@Override
 	public void close() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void retain() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public ServiceEnvironment getEnvironment() {
-		// TODO Auto-generated method stub
-		return null;
+		return getParent().getEnvironment();
 	}
 
 	@Override
@@ -111,7 +136,6 @@ public class DataReader<T> implements org.omg.dds.sub.DataReader<T>{
 
 	@Override
 	public ReadCondition<T> createReadCondition(DataState states) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -131,13 +155,12 @@ public class DataReader<T> implements org.omg.dds.sub.DataReader<T>{
 	@Override
 	public void closeContainedEntities() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public TopicDescription<T> getTopicDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return datas;
 	}
 
 	@Override
@@ -179,13 +202,13 @@ public class DataReader<T> implements org.omg.dds.sub.DataReader<T>{
 	@Override
 	public void waitForHistoricalData(Duration maxWait) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void waitForHistoricalData(long maxWait, TimeUnit unit) throws TimeoutException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -202,13 +225,11 @@ public class DataReader<T> implements org.omg.dds.sub.DataReader<T>{
 
 	@Override
 	public Iterator<T> read() {
-		// TODO Auto-generated method stub
-		return null;
+		return datas.read();
 	}
 
 	@Override
 	public Iterator<T> read(Selector<T> query) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -232,8 +253,7 @@ public class DataReader<T> implements org.omg.dds.sub.DataReader<T>{
 
 	@Override
 	public Iterator<T> take() {
-		// TODO Auto-generated method stub
-		return null;
+		return datas.read();
 	}
 
 	@Override
@@ -298,8 +318,7 @@ public class DataReader<T> implements org.omg.dds.sub.DataReader<T>{
 
 	@Override
 	public Subscriber getParent() {
-		// TODO Auto-generated method stub
-		return null;
+		return subscriber;
 	}
 
 	@Override
