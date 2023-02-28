@@ -1,7 +1,5 @@
 package fr.ddspstl.ports;
 
-import org.omg.dds.topic.Topic;
-
 import fr.ddspstl.connectors.ConnectorPropagation;
 import fr.ddspstl.interfaces.Propagation;
 import fr.sorbonne_u.components.ComponentI;
@@ -16,7 +14,7 @@ public class OutPortPropagation extends AbstractOutboundPort implements Propagat
 	}
 
 	@Override
-	public <T> void propager(T newObject, Topic<T> topic, String id) throws Exception {
+	public <T> void propager(T newObject, String topic, String id) throws Exception {
 		((ConnectorPropagation)getConnector()).propager(newObject, topic, id);
 	}
 

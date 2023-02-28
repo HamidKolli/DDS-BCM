@@ -1,9 +1,6 @@
 package fr.ddspstl.components.interfaces;
 
-import java.util.concurrent.TimeoutException;
-
 import org.omg.dds.sub.Sample.Iterator;
-import org.omg.dds.topic.Topic;
 
 import fr.ddspstl.exceptions.DDSTopicNotFoundException;
 
@@ -20,7 +17,7 @@ public interface IDDSNode {
 
 	public String getDataWriter(String topic) throws DDSTopicNotFoundException;
 
-	public <T> void write(String writer, T data) throws TimeoutException,DDSTopicNotFoundException;
+	public <T> void write(String writer, T data) throws Exception;
 
-	public <T> void propager(T newObject, Topic<T> topic, String id);
+	public <T> void propager(T newObject, String topicName, String id) throws Exception;
 }

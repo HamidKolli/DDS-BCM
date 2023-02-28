@@ -2,10 +2,8 @@ package fr.ddspstl.plugin;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import org.omg.dds.sub.Sample.Iterator;
-import org.omg.dds.topic.Topic;
 
 import fr.ddspstl.components.interfaces.IDDSNode;
 import fr.ddspstl.connectors.ConnectorConnectionDDS;
@@ -150,24 +148,27 @@ public class ConnectionPlugin extends AbstractPlugin {
 	}
 
 	public void disconnectBack(String uri) throws Exception {
-		OutConnectionDDS out = connectionOut.get(uri);
+		OutConnectionDDS out = connectionOut.remove(uri);
 		out.doDisconnection();
 		out.unpublishPort();
 		out.destroyPort();
-		connectionOut.remove(uri);
+		OutPortPropagation pOut = outPropagationPorts.remove(uri);
+		pOut.doDisconnection();
+		pOut.unpublishPort();
+		pOut.destroyPort();
+		
 	}
 
 	public void disconnect(String uri) throws Exception {
-		OutConnectionDDS out  =  connectionOut.get(uri);
+		OutConnectionDDS out  =  connectionOut.remove(uri);
 		out.disconnect(uri);
 		out.doDisconnection();
 		out.unpublishPort();
 		out.destroyPort();
-		OutPortPropagation pOut = outPropagationPorts.get(uri);
+		OutPortPropagation pOut = outPropagationPorts.remove(uri);
 		pOut.doDisconnection();
 		pOut.unpublishPort();
 		pOut.destroyPort();
-		connectionOut.remove(uri);
 	}
 
 
@@ -192,14 +193,13 @@ public class ConnectionPlugin extends AbstractPlugin {
 		return ((IDDSNode) getOwner()).getDataWriter(topic);
 	}
 
-	public <T> void write(String reader, T data) throws TimeoutException, DDSTopicNotFoundException {
+	public <T> void write(String reader, T data) throws Exception {
 		((IDDSNode) getOwner()).write(reader, data);
 	}
 
-	public <T> void propager(T newObject, Topic<T> topic, String id) throws Exception {
-		((IDDSNode) getOwner()).propager(newObject, topic, id);
+	public <T> void propager(T newObject, String topicName, String id) throws Exception {
 		for (OutPortPropagation cp : outPropagationPorts.values()) {
-			cp.propager(newObject, topic, id);
+			cp.propager(newObject, topicName, id);
 		}
 	}
 

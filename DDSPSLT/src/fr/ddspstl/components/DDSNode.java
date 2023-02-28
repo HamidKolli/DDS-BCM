@@ -1,18 +1,19 @@
 package fr.ddspstl.components;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import org.omg.dds.core.ServiceEnvironment;
 import org.omg.dds.domain.DomainParticipant;
 import org.omg.dds.pub.DataWriter;
 import org.omg.dds.pub.Publisher;
 import org.omg.dds.sub.DataReader;
 import org.omg.dds.sub.Sample.Iterator;
 import org.omg.dds.sub.Subscriber;
-import org.omg.dds.topic.Topic;
 
+import fr.ddspstl.DDS.data.Datas;
 import fr.ddspstl.components.interfaces.IDDSNode;
 import fr.ddspstl.exceptions.DDSTopicNotFoundException;
 import fr.ddspstl.plugin.ConnectionPlugin;
@@ -24,15 +25,18 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 public class DDSNode extends AbstractComponent implements IDDSNode {
 
 	private ConnectionPlugin plugin;
+	private List<String> uriDDSNodes;
 	// DDS
 	private DomainParticipant domainParticipant;
 	private Publisher publisher;
 	private Subscriber subscriber;
 	private Map<String, DataReader<Object>> dataReaders;
 	private Map<String, DataWriter<Object>> dataWriters;
+	private Map<String,String> topicID;
 
 	protected DDSNode(int nbThreads, int nbSchedulableThreads, String uriConnectDDSNode, String uriConnectInPort,
-			DomainParticipant domainParticipant, ServiceEnvironment serviceEnvironment) throws Exception {
+			List<String> uriDDSNodes, DomainParticipant domainParticipant,Map<String,String> topicID)
+			throws Exception {
 		super(nbThreads, nbSchedulableThreads);
 
 		this.domainParticipant = domainParticipant;
@@ -40,6 +44,9 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 		subscriber = domainParticipant.createSubscriber();
 		dataReaders = new HashMap<>();
 		dataWriters = new HashMap<>();
+		this.topicID = new HashMap<>(topicID);
+		this.uriDDSNodes = new ArrayList<String>(uriDDSNodes);
+
 		plugin = new ConnectionPlugin(uriConnectDDSNode, uriConnectInPort);
 
 	}
@@ -67,6 +74,15 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 			dataReaders.remove(dataReader);
 		if (dataWriter != null)
 			dataWriters.remove(dataWriter);
+	}
+
+	@Override
+	public void execute() throws Exception {
+		for (String uri : uriDDSNodes) {
+			this.plugin.connect(uri, this.domainParticipant.getDomainId());
+		}
+		System.out.println("connexion fini ");
+		super.execute();
 	}
 
 	@Override
@@ -101,14 +117,12 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 	}
 
 	@Override
-	public <T> void write(String writer, T data) throws TimeoutException, DDSTopicNotFoundException {
+	public <T> void write(String writer, T data) throws Exception {
 		dataWriters.get(writer).write(data);
+		propager(data, dataWriters.get(writer).getTopic().getName(), AbstractPort.generatePortURI());
 	}
 
-	@Override
-	public <T> void propager(T newObject, Topic<T> topic, String id) {
-		// TODO
-	}
+
 
 	@Override
 	public synchronized void finalise() throws Exception {
@@ -118,6 +132,17 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 	@Override
 	public synchronized void shutdown() throws ComponentShutdownException {
 		super.shutdown();
+	}
+
+	@Override
+	public <T> void propager(T newObject, String topicName, String id) throws Exception {
+		if (topicID.get(topicName) == id) {
+			return;
+		}
+		topicID.put(topicName, id);
+		Datas<T> data = (Datas<T>) domainParticipant.findTopic(topicName, null);
+		data.write(newObject);
+		this.plugin.propager(newObject, topicName, id);
 	}
 
 }

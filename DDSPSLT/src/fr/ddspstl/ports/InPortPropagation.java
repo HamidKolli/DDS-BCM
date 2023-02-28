@@ -2,8 +2,6 @@ package fr.ddspstl.ports;
 
 
 
-import org.omg.dds.topic.Topic;
-
 import fr.ddspstl.interfaces.Propagation;
 import fr.ddspstl.plugin.ConnectionPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
@@ -20,13 +18,13 @@ public class InPortPropagation extends AbstractInboundPort implements Propagatio
 	}
 
 	@Override
-	public <T> void propager(T newObject, Topic<T> topic, String id) throws Exception {
+	public <T> void propager(T newObject, String topicName, String id) throws Exception {
 		getOwner().runTask(new AbstractComponent.AbstractTask(getPluginURI()) {
 			
 			@Override
 			public void run() {
 				try {
-					((ConnectionPlugin)getTaskProviderReference()).propager(newObject,topic,id);
+					((ConnectionPlugin)getTaskProviderReference()).propager(newObject,topicName,id);
 				} catch (Exception e) {
 				}
 				

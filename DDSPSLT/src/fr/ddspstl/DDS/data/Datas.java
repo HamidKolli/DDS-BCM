@@ -1,6 +1,5 @@
 package fr.ddspstl.DDS.data;
 
-
 import java.util.Collection;
 import java.util.Set;
 
@@ -21,7 +20,7 @@ import org.omg.dds.topic.TopicListener;
 import org.omg.dds.topic.TopicQos;
 import org.omg.dds.type.TypeSupport;
 
-public class Datas<T> implements Topic<T>{
+public class Datas<T> implements Topic<T> {
 	private Sample.Iterator<T> samplesData;
 	private TypeSupport<T> typeSupport;
 	private ServiceEnvironment serviceEnvironment;
@@ -35,104 +34,121 @@ public class Datas<T> implements Topic<T>{
 		this.serviceEnvironment = serviceEnvironment;
 		this.typeName = typeName;
 		this.domainParticipant = domainParticipant;
-		this.samplesData = new fr.ddspstl.DDS.samples.Sample.Iterator();
+		this.samplesData = new fr.ddspstl.DDS.samples.Sample.Iterator<T>();
 	}
 
-	public Sample.Iterator<T> read(){
+	public Sample.Iterator<T> read() {
 		return samplesData;
 	}
-	
+
 	public void write(T data) {
-		samplesData.add(new fr.ddspstl.DDS.samples.Sample<T>(serviceEnvironment,data));
+		samplesData.add(new fr.ddspstl.DDS.samples.Sample<T>(serviceEnvironment, data));
 	}
-	
-	public void write(T data,Time time) {
-		samplesData.add(new fr.ddspstl.DDS.samples.Sample<T>(serviceEnvironment,data,SampleState.READ,ViewState.NEW,InstanceState.ALIVE,time));
+
+	public void write(T data, Time time) {
+		samplesData.add(new fr.ddspstl.DDS.samples.Sample<T>(serviceEnvironment, data, SampleState.READ, ViewState.NEW,
+				InstanceState.ALIVE, time));
 	}
-	
+
 	@Override
 	public TypeSupport<T> getTypeSupport() {
 		return typeSupport;
 	}
+
 	@Override
 	public <OTHER> TopicDescription<OTHER> cast() {
 		return null;
 	}
+
 	@Override
 	public String getTypeName() {
 		return typeSupport.getTypeName();
 	}
+
 	@Override
 	public String getName() {
 		return typeName;
 	}
+
 	@Override
 	public void close() {
 	}
+
 	@Override
 	public ServiceEnvironment getEnvironment() {
 		return serviceEnvironment;
 	}
+
 	@Override
 	public TopicListener<T> getListener() {
 		return null;
 	}
+
 	@Override
 	public void setListener(TopicListener<T> listener) {
-		
+
 	}
+
 	@Override
 	public void setListener(TopicListener<T> listener, Collection<Class<? extends Status>> statuses) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	@Override
 	public TopicQos getQos() {
 		return null;
 	}
+
 	@Override
 	public void setQos(TopicQos qos) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	@Override
 	public void setQos(String qosLibraryName, String qosProfileName) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	@Override
 	public void enable() {
 	}
+
 	@Override
 	public Set<Class<? extends Status>> getStatusChanges() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	@Override
 	public InstanceHandle getInstanceHandle() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	@Override
 	public void retain() {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	@Override
 	public InconsistentTopicStatus getInconsistentTopicStatus() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	@Override
 	public StatusCondition<Topic<T>> getStatusCondition() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	@Override
 	public DomainParticipant getParent() {
 		return domainParticipant;
 	}
 
-	
-	
 }
