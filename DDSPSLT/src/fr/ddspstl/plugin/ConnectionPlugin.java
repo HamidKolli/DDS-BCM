@@ -3,17 +3,24 @@ package fr.ddspstl.plugin;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.omg.dds.domain.DomainParticipant;
+import org.omg.dds.pub.DataWriter;
+import org.omg.dds.pub.Publisher;
+import org.omg.dds.sub.DataReader;
 import org.omg.dds.sub.Sample.Iterator;
+import org.omg.dds.sub.Subscriber;
+import org.omg.dds.topic.Topic;
+import org.omg.dds.topic.TopicDescription;
 
 import fr.ddspstl.components.interfaces.IDDSNode;
 import fr.ddspstl.connectors.ConnectorConnectionDDS;
 import fr.ddspstl.connectors.ConnectorPropagation;
 import fr.ddspstl.exceptions.DDSTopicNotFoundException;
+import fr.ddspstl.interfaces.ConnectClient;
 import fr.ddspstl.interfaces.ConnectDDSNode;
-import fr.ddspstl.interfaces.ConnectInClient;
-import fr.ddspstl.interfaces.InRead;
-import fr.ddspstl.interfaces.InWrite;
 import fr.ddspstl.interfaces.Propagation;
+import fr.ddspstl.interfaces.ReadCI;
+import fr.ddspstl.interfaces.WriteCI;
 import fr.ddspstl.ports.InConnectionDDS;
 import fr.ddspstl.ports.InPortConnectClient;
 import fr.ddspstl.ports.InPortPropagation;
@@ -24,25 +31,31 @@ import fr.ddspstl.ports.OutPortPropagation;
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
 
-public class ConnectionPlugin extends AbstractPlugin {
+public class ConnectionPlugin<T> extends AbstractPlugin {
 
 	private static final long serialVersionUID = 1L;
 
-	private InPortConnectClient inPortConnectClient;
-	private InPortRead inPortRead;
-	private InPortWrite inPortWrite;
-	private InPortPropagation inPortPropagation;
+	private InPortConnectClient<T> inPortConnectClient;
+	private InPortRead<T> inPortRead;
+	private InPortWrite<T> inPortWrite;
+	private InPortPropagation<T> inPortPropagation;
 	private InConnectionDDS connectionDDS;
 	private String uriConnectInPort;
 	private String uriConnectDDSNode;
 	private Map<String, OutConnectionDDS> connectionOut;
-	private Map<String,OutPortPropagation> outPropagationPorts ;
+	private Map<String,OutPortPropagation<T>> outPropagationPorts ;
+	private DomainParticipant domainParticipant;
+	private Publisher publisher;
+	private Subscriber subscriber;
 
-	public ConnectionPlugin(String uriConnection, String uriConnectInPort) {
+	public ConnectionPlugin(String uriConnection, String uriConnectInPort, DomainParticipant domainParticipant, Publisher publisher, Subscriber subscriber) {
 		this.uriConnectInPort = uriConnectInPort;
 		this.uriConnectDDSNode = uriConnection;
 		this.connectionOut = new HashMap<>();
 		this.outPropagationPorts = new HashMap<>();
+		this.domainParticipant = domainParticipant;
+		this.publisher = publisher;
+		this.subscriber = subscriber;
 	}
 
 
@@ -54,9 +67,9 @@ public class ConnectionPlugin extends AbstractPlugin {
 		super.installOn(owner);
 		
 		
-		this.addOfferedInterface(InRead.class);
-		this.addOfferedInterface(InWrite.class);
-		this.addOfferedInterface(ConnectInClient.class);
+		this.addOfferedInterface(WriteCI.class);
+		this.addOfferedInterface(ReadCI.class);
+		this.addOfferedInterface(ConnectClient.class);
 		this.addOfferedInterface(Propagation.class);
 		this.addOfferedInterface(ConnectDDSNode.class);
 		
@@ -74,10 +87,10 @@ public class ConnectionPlugin extends AbstractPlugin {
 		super.initialise();
 		
 		this.connectionDDS = new InConnectionDDS(uriConnectDDSNode, getOwner(),getPluginURI());
-		this.inPortConnectClient = new InPortConnectClient(uriConnectInPort, getOwner(),getPluginURI());
-		this.inPortRead = new InPortRead(getOwner(),getPluginURI());
-		this.inPortWrite = new InPortWrite(getOwner(),getPluginURI());
-		this.inPortPropagation = new InPortPropagation(getOwner(),getPluginURI());
+		this.inPortConnectClient = new InPortConnectClient<T>(uriConnectInPort, getOwner(),getPluginURI());
+		this.inPortRead = new InPortRead<T>(getOwner(),getPluginURI());
+		this.inPortWrite = new InPortWrite<T>(getOwner(),getPluginURI());
+		this.inPortPropagation = new InPortPropagation<T>(getOwner(),getPluginURI());
 		connectionDDS.publishPort();
 		inPortConnectClient.publishPort();
 		inPortRead.publishPort();
@@ -108,7 +121,7 @@ public class ConnectionPlugin extends AbstractPlugin {
 			cp.getValue().unpublishPort();
 			cp.getValue().destroyPort();
 		}
-		for (Map.Entry<String, OutPortPropagation> cp : outPropagationPorts.entrySet()) {
+		for (Map.Entry<String, OutPortPropagation<T>> cp : outPropagationPorts.entrySet()) {
 			cp.getValue().unpublishPort();
 			cp.getValue().destroyPort();
 		}
@@ -128,19 +141,20 @@ public class ConnectionPlugin extends AbstractPlugin {
 		this.getOwner().doPortConnection(cout.getPortURI(), uri, ConnectorConnectionDDS.class.getCanonicalName());
 		String uriPropagationVoisin = cout.connect(connectionDDS.getPortURI(),inPortPropagation.getPortURI(), domainID);
 		connectionOut.put(uri, cout);
-		OutPortPropagation outPropagation = new OutPortPropagation(getOwner());
+		OutPortPropagation<T> outPropagation = new OutPortPropagation<T>(getOwner());
 		this.getOwner().doPortConnection(outPropagation.getPortURI(), uriPropagationVoisin, ConnectorPropagation.class.getCanonicalName());
 		outPropagationPorts.put(uri, outPropagation);
 	}
 
+	@SuppressWarnings("unchecked")
 	public String connectBack(String uri,String uriPropagation, int domainID) throws Exception {
-		if (((IDDSNode) getOwner()).getDomainId() != domainID) {
+		if (((IDDSNode<T>) getOwner()).getDomainId() != domainID) {
 			throw new Exception("impossible de ce connecter, domaine different");
 		}
 		OutConnectionDDS cout = new OutConnectionDDS(this.getOwner());
 		this.getOwner().doPortConnection(cout.getPortURI(), uri, ConnectorConnectionDDS.class.getCanonicalName());
 		connectionOut.put(uri, cout);
-		OutPortPropagation outPropagation = new OutPortPropagation(getOwner());
+		OutPortPropagation<T> outPropagation = new OutPortPropagation<T>(getOwner());
 		this.getOwner().doPortConnection(outPropagation.getPortURI(), uriPropagation, ConnectorPropagation.class.getCanonicalName());
 		outPropagationPorts.put(uri, outPropagation);
 		
@@ -152,7 +166,8 @@ public class ConnectionPlugin extends AbstractPlugin {
 		out.doDisconnection();
 		out.unpublishPort();
 		out.destroyPort();
-		OutPortPropagation pOut = outPropagationPorts.remove(uri);
+		@SuppressWarnings("unchecked")
+		OutPortPropagation<T> pOut = outPropagationPorts.remove(uri);
 		pOut.doDisconnection();
 		pOut.unpublishPort();
 		pOut.destroyPort();
@@ -165,7 +180,8 @@ public class ConnectionPlugin extends AbstractPlugin {
 		out.doDisconnection();
 		out.unpublishPort();
 		out.destroyPort();
-		OutPortPropagation pOut = outPropagationPorts.remove(uri);
+		@SuppressWarnings("unchecked")
+		OutPortPropagation<T> pOut = outPropagationPorts.remove(uri);
 		pOut.doDisconnection();
 		pOut.unpublishPort();
 		pOut.destroyPort();
@@ -173,34 +189,53 @@ public class ConnectionPlugin extends AbstractPlugin {
 
 
 
+	@SuppressWarnings("unchecked")
 	public int getDomainId() {
-		return ((IDDSNode) getOwner()).getDomainId();
+		return ((IDDSNode<T>) getOwner()).getDomainId();
 	}
 
+	@SuppressWarnings("unchecked")
 	public void disconnectClient(String dataReader, String dataWriter) {
-		((IDDSNode) getOwner()).disconnectClient(dataReader, dataWriter);
+		((IDDSNode<T>) getOwner()).disconnectClient(dataReader, dataWriter);
 	}
 
-	public String getDataReader(String topic) throws DDSTopicNotFoundException {
-		return ((IDDSNode) getOwner()).getDataReader(topic);
+	@SuppressWarnings("unchecked")
+	public DataReader<T> getDataReader(TopicDescription<T> topic) throws Exception {
+		if(domainParticipant.findTopic(topic.getName(), null) == null) {
+			throw new DDSTopicNotFoundException();
+		}
+		return ((fr.ddspstl.DDS.subscribers.interfaces.Subscriber)subscriber).createDataReader(topic, inPortRead.getPortURI());
 	}
 
-	public  Iterator<?> read(String reader) throws DDSTopicNotFoundException {
-		return ((IDDSNode) getOwner()).read(reader);
+	@SuppressWarnings("unchecked")
+	public  Iterator<T> read(TopicDescription<T> reader) throws DDSTopicNotFoundException {
+		return ((IDDSNode<T>) getOwner()).read(reader);
 	}
 
-	public String getDataWriter(String topic) throws DDSTopicNotFoundException {
-		return ((IDDSNode) getOwner()).getDataWriter(topic);
+	@SuppressWarnings("unchecked")
+	public DataWriter<T> getDataWriter(Topic<T> topic) throws Exception {
+		if(domainParticipant.findTopic(topic.getName(), null) == null) {
+			throw new DDSTopicNotFoundException();
+		}
+		return ((fr.ddspstl.DDS.publishers.interfaces.Publisher)publisher).createDataWriter(topic,inPortWrite.getClientPortURI());
 	}
 
-	public <T> void write(String reader, T data) throws Exception {
-		((IDDSNode) getOwner()).write(reader, data);
+	@SuppressWarnings("unchecked")
+	public void  write(Topic<T> topic, T data) throws Exception {
+		((IDDSNode<T>) getOwner()).write(topic, data);
 	}
 
-	public <T> void propager(T newObject, String topicName, String id) throws Exception {
-		for (OutPortPropagation cp : outPropagationPorts.values()) {
-			cp.propager(newObject, topicName, id);
+	@SuppressWarnings("unchecked")
+	public void propagerOut(T newObject, Topic<T> topic, String id) throws Exception {
+		for (OutPortPropagation<T> cp : outPropagationPorts.values()) {
+			cp.propager(newObject, topic, id);
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	public void propagerIn(T newObject, Topic<T> topic, String id) throws Exception {
+		((IDDSNode<T>) getOwner()).propager(newObject, topic, uriConnectDDSNode);
+	}
+	
 
 }

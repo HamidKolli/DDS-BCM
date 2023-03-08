@@ -20,7 +20,7 @@ import org.omg.dds.topic.TopicQos;
 
 import fr.ddspstl.DDS.subscribers.data.DataReader;
 
-public class Subscriber implements org.omg.dds.sub.Subscriber {
+public class Subscriber implements fr.ddspstl.DDS.subscribers.interfaces.Subscriber {
 
 	private DomainParticipant domainParticipant;
 	private Map<String, org.omg.dds.sub.DataReader<Object>> dataReaders;
@@ -103,28 +103,8 @@ public class Subscriber implements org.omg.dds.sub.Subscriber {
 		return domainParticipant.getEnvironment();
 	}
 
-	@Override
-	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic) {
-		DataReader<TYPE> d = new DataReader<TYPE>(topic, this);
-		dataReaders.put(topic.getName(), (DataReader<Object>) d);
-		return d;
-	}
-
-	@Override
-	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic, DataReaderQos qos,
-			DataReaderListener<TYPE> listener, Collection<Class<? extends Status>> statuses) {
-		DataReader<TYPE> d = new DataReader<TYPE>(topic, this, qos, listener, statuses);
-		dataReaders.put(topic.getName(), (DataReader<Object>) d);
-		return d;
-	}
-
-	@Override
-	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic, DataReaderQos qos) {
-		DataReader<TYPE> d = new DataReader<TYPE>(topic, this, qos);
-		dataReaders.put(topic.getName(), (DataReader<Object>) d);
-		return d;
-	}
-
+	
+	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> org.omg.dds.sub.DataReader<TYPE> lookupDataReader(String topicName) {
 		return (org.omg.dds.sub.DataReader<TYPE>) dataReaders.get(topicName);
@@ -205,6 +185,29 @@ public class Subscriber implements org.omg.dds.sub.Subscriber {
 	public DataState createDataState() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic, DataReaderQos qos,
+			DataReaderListener<TYPE> listener, Collection<Class<? extends Status>> statuses) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic, DataReaderQos qos) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic, String uriPortDDSNode) {
+		DataReader<TYPE> data = new DataReader<>(topic, this, uriPortDDSNode);
+		dataReaders.put(topic.getName(), (org.omg.dds.sub.DataReader<Object>) data);
+		return data;
 	}
 
 }

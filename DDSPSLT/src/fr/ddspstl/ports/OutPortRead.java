@@ -1,28 +1,26 @@
 package fr.ddspstl.ports;
 
 import org.omg.dds.sub.Sample.Iterator;
+import org.omg.dds.topic.TopicDescription;
 
 import fr.ddspstl.connectors.ConnectorRead;
-import fr.ddspstl.interfaces.OutRead;
+import fr.ddspstl.interfaces.ReadCI;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 
-public class OutPortRead extends AbstractOutboundPort implements OutRead {
+public class OutPortRead<TYPE> extends AbstractOutboundPort implements ReadCI<TYPE> {
 
 	private static final long serialVersionUID = 1L;
 
 	public OutPortRead( ComponentI owner) throws Exception {
-		super(OutRead.class, owner);
+		super(ReadCI.class, owner);
 	}
 
-	@Override
-	public String getDataReader(String topic) throws Exception {
-		return ((ConnectorRead)getConnector()).getDataReader(topic);
+
+	public  Iterator<TYPE> read(TopicDescription<TYPE> topic) throws Exception {
+		return ((ConnectorRead<TYPE>)getConnector()).read(topic);
 	}
 
-	@Override
-	public Iterator<?> read(String reader) throws Exception {
-		return ((ConnectorRead)getConnector()).read(reader);
-	}
+
 
 }

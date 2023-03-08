@@ -1,51 +1,50 @@
 package fr.ddspstl.ports;
 
-import fr.ddspstl.interfaces.ConnectInClient;
+import org.omg.dds.pub.DataWriter;
+import org.omg.dds.sub.DataReader;
+import org.omg.dds.topic.Topic;
+import org.omg.dds.topic.TopicDescription;
+
+import fr.ddspstl.interfaces.ConnectClient;
+
 import fr.ddspstl.plugin.ConnectionPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
-public class InPortConnectClient extends AbstractInboundPort implements ConnectInClient {
+public class InPortConnectClient<T> extends AbstractInboundPort implements ConnectClient<T> {
 
 	private static final long serialVersionUID = 1L;
 
 	public InPortConnectClient(String uri, ComponentI owner,String pluginURI) throws Exception {
-		super(uri, ConnectInClient.class, owner,pluginURI,null);
+		super(uri, ConnectClient.class, owner,pluginURI,null);
 	}
 
 
 
 	@Override
-	public String getReaderURI() throws Exception{
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<String>(getPluginURI()) {
+	public DataReader<T> getReader(TopicDescription<T> topic) throws Exception {
+		return getOwner().handleRequest(new AbstractComponent.AbstractService<DataReader<T>>(getPluginURI()) {
 			@Override
-			public String call() throws Exception {
-				return ((ConnectionPlugin)getServiceProviderReference()).getReaderURI();
+			public DataReader<T> call() throws Exception {
+				return ((ConnectionPlugin)getServiceProviderReference()).getDataReader(topic);
 			}
 		});
 	}
+
 
 	@Override
-	public String getWriterURI() throws Exception{
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<String>(getPluginURI()) {
+	public DataWriter<T> getWriter(Topic<T> topic) throws Exception {
+		return getOwner().handleRequest(new AbstractComponent.AbstractService<DataWriter<T>>(getPluginURI()) {
 			@Override
-			public String call() throws Exception {
-				return ((ConnectionPlugin)getServiceProviderReference()).getWriterURI();
+			public DataWriter<T> call() throws Exception {
+				return ((ConnectionPlugin)getServiceProviderReference()).getDataWriter(topic);
 			}
 		});
 	}
+	
+	
 
-	@Override
-	public void disconnectClient(String dataReader, String dataWriter) throws Exception{
-		getOwner().handleRequest(new AbstractComponent.AbstractService<Void>(getPluginURI()) {
-			@Override
-			public Void call() throws Exception {
-				((ConnectionPlugin)getServiceProviderReference()).disconnectClient( dataReader,  dataWriter);
-				return null;
-			}
-		});
-
-	}
+	
 
 }

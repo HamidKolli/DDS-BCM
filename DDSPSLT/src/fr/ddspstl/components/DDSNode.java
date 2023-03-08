@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import org.omg.dds.domain.DomainParticipant;
-import org.omg.dds.pub.DataWriter;
 import org.omg.dds.pub.Publisher;
-import org.omg.dds.sub.DataReader;
 import org.omg.dds.sub.Sample.Iterator;
 import org.omg.dds.sub.Subscriber;
+import org.omg.dds.topic.Topic;
+import org.omg.dds.topic.TopicDescription;
 
 import fr.ddspstl.DDS.data.Datas;
 import fr.ddspstl.components.interfaces.IDDSNode;
@@ -22,32 +21,31 @@ import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 
-public class DDSNode extends AbstractComponent implements IDDSNode {
+public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
-	private ConnectionPlugin plugin;
+	private ConnectionPlugin<T> plugin;
 	private List<String> uriDDSNodes;
 	// DDS
 	private DomainParticipant domainParticipant;
 	private Publisher publisher;
 	private Subscriber subscriber;
-	private Map<String, DataReader<Object>> dataReaders;
-	private Map<String, DataWriter<Object>> dataWriters;
-	private Map<String,String> topicID;
+	private Map<Topic<T>, Datas<T>> datas;
+	private Map<Topic<T>,String > topicID;
 
 	protected DDSNode(int nbThreads, int nbSchedulableThreads, String uriConnectDDSNode, String uriConnectInPort,
-			List<String> uriDDSNodes, DomainParticipant domainParticipant,Map<String,String> topicID)
-			throws Exception {
+			List<String> uriDDSNodes, DomainParticipant domainParticipant, Map<Topic<T>, Datas<T>> datas,
+			Map<Topic<T>,String > topicID) throws Exception {
 		super(nbThreads, nbSchedulableThreads);
 
 		this.domainParticipant = domainParticipant;
 		publisher = domainParticipant.createPublisher();
 		subscriber = domainParticipant.createSubscriber();
-		dataReaders = new HashMap<>();
-		dataWriters = new HashMap<>();
+
+		this.datas = new HashMap<>(datas);
 		this.topicID = new HashMap<>(topicID);
 		this.uriDDSNodes = new ArrayList<String>(uriDDSNodes);
 
-		plugin = new ConnectionPlugin(uriConnectDDSNode, uriConnectInPort);
+		plugin = new ConnectionPlugin<T>(uriConnectDDSNode, uriConnectInPort, domainParticipant, publisher, subscriber);
 
 	}
 
@@ -70,10 +68,7 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 
 	@Override
 	public void disconnectClient(String dataReader, String dataWriter) {
-		if (dataReader != null)
-			dataReaders.remove(dataReader);
-		if (dataWriter != null)
-			dataWriters.remove(dataWriter);
+
 	}
 
 	@Override
@@ -85,64 +80,28 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 		super.execute();
 	}
 
-	@Override
-	public String getDataReader(String topic) throws DDSTopicNotFoundException {
-		String id = AbstractPort.generatePortURI();
-		DataReader<Object> dataReader = null;
-		try {
-			dataReader = subscriber.createDataReader(domainParticipant.findTopic(topic, null));
-		} catch (TimeoutException e) {
-			throw new DDSTopicNotFoundException(e);
-		}
-		dataReaders.put(id, dataReader);
-		return id;
+	
+
+	@SuppressWarnings("unchecked")
+	public Iterator<T> read(TopicDescription<T> topic) throws DDSTopicNotFoundException {
+			return datas.get(topic).read();
 	}
 
-	@Override
-	public Iterator<?> read(String reader) throws DDSTopicNotFoundException {
-		return dataReaders.get(reader).read();
+	public void write(Topic<T> topic, T data) throws Exception {
+		Datas<T> dt = datas.get(topic);
+		dt.write(data);
+		propager(data, topic, AbstractPort.generatePortURI());
+
 	}
 
-	@Override
-	public String getDataWriter(String topic) throws DDSTopicNotFoundException {
-		String id = AbstractPort.generatePortURI();
-		DataWriter<Object> dataWriter;
-		try {
-			dataWriter = publisher.createDataWriter(domainParticipant.findTopic(topic, null));
-		} catch (TimeoutException e) {
-			throw new DDSTopicNotFoundException(e);
-		}
-		dataWriters.put(id, dataWriter);
-		return id;
-	}
-
-	@Override
-	public <T> void write(String writer, T data) throws Exception {
-		dataWriters.get(writer).write(data);
-		propager(data, dataWriters.get(writer).getTopic().getName(), AbstractPort.generatePortURI());
-	}
-
-
-
-	@Override
-	public synchronized void finalise() throws Exception {
-		super.finalise();
-	}
-
-	@Override
-	public synchronized void shutdown() throws ComponentShutdownException {
-		super.shutdown();
-	}
-
-	@Override
-	public <T> void propager(T newObject, String topicName, String id) throws Exception {
-		if (topicID.get(topicName) == id) {
+	public void propager(T newObject, Topic<T> topicName, String id) throws Exception {
+		if(topicID.get(topicName).equals(id)) {
 			return;
 		}
 		topicID.put(topicName, id);
-		Datas<T> data = (Datas<T>) domainParticipant.findTopic(topicName, null);
-		data.write(newObject);
-		this.plugin.propager(newObject, topicName, id);
+		datas.get(topicName).write(newObject);
+		plugin.propagerOut(newObject, topicName, id);
+		
 	}
 
 }

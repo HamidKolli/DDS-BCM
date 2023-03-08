@@ -1,19 +1,16 @@
 package fr.ddspstl.connectors;
 
-import fr.ddspstl.interfaces.OutWrite;
-import fr.ddspstl.ports.InPortWrite;
+import org.omg.dds.topic.Topic;
+
+import fr.ddspstl.interfaces.WriteCI;
 import fr.sorbonne_u.components.connectors.AbstractConnector;
 
-public class ConnectorWrite extends AbstractConnector implements OutWrite {
+public class ConnectorWrite<T> extends AbstractConnector implements WriteCI<T> {
 
-	@Override
-	public String getDataWriter(String topic) throws Exception {
-		return ((InPortWrite)this.offering).getDataWriter(topic);
-	}
-
-	@Override
-	public <T> void write(String reader, T data) throws Exception {
-		((InPortWrite)this.offering).write(reader,data);
+	@SuppressWarnings("unchecked")
+	public  void write(Topic<T> topic, T data) throws Exception {
+		((WriteCI<T>)this.offering).write(topic,data);
+		
 	}
 
 }

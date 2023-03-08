@@ -1,5 +1,7 @@
 package fr.ddspstl.components;
 
+import org.omg.dds.topic.Topic;
+
 import fr.ddspstl.plugin.ClientPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.AbstractPort;
@@ -10,17 +12,18 @@ public abstract class ClientComponent<T> extends AbstractComponent {
 
 	protected String uriConnectPortDDS;
 	protected String pluginURI;
-	
+	protected Topic<String> topic;
 
-	protected ClientComponent(int nbThreads, int nbSchedulableThreads, String uriConnectPortDDS) throws Exception {
+	protected ClientComponent(int nbThreads, int nbSchedulableThreads, String uriConnectPortDDS, Topic<String> topic) throws Exception {
 		super(nbThreads, nbSchedulableThreads);
 		this.uriConnectPortDDS = uriConnectPortDDS;
+		this.topic = topic;
 	}
 
 	@Override
 	public synchronized void start() throws ComponentStartException {
 		try {
-		ClientPlugin<T> plugin  = new ClientPlugin<>();
+		ClientPlugin<T> plugin  = new ClientPlugin<>(uriConnectPortDDS);
 		pluginURI = AbstractPort.generatePortURI();
 		plugin.setPluginURI(pluginURI);
 		this.installPlugin(plugin);

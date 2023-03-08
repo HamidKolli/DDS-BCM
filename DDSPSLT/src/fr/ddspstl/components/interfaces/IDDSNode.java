@@ -1,23 +1,20 @@
 package fr.ddspstl.components.interfaces;
 
 import org.omg.dds.sub.Sample.Iterator;
+import org.omg.dds.topic.Topic;
+import org.omg.dds.topic.TopicDescription;
 
 import fr.ddspstl.exceptions.DDSTopicNotFoundException;
 
-public interface IDDSNode {
-	
+public interface IDDSNode<T> {
 
 	public int getDomainId();
 
 	public void disconnectClient(String dataReader, String dataWriter);
 
-	public String getDataReader(String topic) throws DDSTopicNotFoundException;
+	public  Iterator<T> read(TopicDescription<T> reader) throws DDSTopicNotFoundException;
 
-	public Iterator<?> read(String reader) throws DDSTopicNotFoundException;
+	public  void write(Topic<T> writer, T data) throws Exception;
 
-	public String getDataWriter(String topic) throws DDSTopicNotFoundException;
-
-	public <T> void write(String writer, T data) throws Exception;
-
-	public <T> void propager(T newObject, String topicName, String id) throws Exception;
+	public  void propager(T newObject, Topic<T> topicName, String id) throws Exception;
 }

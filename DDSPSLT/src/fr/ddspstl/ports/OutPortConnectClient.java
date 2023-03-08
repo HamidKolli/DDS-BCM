@@ -1,33 +1,31 @@
 package fr.ddspstl.ports;
 
-import fr.ddspstl.connectors.ConnectorClient;
-import fr.ddspstl.interfaces.ConnectOutClient;
+import org.omg.dds.pub.DataWriter;
+import org.omg.dds.sub.DataReader;
+import org.omg.dds.topic.Topic;
+import org.omg.dds.topic.TopicDescription;
+
+import fr.ddspstl.interfaces.ConnectClient;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 
-public class OutPortConnectClient extends AbstractOutboundPort implements ConnectOutClient{
+public class OutPortConnectClient<T> extends AbstractOutboundPort implements ConnectClient<T>{
 
 
 	private static final long serialVersionUID = 1L;
 
 	public OutPortConnectClient( ComponentI owner) throws Exception {
-		super(ConnectOutClient.class, owner);
-		
+		super(ConnectClient.class, owner);	
 	}
+	
 	@Override
-	public String getReaderURI() throws Exception{
-		return ((ConnectorClient)getConnector()).getReaderURI();
-	}
-
-	@Override
-	public String getWriterURI() throws Exception{
-		return ((ConnectorClient)getConnector()).getWriterURI();
+	public DataReader<T> getReader(TopicDescription<T> topic) throws Exception {
+		return ((ConnectClient<T>)getConnector()).getReader(topic);
 	}
 
 	@Override
-	public void disconnectClient(String dataReader, String dataWriter) throws Exception{
-		((ConnectorClient)getConnector()).disconnectClient(dataReader,dataWriter);
-		
+	public DataWriter<T> getWriter(Topic<T> topic) throws Exception {
+		return ((ConnectClient<T>)getConnector()).getWriter(topic);
 	}
 
 

@@ -1,13 +1,14 @@
 package fr.ddspstl.plugin;
 
+import org.omg.dds.pub.DataWriter;
+import org.omg.dds.sub.DataReader;
 import org.omg.dds.sub.Sample.Iterator;
+import org.omg.dds.topic.Topic;
+import org.omg.dds.topic.TopicDescription;
 
 import fr.ddspstl.connectors.ConnectorClient;
-import fr.ddspstl.connectors.ConnectorRead;
-import fr.ddspstl.connectors.ConnectorWrite;
-import fr.ddspstl.interfaces.ConnectOutClient;
-import fr.ddspstl.interfaces.OutRead;
-import fr.ddspstl.interfaces.OutWrite;
+import fr.ddspstl.interfaces.ReadCI;
+import fr.ddspstl.interfaces.WriteCI;
 import fr.ddspstl.ports.OutPortConnectClient;
 import fr.ddspstl.ports.OutPortRead;
 import fr.ddspstl.ports.OutPortWrite;
@@ -17,23 +18,25 @@ import fr.sorbonne_u.components.ComponentI;
 public class ClientPlugin<T> extends AbstractPlugin {
 
 	private static final long serialVersionUID = 1L;
-	private OutPortConnectClient outPortconnectClient;
-	private OutPortRead outPortRead;
-	private OutPortWrite outPortWrite;
+	private OutPortConnectClient<T> outPortconnectClient;
+	private OutPortRead<T> outPortRead;
+	private OutPortWrite<T> outPortWrite;
 	private boolean isReader;
 	private boolean isWriter;
+	private String uriDDSNode;
 
-	public ClientPlugin() {
+	public ClientPlugin(String uriDDSNode) {
 		isReader = false;
 		isWriter = false;
+		this.uriDDSNode = uriDDSNode;
 	}
 
 	@Override
 	public void installOn(ComponentI owner) throws Exception {
 		super.installOn(owner);
-		this.addRequiredInterface(ConnectOutClient.class);
-		this.addRequiredInterface(OutWrite.class);
-		this.addRequiredInterface(OutRead.class);
+		this.addRequiredInterface(ConnectorClient.class);
+		this.addRequiredInterface(WriteCI.class);
+		this.addRequiredInterface(ReadCI.class);
 	}
 
 	@Override
@@ -41,53 +44,30 @@ public class ClientPlugin<T> extends AbstractPlugin {
 
 		super.initialise();
 
-		this.outPortconnectClient = new OutPortConnectClient(getOwner());
-		this.outPortRead = new OutPortRead(getOwner());
-		this.outPortWrite = new OutPortWrite(getOwner());
-
+		this.outPortconnectClient = new OutPortConnectClient<>(getOwner());
 		this.outPortconnectClient.publishPort();
-		this.outPortRead.publishPort();
-		this.outPortWrite.publishPort();
-
-	}
-
-	public void connect(String ddsNodeURI) throws Exception {
-		getOwner().doPortConnection(this.outPortconnectClient.getPortURI(), ddsNodeURI,
+		getOwner().doPortConnection(this.outPortconnectClient.getPortURI(), uriDDSNode,
 				ConnectorClient.class.getCanonicalName());
 	}
 
-	public void connectReader() throws Exception {
-		String uri = this.outPortconnectClient.getReaderURI();
-		getOwner().doPortConnection(this.outPortRead.getPortURI(), uri, ConnectorRead.class.getCanonicalName());
-		isReader = true;
+	public DataReader<T> connectReader(TopicDescription<T> topic) throws Exception {
+		return this.outPortconnectClient.getReader(topic);
 	}
 
-	public void connectWriter() throws Exception {
-		String uri = this.outPortconnectClient.getWriterURI();
-		getOwner().doPortConnection(this.outPortWrite.getPortURI(), uri, ConnectorWrite.class.getCanonicalName());
-		isWriter = true;
+	public DataWriter<T> connectWriter(Topic<T> topic) throws Exception {
+		return this.outPortconnectClient.getWriter(topic);
 	}
 
-	public String getDataReader(String topic) throws Exception {
-		return this.outPortRead.getDataReader(topic);
+
+	public Iterator<T> read(TopicDescription<T> topic) throws Exception {
+		return this.outPortRead.read(topic);
 	}
 
-	public String getDataWriter(String topic) throws Exception {
-		return this.outPortWrite.getDataWriter(topic);
+	public void write(Topic<T> topic, T Data) throws Exception {
+		this.outPortWrite.write(topic, Data);
 	}
 
-	public Iterator<?> read(String dataReader) throws Exception {
-		return this.outPortRead.read(dataReader);
-	}
-
-	public void write(String dataWriter, T Data) throws Exception {
-		this.outPortWrite.write(dataWriter, Data);
-	}
-
-	public void disconnect(String dataReader, String dataWriter) throws Exception {
-		this.outPortconnectClient.disconnectClient( dataReader,  dataWriter);
-	}
-
+	
 	@Override
 	public void finalise() throws Exception {
 		this.outPortconnectClient.doDisconnection();

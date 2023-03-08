@@ -34,8 +34,6 @@ import org.omg.dds.topic.TopicQos;
 import org.omg.dds.type.TypeSupport;
 import org.omg.dds.type.dynamic.DynamicType;
 
-import fr.ddspstl.DDS.data.Datas;
-
 public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 
 	
@@ -191,10 +189,11 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> Topic<TYPE> createTopic(String topicName, TypeSupport<TYPE> type) {
 		
-		Topic<TYPE> t =  new Datas<TYPE>(type, getEnvironment(), topicName, this);
+		Topic<TYPE> t =  new fr.ddspstl.DDS.topic.Topic<>(type, serviceEnvironment, topicName, this);
 		topics.put(topicName, (Topic<Object>) t);
 		return t;
 	}
@@ -232,6 +231,7 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> Topic<TYPE> findTopic(String topicName, Duration timeout) throws TimeoutException {
 		return (Topic<TYPE>) topics.get(topicName);
@@ -242,6 +242,7 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> TopicDescription<TYPE> lookupTopicDescription(String name) {
 		return (TopicDescription<TYPE>) topics.get(name);

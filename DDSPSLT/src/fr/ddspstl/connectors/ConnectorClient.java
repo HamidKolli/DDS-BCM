@@ -1,25 +1,25 @@
 package fr.ddspstl.connectors;
 
-import fr.ddspstl.interfaces.ConnectInClient;
-import fr.ddspstl.interfaces.ConnectOutClient;
+import org.omg.dds.pub.DataWriter;
+import org.omg.dds.sub.DataReader;
+import org.omg.dds.topic.Topic;
+import org.omg.dds.topic.TopicDescription;
+
+import fr.ddspstl.interfaces.ConnectClient;
+
 import fr.sorbonne_u.components.connectors.AbstractConnector;
 
-public class ConnectorClient extends AbstractConnector implements ConnectOutClient {
+public class ConnectorClient<T> extends AbstractConnector implements ConnectClient<T> {
 
-
-	@Override
-	public String getReaderURI() throws Exception{
-		return ((ConnectInClient)this.offering).getReaderURI();
+	public DataReader<T> getReader(TopicDescription<T> topic) throws Exception {
+		return ((ConnectClient<T>)this.offering).getReader(topic);
 	}
 
-	@Override
-	public String getWriterURI() throws Exception{
-		return ((ConnectInClient)this.offering).getWriterURI();
+	public DataWriter<T> getWriter(Topic<T> topic) throws Exception {
+		return ((ConnectClient<T>)this.offering).getWriter(topic);
 	}
 
-	@Override
-	public void disconnectClient(String dataReader, String dataWriter) throws Exception{
-		((ConnectInClient)this.offering).disconnectClient(dataReader, dataWriter);
-	}
+
+	
 
 }

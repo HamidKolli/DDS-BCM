@@ -1,6 +1,6 @@
 package fr.ddspstl.ports;
 
-
+import org.omg.dds.topic.Topic;
 
 import fr.ddspstl.interfaces.Propagation;
 import fr.ddspstl.plugin.ConnectionPlugin;
@@ -8,7 +8,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
-public class InPortPropagation extends AbstractInboundPort implements Propagation{
+public class InPortPropagation<T> extends AbstractInboundPort implements Propagation<T>{
 
 	private static final long serialVersionUID = 1L;
 
@@ -18,13 +18,12 @@ public class InPortPropagation extends AbstractInboundPort implements Propagatio
 	}
 
 	@Override
-	public <T> void propager(T newObject, String topicName, String id) throws Exception {
+	public void propager(T newObject, Topic<T> topicName, String id) throws Exception {
 		getOwner().runTask(new AbstractComponent.AbstractTask(getPluginURI()) {
-			
 			@Override
 			public void run() {
 				try {
-					((ConnectionPlugin)getTaskProviderReference()).propager(newObject,topicName,id);
+					((ConnectionPlugin)getTaskProviderReference()).propagerIn(newObject,topicName,id);
 				} catch (Exception e) {
 				}
 				

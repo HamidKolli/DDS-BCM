@@ -22,34 +22,59 @@ import org.omg.dds.pub.Publisher;
 import org.omg.dds.topic.SubscriptionBuiltinTopicData;
 import org.omg.dds.topic.Topic;
 
-import fr.ddspstl.DDS.data.Datas;
+import fr.ddspstl.connectors.ConnectorRead;
+import fr.ddspstl.interfaces.WriteCI;
+import fr.ddspstl.ports.OutPortWrite;
+import fr.sorbonne_u.components.AbstractPlugin;
+import fr.sorbonne_u.components.ComponentI;
 
-public class DataWriter<T> implements org.omg.dds.pub.DataWriter<T> {
+public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.DataWriter<T> {
 
-	private Datas<T> datas;
+	private static final long serialVersionUID = 1L;
+	private Topic<T> topic;
 	private Publisher publisher;
 	private DataWriterQos qos;
 	private DataWriterListener<T> listener;
 	private Collection<Class<? extends Status>> statuses;
+	private OutPortWrite<T> outPortWrite;	
+	private String inPortReadDDSNode;
 
-	public DataWriter(Topic<T> datas, Publisher publisher) {
+	public DataWriter(Topic<T> datas, Publisher publisher,String inPortReadDDSNode) {
 		super();
-		this.datas = (Datas<T>) datas;
+		this.topic =  datas;
 		this.publisher = publisher;
+		this.inPortReadDDSNode = inPortReadDDSNode;
 	}
 
-	public DataWriter(Topic<T> datas, Publisher publisher, DataWriterQos qos, DataWriterListener<T> listener,
-			Collection<Class<? extends Status>> statuses) {
-		this(datas, publisher, qos);
-
-		this.listener = listener;
-		this.statuses = statuses;
+	
+	
+	@Override
+	public void installOn(ComponentI owner) throws Exception {
+		super.installOn(owner);
+		this.addRequiredInterface(WriteCI.class);
 	}
-
-	public DataWriter(Topic<T> datas, Publisher publisher, DataWriterQos qos) {
-		this(datas, publisher);
-		this.qos = qos;
+	
+	
+	@Override
+	public void initialise() throws Exception {
+		super.initialise();
+		this.outPortWrite = new OutPortWrite<T>(getOwner());
+		this.outPortWrite.publishPort();
+		getOwner().doPortConnection(outPortWrite.getPortURI(), inPortReadDDSNode, ConnectorRead.class.getCanonicalName());
 	}
+	
+	@Override
+	public void finalise() throws Exception {
+		outPortWrite.doDisconnection();
+		super.finalise();
+	}
+	
+	public void uninstall() throws Exception {
+		outPortWrite.unpublishPort();
+		outPortWrite.destroyPort();
+		super.uninstall();
+	}
+	
 
 	@Override
 	public DataWriterListener<T> getListener() {
@@ -85,17 +110,17 @@ public class DataWriter<T> implements org.omg.dds.pub.DataWriter<T> {
 
 	@Override
 	public void enable() {
-		datas.enable();
+		topic.enable();
 	}
 
 	@Override
 	public Set<Class<? extends Status>> getStatusChanges() {
-		return datas.getStatusChanges();
+		return topic.getStatusChanges();
 	}
 
 	@Override
 	public InstanceHandle getInstanceHandle() {
-		return datas.getInstanceHandle();
+		return topic.getInstanceHandle();
 	}
 
 	@Override
@@ -105,7 +130,7 @@ public class DataWriter<T> implements org.omg.dds.pub.DataWriter<T> {
 
 	@Override
 	public void retain() {
-		datas.retain();
+		topic.retain();
 	}
 
 	@Override
@@ -121,7 +146,7 @@ public class DataWriter<T> implements org.omg.dds.pub.DataWriter<T> {
 
 	@Override
 	public Topic<T> getTopic() {
-		return datas;
+		return topic;
 	}
 
 	@Override
@@ -225,12 +250,16 @@ public class DataWriter<T> implements org.omg.dds.pub.DataWriter<T> {
 
 	@Override
 	public void write(T instanceData) throws TimeoutException {
-		datas.write(instanceData);
+		try {
+			this.outPortWrite.write(topic, instanceData);
+		} catch (Exception e) {
+
+		}
 	}
 
 	@Override
 	public void write(T instanceData, Time sourceTimestamp) throws TimeoutException {
-		datas.write(instanceData, sourceTimestamp);
+		
 
 	}
 

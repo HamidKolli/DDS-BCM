@@ -22,7 +22,7 @@ import org.omg.dds.topic.TopicQos;
 
 import fr.ddspstl.DDS.publishers.data.DataWriter;
 
-public class Publisher implements org.omg.dds.pub.Publisher {
+public class Publisher implements fr.ddspstl.DDS.publishers.interfaces.Publisher {
 
 	private DomainParticipant domainParticipant;
 	private Map<String, org.omg.dds.pub.DataWriter<Object>> dataWriters;
@@ -103,36 +103,18 @@ public class Publisher implements org.omg.dds.pub.Publisher {
 		return domainParticipant.getEnvironment();
 	}
 
-	@Override
-	public <TYPE> DataWriter<TYPE> createDataWriter(Topic<TYPE> topic) {
-		DataWriter<TYPE> d = new DataWriter<>(topic, this);
-		dataWriters.put(topic.getName(), (org.omg.dds.pub.DataWriter<Object>) d);
-		return d;
-	}
 
-	@Override
-	public <TYPE> DataWriter<TYPE> createDataWriter(Topic<TYPE> topic, DataWriterQos qos,
-			DataWriterListener<TYPE> listener, Collection<Class<? extends Status>> statuses) {
-		DataWriter<TYPE> d = new DataWriter<>(topic, this, qos, listener, statuses);
-		dataWriters.put(topic.getName(), (org.omg.dds.pub.DataWriter<Object>) d);
-		return d;
-	}
 
-	@Override
-	public <TYPE> DataWriter<TYPE> createDataWriter(Topic<TYPE> topic, DataWriterQos qos) {
-		DataWriter<TYPE> d = new DataWriter<>(topic, this, qos);
-		dataWriters.put(topic.getName(), (org.omg.dds.pub.DataWriter<Object>) d);
-		return d;
-	}
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> DataWriter<TYPE> lookupDataWriter(String topicName) {
 		return (DataWriter<TYPE>) dataWriters.get(topicName);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> DataWriter<TYPE> lookupDataWriter(Topic<TYPE> topic) {
-		 return (DataWriter<TYPE>) dataWriters.get(topic.getName());
+		return (DataWriter<TYPE>) dataWriters.get(topic.getName());
 	}
 
 	@Override
@@ -205,5 +187,29 @@ public class Publisher implements org.omg.dds.pub.Publisher {
 	public DomainParticipant getParent() {
 		return domainParticipant;
 	}
+
+	public <TYPE> DataWriter<TYPE>  createDataWriter(Topic<TYPE>  topic, String uriPortSortant) {
+		DataWriter<TYPE> d = new DataWriter<>(topic, this,uriPortSortant);
+		dataWriters.put(topic.getName(), (org.omg.dds.pub.DataWriter<Object>) d);
+		return d;
+	}
+
+	public <TYPE> org.omg.dds.pub.DataWriter<TYPE> createDataWriter(Topic<TYPE> topic) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public <TYPE> org.omg.dds.pub.DataWriter<TYPE> createDataWriter(Topic<TYPE> topic, DataWriterQos qos,
+			DataWriterListener<TYPE> listener, Collection<Class<? extends Status>> statuses) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public <TYPE> org.omg.dds.pub.DataWriter<TYPE> createDataWriter(Topic<TYPE> topic, DataWriterQos qos) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 
 }

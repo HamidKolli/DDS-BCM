@@ -5,6 +5,6 @@ import org.omg.dds.topic.Topic;
 import fr.sorbonne_u.components.interfaces.OfferedCI;
 import fr.sorbonne_u.components.interfaces.RequiredCI;
 
-public interface Propagation<T> extends OfferedCI, RequiredCI{
-	public void propager(T newObject, Topic<T> topic,String id) throws Exception;
+public interface WriteCI<T> extends RequiredCI,OfferedCI{
+	public void write(Topic<T> topic,T data) throws Exception ;
 }

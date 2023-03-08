@@ -1,23 +1,17 @@
 package fr.ddspstl.connectors;
 
 import org.omg.dds.sub.Sample.Iterator;
+import org.omg.dds.topic.TopicDescription;
 
-import fr.ddspstl.interfaces.InRead;
-import fr.ddspstl.interfaces.OutRead;
+import fr.ddspstl.interfaces.ReadCI;
 import fr.sorbonne_u.components.connectors.AbstractConnector;
 
-public class ConnectorRead extends AbstractConnector implements OutRead {
+public class ConnectorRead<TYPE> extends AbstractConnector implements ReadCI<TYPE> {
 
 
+	public  Iterator<TYPE> read(TopicDescription<TYPE> topic) throws Exception {
+		return ((ReadCI<TYPE> )this.offering).read(topic);
 
-	@Override
-	public String getDataReader(String topic)throws Exception {
-		return ((InRead)this.offering).getDataReader(topic);
-	}
-
-	@Override
-	public Iterator<?> read(String reader) throws Exception{
-		return ((InRead)this.offering).read(reader);
 	}
 
 }
