@@ -19,24 +19,26 @@ public class ClientReadComponent extends ClientComponent<String>{
 	@Override
 	public void execute() throws Exception {
 		
-		Thread.sleep(2000L);
+		System.out.println("debut reader");
 		
 		ClientPlugin<String> plugin = ((ClientPlugin<String>)getPlugin(pluginURI));
-		
+		plugin.connect();
+		Thread.sleep(1000L);
 		
 		
 		//How to read a data from a topic
 		
 		@SuppressWarnings("unchecked")
 		DataReader<String> dataReader  = plugin.connectReader(topic);
-		
+		System.out.println("data reader recup");
 		((PluginI)dataReader).setPluginURI(AbstractPort.generatePortURI());
 		this.installPlugin((PluginI)dataReader);
 		
-		
+		Thread.sleep(3000L);
 		@SuppressWarnings("unchecked")
-		Iterator<String> data =  (Iterator<String>) plugin.read(topic);
-		System.out.println(data);
+		Iterator<String> data =  (Iterator<String>) dataReader.read();
+		System.out.println("la donnee" + data);
+		
 		
 		super.execute();
 	}

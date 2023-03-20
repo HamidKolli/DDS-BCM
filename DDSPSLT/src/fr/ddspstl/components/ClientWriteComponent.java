@@ -15,12 +15,20 @@ public class ClientWriteComponent extends ClientComponent<String>{
 	
 	@Override
 	public void execute() throws Exception {
-		ClientPlugin<String> plugin = ((ClientPlugin<String>)getPlugin(pluginURI));
 		
+		System.out.println("debut writer");
+		
+		ClientPlugin<String> plugin = ((ClientPlugin<String>)getPlugin(pluginURI));
+		plugin.connect();
+		Thread.sleep(1000L);
 		DataWriter<String> dataWriter = plugin.connectWriter(topic);
-		((PluginI)dataWriter).setPluginURI(AbstractPort.generatePortURI());
+		System.out.println("data writer recup");
+		String tmp = AbstractPort.generatePortURI();
+		((PluginI)dataWriter).setPluginURI(tmp);
 		this.installPlugin(((PluginI)dataWriter));
-		plugin.write(topic, "Hello");
+		System.out.println("data writer installer");
+		System.out.println("j'ecrit");
+		dataWriter.write("Hello");
 		super.execute();
 	}
 

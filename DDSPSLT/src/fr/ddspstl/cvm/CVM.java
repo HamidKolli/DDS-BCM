@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.omg.dds.core.ServiceEnvironment;
 import org.omg.dds.domain.DomainParticipant;
 import org.omg.dds.topic.Topic;
 
@@ -27,8 +26,7 @@ public class CVM extends AbstractCVM {
 	public void deploy() throws Exception {
 
 		String topicName = "Hello";
-		ServiceEnvironment se = ServiceEnvironment.createInstance(null);
-		DomainParticipant dp = new fr.ddspstl.DDS.Domain.DomainParticipant(1, se);
+		DomainParticipant dp = new fr.ddspstl.DDS.Domain.DomainParticipant(1, null);
 		Topic<String> topic = dp.createTopic(topicName, String.class);
 		
 		Map<Topic<String>,String> topicId = new HashMap<>();
@@ -42,9 +40,9 @@ public class CVM extends AbstractCVM {
 		uris.add(AbstractPort.generatePortURI());
 
 		List<String> urisForClient = new ArrayList<>();
-		uris.add(AbstractPort.generatePortURI());
-		uris.add(AbstractPort.generatePortURI());
-		uris.add(AbstractPort.generatePortURI());
+		urisForClient.add(AbstractPort.generatePortURI());
+		urisForClient.add(AbstractPort.generatePortURI());
+		urisForClient.add(AbstractPort.generatePortURI());
 
 		for (int i = 0; i < uris.size(); i++) {
 			String tmp = uris.get(i);
@@ -52,14 +50,15 @@ public class CVM extends AbstractCVM {
 			List<String> urisTmp = new ArrayList<>(uris);
 			AbstractComponent.createComponent(DDSNode.class.getCanonicalName(),
 					new Object[] { 1, 0, tmp, urisForClient.get(i), urisTmp, dp,datas,topicId });
+			
 			uris.add(i, tmp);
 		}
 
 		AbstractComponent.createComponent(ClientReadComponent.class.getCanonicalName(),
-				new Object[] { 1, 0, urisForClient.get(2) });
+				new Object[] { 1, 0, urisForClient.get(0),topic });
 		
 		AbstractComponent.createComponent(ClientWriteComponent.class.getCanonicalName(),
-				new Object[] { 1, 0, urisForClient.get(0) });
+				new Object[] { 1, 0, urisForClient.get(0),topic });
 		
 		
 
@@ -70,8 +69,8 @@ public class CVM extends AbstractCVM {
 		CVM cvm;
 		try {
 			cvm = new CVM();
-			cvm.startStandardLifeCycle(20000L);
-			Thread.sleep(1000L);
+			cvm.startStandardLifeCycle(200000L);
+			Thread.sleep(10000L);
 			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();

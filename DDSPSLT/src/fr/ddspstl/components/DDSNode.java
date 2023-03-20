@@ -15,7 +15,7 @@ import org.omg.dds.topic.TopicDescription;
 import fr.ddspstl.DDS.data.Datas;
 import fr.ddspstl.components.interfaces.IDDSNode;
 import fr.ddspstl.exceptions.DDSTopicNotFoundException;
-import fr.ddspstl.plugin.ConnectionPlugin;
+import fr.ddspstl.plugin.DDSPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
@@ -23,7 +23,7 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 
 public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
-	private ConnectionPlugin<T> plugin;
+	private DDSPlugin<T> plugin;
 	private List<String> uriDDSNodes;
 	// DDS
 	private DomainParticipant domainParticipant;
@@ -45,7 +45,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		this.topicID = new HashMap<>(topicID);
 		this.uriDDSNodes = new ArrayList<String>(uriDDSNodes);
 
-		plugin = new ConnectionPlugin<T>(uriConnectDDSNode, uriConnectInPort, domainParticipant, publisher, subscriber);
+		plugin = new DDSPlugin<T>(uriConnectDDSNode, uriConnectInPort, domainParticipant, publisher, subscriber);
 
 	}
 

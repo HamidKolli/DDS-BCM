@@ -203,7 +203,6 @@ public class Subscriber implements fr.ddspstl.DDS.subscribers.interfaces.Subscri
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic, String uriPortDDSNode) {
 		DataReader<TYPE> data = new DataReader<>(topic, this, uriPortDDSNode);
 		dataReaders.put(topic.getName(), (org.omg.dds.sub.DataReader<Object>) data);

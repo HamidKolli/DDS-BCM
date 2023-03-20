@@ -31,7 +31,7 @@ import fr.ddspstl.ports.OutPortPropagation;
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
 
-public class ConnectionPlugin<T> extends AbstractPlugin {
+public class DDSPlugin<T> extends AbstractPlugin {
 
 	private static final long serialVersionUID = 1L;
 
@@ -48,7 +48,7 @@ public class ConnectionPlugin<T> extends AbstractPlugin {
 	private Publisher publisher;
 	private Subscriber subscriber;
 
-	public ConnectionPlugin(String uriConnection, String uriConnectInPort, DomainParticipant domainParticipant, Publisher publisher, Subscriber subscriber) {
+	public DDSPlugin(String uriConnection, String uriConnectInPort, DomainParticipant domainParticipant, Publisher publisher, Subscriber subscriber) {
 		this.uriConnectInPort = uriConnectInPort;
 		this.uriConnectDDSNode = uriConnection;
 		this.connectionOut = new HashMap<>();
@@ -113,6 +113,9 @@ public class ConnectionPlugin<T> extends AbstractPlugin {
 		inPortConnectClient.unpublishPort();
 		inPortRead.unpublishPort();
 		inPortWrite.unpublishPort();
+		inPortPropagation.unpublishPort();
+		
+		inPortPropagation.destroyPort();
 		connectionDDS.destroyPort();
 		inPortConnectClient.destroyPort();
 		inPortRead.destroyPort();
@@ -217,7 +220,7 @@ public class ConnectionPlugin<T> extends AbstractPlugin {
 		if(domainParticipant.findTopic(topic.getName(), null) == null) {
 			throw new DDSTopicNotFoundException();
 		}
-		return ((fr.ddspstl.DDS.publishers.interfaces.Publisher)publisher).createDataWriter(topic,inPortWrite.getClientPortURI());
+		return ((fr.ddspstl.DDS.publishers.interfaces.Publisher)publisher).createDataWriter(topic,inPortWrite.getPortURI());
 	}
 
 	@SuppressWarnings("unchecked")

@@ -4,7 +4,7 @@ import org.omg.dds.sub.Sample.Iterator;
 import org.omg.dds.topic.TopicDescription;
 
 import fr.ddspstl.interfaces.ReadCI;
-import fr.ddspstl.plugin.ConnectionPlugin;
+import fr.ddspstl.plugin.DDSPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
@@ -23,7 +23,7 @@ public class InPortRead<TYPE> extends AbstractInboundPort implements ReadCI<TYPE
 		return getOwner().handleRequest(new AbstractComponent.AbstractService<Iterator<TYPE>>(getPluginURI()) {
 			@Override
 			public Iterator<TYPE> call() throws Exception {
-				return ((ConnectionPlugin)getServiceProviderReference()).read(topic);
+				return ((DDSPlugin)getServiceProviderReference()).read(topic);
 			}
 		});
 	}

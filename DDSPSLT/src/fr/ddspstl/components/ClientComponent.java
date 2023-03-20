@@ -71,25 +71,11 @@ public abstract class ClientComponent<T> extends AbstractComponent {
 		plugin.write(dataWriter, (T) data.next());
 		plugin.disconnect(dataReader,dataWriter);
 		*/
+		@SuppressWarnings("unchecked")
+		ClientPlugin<T> plugin = ((ClientPlugin<T>)getPlugin(pluginURI));
 		
 		super.execute();
 	}
 
 
-	@Override
-	public synchronized void finalise() throws Exception {
-		getPlugin(pluginURI).finalise();
-		super.finalise();
-	}
-	
-	@Override
-	public synchronized void shutdown() throws ComponentShutdownException {
-		try {
-			getPlugin(pluginURI).uninstall();
-		} catch (Exception e) {
-			throw new ComponentShutdownException(e);
-		}
-
-		super.shutdown();
-	}
 }

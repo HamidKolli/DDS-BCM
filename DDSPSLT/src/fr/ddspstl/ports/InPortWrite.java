@@ -4,7 +4,7 @@ package fr.ddspstl.ports;
 import org.omg.dds.topic.Topic;
 
 import fr.ddspstl.interfaces.WriteCI;
-import fr.ddspstl.plugin.ConnectionPlugin;
+import fr.ddspstl.plugin.DDSPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
@@ -22,7 +22,7 @@ public class InPortWrite<T> extends AbstractInboundPort implements WriteCI<T> {
 		 getOwner().handleRequest(new AbstractComponent.AbstractService<Void>(getPluginURI()) {
 			@Override
 			public Void call() throws Exception {
-				((ConnectionPlugin)getServiceProviderReference()).write(topic,data);
+				((DDSPlugin)getServiceProviderReference()).write(topic,data);
 				 return null;
 			}
 		});

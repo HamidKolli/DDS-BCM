@@ -214,7 +214,12 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 	}
 
 	public Iterator<T> read() {
-		// TODO Auto-generated method stub
+		try {
+			return this.portRead.read(topic);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
 	}
 

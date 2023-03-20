@@ -1,6 +1,7 @@
 package fr.ddspstl.DDS.Domain;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -34,25 +35,26 @@ import org.omg.dds.topic.TopicQos;
 import org.omg.dds.type.TypeSupport;
 import org.omg.dds.type.dynamic.DynamicType;
 
+import fr.ddspstl.DDS.Exemples.TypeSupportString;
+
 public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 
-	
 	private int domainId;
 	private Map<String, Topic<Object>> topics;
 	private ServiceEnvironment serviceEnvironment;
-	
-	
+
 	public DomainParticipant(ServiceEnvironment serviceEnvironment) {
-		this((new Random()).nextInt(),serviceEnvironment);
+		this((new Random()).nextInt(), serviceEnvironment);
 	}
 
-	public DomainParticipant(int domainID,ServiceEnvironment serviceEnvironment) {
+	public DomainParticipant(int domainID, ServiceEnvironment serviceEnvironment) {
 		this.domainId = domainID;
 		this.serviceEnvironment = serviceEnvironment;
+		topics = new HashMap<>();
 	}
 
 	// Listener
-	
+
 	@Override
 	public DomainParticipantListener getListener() {
 		// TODO Auto-generated method stub
@@ -70,8 +72,8 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 		// TODO Auto-generated method stub
 
 	}
-	
-	//QOS
+
+	// QOS
 
 	@Override
 	public DomainParticipantQos getQos() {
@@ -96,8 +98,7 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 		// TODO Auto-generated method stub
 
 	}
-	
-	
+
 	// Listener
 
 	@Override
@@ -130,7 +131,7 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 	}
 
 	// Publisher
-	
+
 	@Override
 	public Publisher createPublisher() {
 		return new fr.ddspstl.DDS.publishers.Publisher(this);
@@ -148,9 +149,8 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 		return null;
 	}
 
-	
 	// Subscriber
-	
+
 	@Override
 	public Subscriber createSubscriber() {
 		return new fr.ddspstl.DDS.subscribers.Subscriber(this);
@@ -176,10 +176,11 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 	}
 
 	// Topic
+	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> Topic<TYPE> createTopic(String topicName, Class<TYPE> type) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return (Topic<TYPE>) createTopic(topicName, new TypeSupportString(getEnvironment(), type.getName()));
 	}
 
 	@Override
@@ -192,8 +193,8 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> Topic<TYPE> createTopic(String topicName, TypeSupport<TYPE> type) {
-		
-		Topic<TYPE> t =  new fr.ddspstl.DDS.topic.Topic<>(type, serviceEnvironment, topicName, this);
+
+		Topic<TYPE> t = new fr.ddspstl.DDS.topic.Topic<>(type, serviceEnvironment, topicName, this);
 		topics.put(topicName, (Topic<Object>) t);
 		return t;
 	}

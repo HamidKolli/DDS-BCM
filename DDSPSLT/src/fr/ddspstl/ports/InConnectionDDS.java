@@ -1,7 +1,7 @@
 package fr.ddspstl.ports;
 
 import fr.ddspstl.interfaces.ConnectDDSNode;
-import fr.ddspstl.plugin.ConnectionPlugin;
+import fr.ddspstl.plugin.DDSPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
@@ -23,7 +23,7 @@ public class InConnectionDDS extends AbstractInboundPort implements ConnectDDSNo
 
 			@Override
 			public Void call() throws Exception {
-				((ConnectionPlugin)getServiceProviderReference()).disconnectBack(uri);
+				((DDSPlugin)getServiceProviderReference()).disconnectBack(uri);
 				return null;
 			}
 			
@@ -36,7 +36,7 @@ public class InConnectionDDS extends AbstractInboundPort implements ConnectDDSNo
 
 			@Override
 			public String call() throws Exception {
-				return ((ConnectionPlugin)getServiceProviderReference()).connectBack(uri,uriPropagation,domainID);
+				return ((DDSPlugin)getServiceProviderReference()).connectBack(uri,uriPropagation,domainID);
 			}
 			
 		});
