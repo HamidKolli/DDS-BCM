@@ -12,10 +12,12 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 public class ClientReadComponent extends ClientComponent{
 
 	private String topicName;
+	private Subscriber subscriber;
 	private DataReader<?> dataReader;
 	protected ClientReadComponent(int nbThreads, int nbSchedulableThreads,String uriDDSNode,DomainParticipant domainParticipant,String topicName) throws Exception {
 		super(nbThreads, nbSchedulableThreads,uriDDSNode,domainParticipant);
 		this.topicName = topicName;
+		this.subscriber = (Subscriber) domainParticipant.createSubscriber();
 	}
 
 	@Override

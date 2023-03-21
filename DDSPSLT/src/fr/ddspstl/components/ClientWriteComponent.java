@@ -1,10 +1,7 @@
 package fr.ddspstl.components;
 
-import java.util.concurrent.TimeoutException;
-
 import org.omg.dds.domain.DomainParticipant;
 import org.omg.dds.pub.DataWriter;
-import org.omg.dds.topic.Topic;
 
 import fr.ddspstl.DDS.publishers.interfaces.Publisher;
 import fr.sorbonne_u.components.AbstractPort;
@@ -15,9 +12,11 @@ public class ClientWriteComponent extends ClientComponent{
 
 	private String topicName;
 	private DataWriter<String> dataWriter;
+	protected Publisher publisher;
 	protected ClientWriteComponent(int nbThreads, int nbSchedulableThreads,String uriDDSNode,DomainParticipant domainParticipant,String topicName) throws Exception {
 		super(nbThreads, nbSchedulableThreads,uriDDSNode,domainParticipant);
 		this.topicName = topicName;
+		this.publisher = (Publisher) domainParticipant.createPublisher();
 	}
 	
 	@Override
