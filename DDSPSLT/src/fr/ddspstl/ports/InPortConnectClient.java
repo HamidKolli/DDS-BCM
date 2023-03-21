@@ -1,18 +1,12 @@
 package fr.ddspstl.ports;
 
-import org.omg.dds.pub.DataWriter;
-import org.omg.dds.sub.DataReader;
-import org.omg.dds.topic.Topic;
-import org.omg.dds.topic.TopicDescription;
-
 import fr.ddspstl.interfaces.ConnectClient;
-
 import fr.ddspstl.plugin.DDSPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
-public class InPortConnectClient<T> extends AbstractInboundPort implements ConnectClient<T> {
+public class InPortConnectClient extends AbstractInboundPort implements ConnectClient {
 
 	private static final long serialVersionUID = 1L;
 
@@ -22,25 +16,29 @@ public class InPortConnectClient<T> extends AbstractInboundPort implements Conne
 
 
 
+
+
+
 	@Override
-	public DataReader<T> getReader(TopicDescription<T> topic) throws Exception {
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<DataReader<T>>(getPluginURI()) {
+	public String getReaderURI() throws Exception {
+		return getOwner().handleRequest(new AbstractComponent.AbstractService<String>(getPluginURI()) {
 			@SuppressWarnings("unchecked")
 			@Override
-			public DataReader<T> call() throws Exception {
-				return ((DDSPlugin<T>)getServiceProviderReference()).getDataReader(topic);
+			public String call() throws Exception {
+				return ((DDSPlugin)getServiceProviderReference()).getReaderURI();
 			}
 		});
 	}
 
 
+
 	@Override
-	public DataWriter<T> getWriter(Topic<T> topic) throws Exception {
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<DataWriter<T>>(getPluginURI()) {
+	public String getWriterURI() throws Exception {
+		return getOwner().handleRequest(new AbstractComponent.AbstractService<String>(getPluginURI()) {
 			@SuppressWarnings("unchecked")
 			@Override
-			public DataWriter<T> call() throws Exception {
-				return ((DDSPlugin<T>)getServiceProviderReference()).getDataWriter(topic);
+			public String call() throws Exception {
+				return ((DDSPlugin)getServiceProviderReference()).getWriterURI();
 			}
 		});
 	}

@@ -1,42 +1,51 @@
 package fr.ddspstl.components;
 
+import org.omg.dds.domain.DomainParticipant;
 import org.omg.dds.sub.DataReader;
-import org.omg.dds.topic.TopicDescription;
 
 import fr.ddspstl.DDS.samples.Sample.Iterator;
-import fr.ddspstl.DDS.topic.Topic;
-import fr.ddspstl.plugin.ClientPlugin;
+import fr.ddspstl.DDS.subscribers.interfaces.Subscriber;
 import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.PluginI;
+import fr.sorbonne_u.components.exceptions.ComponentStartException;
 
-public class ClientReadComponent extends ClientComponent<String>{
+public class ClientReadComponent extends ClientComponent{
 
-	protected ClientReadComponent(int nbThreads, int nbSchedulableThreads, String uriConnectPortDDS, Topic<String> topic) throws Exception {
-		super(nbThreads, nbSchedulableThreads, uriConnectPortDDS,topic);
+	private String topicName;
+	private DataReader<?> dataReader;
+	protected ClientReadComponent(int nbThreads, int nbSchedulableThreads,String uriDDSNode,DomainParticipant domainParticipant,String topicName) throws Exception {
+		super(nbThreads, nbSchedulableThreads,uriDDSNode,domainParticipant);
+		this.topicName = topicName;
 	}
 
-	
+	@Override
+	public synchronized void start() throws ComponentStartException {
+		try {
+			org.omg.dds.topic.Topic<?> topic  =  domainParticipant.findTopic(topicName, null);
+			if(topic == null)
+				throw new Exception("topic not found");
+			dataReader = ((Subscriber)subscriber).createDataReader(topic,uriDDSNode);
+			PluginI plugin  = (PluginI)dataReader;
+			plugin.setPluginURI(AbstractPort.generatePortURI());
+			this.installPlugin(plugin);
+		} catch (Exception e) {
+			throw new ComponentStartException(e);
+		}
+		super.start();
+	}
 	@Override
 	public void execute() throws Exception {
 		
 		System.out.println("debut reader");
 		
-		ClientPlugin<String> plugin = ((ClientPlugin<String>)getPlugin(pluginURI));
-		plugin.connect();
 		Thread.sleep(1000L);
 		
 		
 		//How to read a data from a topic
-		
-		@SuppressWarnings("unchecked")
-		DataReader<String> dataReader  = plugin.connectReader(topic);
-		System.out.println("data reader recup");
-		((PluginI)dataReader).setPluginURI(AbstractPort.generatePortURI());
-		this.installPlugin((PluginI)dataReader);
-		
+
 		Thread.sleep(3000L);
 		@SuppressWarnings("unchecked")
-		Iterator<String> data =  (Iterator<String>) dataReader.read();
+		Iterator<?> data =  (Iterator<?>) dataReader.read();
 		System.out.println("la donnee" + data);
 		
 		

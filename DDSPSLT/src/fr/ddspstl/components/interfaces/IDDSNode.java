@@ -8,7 +8,6 @@ import fr.ddspstl.exceptions.DDSTopicNotFoundException;
 
 public interface IDDSNode<T> {
 
-	public int getDomainId();
 
 	public void disconnectClient(String dataReader, String dataWriter);
 

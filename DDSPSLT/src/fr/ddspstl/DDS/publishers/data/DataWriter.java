@@ -22,8 +22,10 @@ import org.omg.dds.pub.Publisher;
 import org.omg.dds.topic.SubscriptionBuiltinTopicData;
 import org.omg.dds.topic.Topic;
 
-import fr.ddspstl.connectors.ConnectorRead;
+import fr.ddspstl.connectors.ConnectorClient;
+import fr.ddspstl.connectors.ConnectorWrite;
 import fr.ddspstl.interfaces.WriteCI;
+import fr.ddspstl.ports.OutPortConnectClient;
 import fr.ddspstl.ports.OutPortWrite;
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
@@ -37,13 +39,15 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	private DataWriterListener<T> listener;
 	private Collection<Class<? extends Status>> statuses;
 	private OutPortWrite<T> outPortWrite;	
-	private String inPortReadDDSNode;
+	private OutPortConnectClient outPortConnectClient;
+	private String inPortDDSNodeURI;
+	private String inPortWriteURI;
 
-	public DataWriter(Topic<T> datas, Publisher publisher,String inPortReadDDSNode) {
+	public DataWriter(Topic<T> datas, Publisher publisher,String inPortDDSNode) {
 		super();
 		this.topic =  datas;
 		this.publisher = publisher;
-		this.inPortReadDDSNode = inPortReadDDSNode;
+		this.inPortDDSNodeURI = inPortDDSNode;
 	}
 
 	
@@ -58,20 +62,28 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	@Override
 	public void initialise() throws Exception {
 		super.initialise();
-		this.outPortWrite = new OutPortWrite<T>(getOwner());
-		this.outPortWrite.publishPort();
-		getOwner().doPortConnection(outPortWrite.getPortURI(), inPortReadDDSNode, ConnectorRead.class.getCanonicalName());
+		outPortWrite = new OutPortWrite<T>(getOwner());
+		outPortWrite.publishPort();
+		outPortConnectClient = new OutPortConnectClient(getOwner());
+		outPortConnectClient.publishPort();
+		getOwner().doPortConnection(outPortConnectClient.getPortURI(), inPortDDSNodeURI, ConnectorClient.class.getCanonicalName());
+		inPortWriteURI = outPortConnectClient.getWriterURI();
+		getOwner().doPortConnection(outPortWrite.getPortURI(), inPortWriteURI, ConnectorWrite.class.getCanonicalName());
+		
 	}
 	
 	@Override
 	public void finalise() throws Exception {
 		outPortWrite.doDisconnection();
+		outPortConnectClient.doDisconnection();
 		super.finalise();
 	}
 	
 	public void uninstall() throws Exception {
 		outPortWrite.unpublishPort();
 		outPortWrite.destroyPort();
+		outPortConnectClient.unpublishPort();
+		outPortConnectClient.destroyPort();
 		super.uninstall();
 	}
 	

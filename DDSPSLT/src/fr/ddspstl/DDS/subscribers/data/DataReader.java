@@ -29,8 +29,10 @@ import org.omg.dds.sub.Subscriber.DataState;
 import org.omg.dds.topic.PublicationBuiltinTopicData;
 import org.omg.dds.topic.TopicDescription;
 
+import fr.ddspstl.connectors.ConnectorClient;
 import fr.ddspstl.connectors.ConnectorRead;
 import fr.ddspstl.interfaces.ReadCI;
+import fr.ddspstl.ports.OutPortConnectClient;
 import fr.ddspstl.ports.OutPortRead;
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
@@ -42,6 +44,8 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 	private Subscriber subscriber;
 	private OutPortRead<T> portRead;
 	private String uriPortDDSnode;
+	private String uriPortRead;
+	private OutPortConnectClient outPortConnectClient;
 
 	public DataReader(TopicDescription<T> topic, Subscriber subscriber, String uriPortDDSNode) {
 		this.topic = topic;
@@ -60,17 +64,25 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 		super.initialise();
 		portRead = new OutPortRead<>(getOwner());
 		portRead.publishPort();
-		getOwner().doPortConnection(portRead.getPortURI(), uriPortDDSnode, ConnectorRead.class.getCanonicalName());
+		outPortConnectClient = new OutPortConnectClient(getOwner());
+		outPortConnectClient.publishPort();
+		getOwner().doPortConnection(outPortConnectClient.getPortURI(), uriPortDDSnode, ConnectorClient.class.getCanonicalName());
+		String uriReader = outPortConnectClient.getReaderURI();
+		getOwner().doPortConnection(portRead.getPortURI(), uriReader, ConnectorRead.class.getCanonicalName());
+		
 	}
 
 	public void finalise() throws Exception {
 		portRead.doDisconnection();
+		outPortConnectClient.doDisconnection();
 		super.finalise();
 	}
 
 	public void uninstall() throws Exception {
 		portRead.unpublishPort();
 		portRead.destroyPort();
+		outPortConnectClient.unpublishPort();
+		outPortConnectClient.destroyPort();
 		super.uninstall();
 	}
 

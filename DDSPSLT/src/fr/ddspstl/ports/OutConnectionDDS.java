@@ -13,15 +13,13 @@ public class OutConnectionDDS extends AbstractOutboundPort implements ConnectDDS
 	}
 
 	@Override
-	public String connect(String uri,String uriPropagation, int domainID) throws Exception {
-		return ((ConnectDDSNode)getConnector()).connect(uri,uriPropagation, domainID);
-		
+	public String connect(String uri,String uriPropagation) throws Exception {
+		return ((ConnectDDSNode)getConnector()).connect(uri,uriPropagation);
 	}
 
 	@Override
 	public void disconnect(String uri) throws Exception {
 		((ConnectDDSNode)getConnector()).disconnect(uri);
-		
 	}
 
 }

@@ -131,4 +131,45 @@ public class Topic<T> implements org.omg.dds.topic.Topic<T> {
 		return domainParticipant;
 	}
 
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((typeName == null) ? 0 : typeName.hashCode());
+		result = prime * result + ((typeSupport == null) ? 0 : typeSupport.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof Topic)) {
+			return false;
+		}
+		Topic other = (Topic) obj;
+		if (typeName == null) {
+			if (other.typeName != null) {
+				return false;
+			}
+		} else if (!typeName.equals(other.typeName)) {
+			return false;
+		}
+		if (typeSupport == null) {
+			if (other.typeSupport != null) {
+				return false;
+			}
+		} else if (!typeSupport.equals(other.typeSupport)) {
+			return false;
+		}
+		return true;
+	}
+	
+	
+	
+	
+
 }
