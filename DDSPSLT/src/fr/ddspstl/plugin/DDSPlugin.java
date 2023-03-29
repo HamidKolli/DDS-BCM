@@ -17,6 +17,7 @@ import fr.ddspstl.interfaces.Propagation;
 import fr.ddspstl.interfaces.ReadCI;
 import fr.ddspstl.interfaces.WriteCI;
 import fr.ddspstl.ports.InConnectionDDS;
+import fr.ddspstl.ports.InPortConnectClient;
 import fr.ddspstl.ports.InPortPropagation;
 import fr.ddspstl.ports.InPortRead;
 import fr.ddspstl.ports.InPortWrite;
@@ -33,13 +34,16 @@ public class DDSPlugin<T> extends AbstractPlugin {
 	private InPortWrite<T> inPortWrite;
 	private InPortPropagation<T> inPortPropagation;
 	private InConnectionDDS connectionDDS;
+	private InPortConnectClient inPortConnectClient;
 	private String uriConnectDDSNode;
+	private String uriConnectClient;
 	private Map<String, OutConnectionDDS> connectionOut;
 	private Map<String,OutPortPropagation<T>> outPropagationPorts ;
 	
 
-	public DDSPlugin(String uriConnection) {
+	public DDSPlugin(String uriConnection, String uriConnectClient) {
 		this.uriConnectDDSNode = uriConnection;
+		this.uriConnectClient = uriConnectClient;
 		this.connectionOut = new HashMap<>();
 		this.outPropagationPorts = new HashMap<>();
 
@@ -72,14 +76,19 @@ public class DDSPlugin<T> extends AbstractPlugin {
 	public void initialise() throws Exception {
 		
 		super.initialise();
+		inPortConnectClient = new InPortConnectClient(uriConnectClient, getOwner(), getPluginURI());
+		inPortConnectClient.publishPort();
 		
-		this.connectionDDS = new InConnectionDDS(uriConnectDDSNode, getOwner(),getPluginURI());
-		this.inPortRead = new InPortRead<T>(getOwner(),getPluginURI());
-		this.inPortWrite = new InPortWrite<T>(getOwner(),getPluginURI());
-		this.inPortPropagation = new InPortPropagation<T>(getOwner(),getPluginURI());
+		connectionDDS = new InConnectionDDS(uriConnectDDSNode, getOwner(),getPluginURI());
 		connectionDDS.publishPort();
+		
+		inPortRead = new InPortRead<T>(getOwner(),getPluginURI());
 		inPortRead.publishPort();
+		
+		inPortWrite = new InPortWrite<T>(getOwner(),getPluginURI());
 		inPortWrite.publishPort();
+		
+		inPortPropagation = new InPortPropagation<T>(getOwner(),getPluginURI());
 		inPortPropagation.publishPort();
 		
 	}
@@ -94,11 +103,13 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 	@Override
 	public void uninstall() throws Exception {
+		inPortConnectClient.unpublishPort();
 		connectionDDS.unpublishPort();
 		inPortRead.unpublishPort();
 		inPortWrite.unpublishPort();
 		inPortPropagation.unpublishPort();
 		
+		inPortConnectClient.destroyPort();
 		inPortPropagation.destroyPort();
 		connectionDDS.destroyPort();
 		inPortRead.destroyPort();
@@ -169,15 +180,6 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		pOut.doDisconnection();
 		pOut.unpublishPort();
 		pOut.destroyPort();
-	}
-
-
-
-	
-
-	@SuppressWarnings("unchecked")
-	public void disconnectClient(String dataReader, String dataWriter) {
-		((IDDSNode<T>) getOwner()).disconnectClient(dataReader, dataWriter);
 	}
 
 

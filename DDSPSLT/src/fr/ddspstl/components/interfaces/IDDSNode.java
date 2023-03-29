@@ -8,9 +8,6 @@ import fr.ddspstl.exceptions.DDSTopicNotFoundException;
 
 public interface IDDSNode<T> {
 
-
-	public void disconnectClient(String dataReader, String dataWriter);
-
 	public  Iterator<T> read(TopicDescription<T> reader) throws DDSTopicNotFoundException;
 
 	public  void write(Topic<T> writer, T data) throws Exception;

@@ -24,7 +24,6 @@ public class ClientWriteComponent extends ClientComponent{
 		org.omg.dds.topic.Topic<?> topic;
 		try {
 			topic = domainParticipant.findTopic(topicName, null);
-			System.out.println(topicName);
 			
 			if(topic == null)
 				throw new Exception("topic not found");

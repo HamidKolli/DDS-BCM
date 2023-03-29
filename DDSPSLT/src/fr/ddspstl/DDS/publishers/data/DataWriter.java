@@ -24,6 +24,7 @@ import org.omg.dds.topic.Topic;
 
 import fr.ddspstl.connectors.ConnectorClient;
 import fr.ddspstl.connectors.ConnectorWrite;
+import fr.ddspstl.interfaces.ConnectClient;
 import fr.ddspstl.interfaces.WriteCI;
 import fr.ddspstl.ports.OutPortConnectClient;
 import fr.ddspstl.ports.OutPortWrite;
@@ -56,6 +57,7 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	public void installOn(ComponentI owner) throws Exception {
 		super.installOn(owner);
 		this.addRequiredInterface(WriteCI.class);
+		this.addRequiredInterface(ConnectClient.class);
 	}
 	
 	
@@ -66,9 +68,6 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 		outPortWrite.publishPort();
 		outPortConnectClient = new OutPortConnectClient(getOwner());
 		outPortConnectClient.publishPort();
-		getOwner().doPortConnection(outPortConnectClient.getPortURI(), inPortDDSNodeURI, ConnectorClient.class.getCanonicalName());
-		inPortWriteURI = outPortConnectClient.getWriterURI();
-		getOwner().doPortConnection(outPortWrite.getPortURI(), inPortWriteURI, ConnectorWrite.class.getCanonicalName());
 		
 	}
 	
@@ -263,7 +262,13 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	@Override
 	public void write(T instanceData) throws TimeoutException {
 		try {
+			getOwner().doPortConnection(outPortConnectClient.getPortURI(), inPortDDSNodeURI, ConnectorClient.class.getCanonicalName());
+			inPortWriteURI = outPortConnectClient.getWriterURI();
+			getOwner().doPortConnection(outPortWrite.getPortURI(), inPortWriteURI, ConnectorWrite.class.getCanonicalName());
+			
 			this.outPortWrite.write(topic, instanceData);
+			outPortConnectClient.doDisconnection();
+			outPortWrite.doDisconnection();
 		} catch (Exception e) {
 
 		}

@@ -25,7 +25,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	private Map<Topic<T>, Datas<T>> datas;
 	private Map<Topic<T>, String> topicID;
 
-	protected DDSNode(int nbThreads, int nbSchedulableThreads, String uriConnectDDSNode,
+	protected DDSNode(int nbThreads, int nbSchedulableThreads, String uriConnectDDSNode,String uriConnectClient,
 			List<String> uriDDSNodes, Map<Topic<T>, Datas<T>> datas, Map<Topic<T>, String> topicID) throws Exception {
 		super(nbThreads, nbSchedulableThreads);
 
@@ -33,7 +33,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		this.topicID = new HashMap<>(topicID);
 		this.uriDDSNodes = new ArrayList<String>(uriDDSNodes);
 
-		plugin = new DDSPlugin<T>(uriConnectDDSNode);
+		plugin = new DDSPlugin<T>(uriConnectDDSNode,uriConnectClient);
 
 	}
 
@@ -49,10 +49,6 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		super.start();
 	}
 
-	@Override
-	public void disconnectClient(String dataReader, String dataWriter) {
-
-	}
 
 	@Override
 	public void execute() throws Exception {

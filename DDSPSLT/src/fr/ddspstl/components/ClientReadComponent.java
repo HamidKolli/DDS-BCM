@@ -2,6 +2,7 @@ package fr.ddspstl.components;
 
 import org.omg.dds.domain.DomainParticipant;
 import org.omg.dds.sub.DataReader;
+import org.omg.dds.sub.Sample;
 
 import fr.ddspstl.DDS.samples.Sample.Iterator;
 import fr.ddspstl.DDS.subscribers.interfaces.Subscriber;
@@ -48,7 +49,10 @@ public class ClientReadComponent extends ClientComponent{
 		Thread.sleep(3000L);
 		@SuppressWarnings("unchecked")
 		Iterator<?> data =  (Iterator<?>) dataReader.read();
-		System.out.println("la donnee" + data);
+		while(data.hasNext()) {
+			System.out.println("la donnee" + data.next().getData());
+		}
+		
 		
 		
 		super.execute();

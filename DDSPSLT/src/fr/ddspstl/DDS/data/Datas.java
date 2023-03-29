@@ -1,5 +1,7 @@
 package fr.ddspstl.DDS.data;
 
+import java.util.Iterator;
+
 import org.omg.dds.core.Time;
 import org.omg.dds.sub.InstanceState;
 import org.omg.dds.sub.Sample;
@@ -20,6 +22,7 @@ public class Datas<T>  {
 	}
 
 	public Sample.Iterator<T> read() {
+	
 		return samplesData;
 	}
 

@@ -2,7 +2,6 @@ package fr.ddspstl.DDS.samples;
 
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.omg.dds.core.ModifiableInstanceHandle;
 import org.omg.dds.core.ServiceEnvironment;

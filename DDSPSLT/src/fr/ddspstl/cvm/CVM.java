@@ -49,7 +49,7 @@ public class CVM extends AbstractCVM {
 			uris.remove(uris.get(i));
 			List<String> urisTmp = new ArrayList<>(uris);
 			AbstractComponent.createComponent(DDSNode.class.getCanonicalName(),
-					new Object[] { 1, 0, tmp, urisTmp,urisForClient.get(i),datas,topicId });
+					new Object[] { 1, 0, tmp, urisForClient.get(i),urisTmp,datas,topicId });
 			
 			uris.add(i, tmp);
 		}
