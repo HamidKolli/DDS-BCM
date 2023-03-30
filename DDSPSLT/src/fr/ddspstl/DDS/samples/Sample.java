@@ -1,7 +1,9 @@
 package fr.ddspstl.DDS.samples;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 import org.omg.dds.core.ModifiableInstanceHandle;
 import org.omg.dds.core.ServiceEnvironment;
@@ -117,52 +119,54 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 
 	public static class Iterator<T> implements org.omg.dds.sub.Sample.Iterator<T> {
 
-		private LinkedList<org.omg.dds.sub.Sample<T>> list;
+		private ArrayList<org.omg.dds.sub.Sample<T>> list;
+		private ListIterator<org.omg.dds.sub.Sample<T>> iterator;
 		private boolean close;
 		
 
 		public Iterator() {
 			super();
-			list = new LinkedList<>();
+			list = new ArrayList<>();
+			
 			close = false;
 		}
 
 		@Override
 		public boolean hasNext() {
-			return list.listIterator().hasNext() && !close;
+			return iterator.hasNext() && !close;
 		}
 
 		@Override
 		public boolean hasPrevious() {
-			return list.listIterator().hasPrevious() && !close;
+			return iterator.hasPrevious() && !close;
 		}
 
 		@Override
-		public org.omg.dds.sub.Sample<T> next() {
+		public synchronized org.omg.dds.sub.Sample<T> next() {
 			if(close)
 				return null;
-			return list.listIterator().next();
+			return iterator.next();
 		}
 
 		@Override
 		public int nextIndex() {
 			if(close)
 				return -1;
-			return list.listIterator().nextIndex();
+			return iterator.nextIndex();
 		}
 
 		@Override
 		public org.omg.dds.sub.Sample<T> previous() {
 			if(close)
 				return null;
-			return list.listIterator().previous();
+			return iterator.previous();
 		}
 
 		@Override
 		public int previousIndex() {
 			if(close)
 				return -1;
-			return list.listIterator().previousIndex();
+			return iterator.previousIndex();
 		}
 
 		@Override
@@ -178,11 +182,14 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 		@Override
 		public void set(org.omg.dds.sub.Sample<T> o) {
 			list.set(0, o);
+			iterator = list.listIterator();
 		}
 
 		@Override
 		public void add(org.omg.dds.sub.Sample<T> o) {
+			System.out.println("hoho");
 			list.add(o);
+			iterator = list.listIterator();
 		}
 
 	}

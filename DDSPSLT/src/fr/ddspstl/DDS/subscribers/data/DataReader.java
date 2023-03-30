@@ -72,8 +72,6 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 	}
 
 	public void finalise() throws Exception {
-		portRead.doDisconnection();
-		outPortConnectClient.doDisconnection();
 		super.finalise();
 	}
 
@@ -232,9 +230,7 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 			
 			return this.portRead.read(topic);
 			
-			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
 			try {

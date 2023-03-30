@@ -2,13 +2,14 @@ package fr.ddspstl.cvm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.omg.dds.domain.DomainParticipant;
 import org.omg.dds.topic.Topic;
 
-import fr.ddspstl.DDS.data.Datas;
 import fr.ddspstl.components.ClientReadComponent;
 import fr.ddspstl.components.ClientWriteComponent;
 import fr.ddspstl.components.DDSNode;
@@ -32,8 +33,8 @@ public class CVM extends AbstractCVM {
 		Map<Topic<String>,String> topicId = new HashMap<>();
 		topicId.put(topic, topicName);
 		
-		Map<Topic<String>,Datas<String>> datas = new HashMap<>();
-		datas.put(topic, new Datas<>(topic));
+		Set<Topic<String>> topics = new HashSet<>();
+		topics.add(topic);
 		List<String> uris = new ArrayList<>();
 		uris.add(AbstractPort.generatePortURI());
 		uris.add(AbstractPort.generatePortURI());
@@ -49,7 +50,7 @@ public class CVM extends AbstractCVM {
 			uris.remove(uris.get(i));
 			List<String> urisTmp = new ArrayList<>(uris);
 			AbstractComponent.createComponent(DDSNode.class.getCanonicalName(),
-					new Object[] { 1, 0, tmp, urisForClient.get(i),urisTmp,datas,topicId });
+					new Object[] { 1, 0, tmp, urisForClient.get(i),urisTmp,topics,topicId });
 			
 			uris.add(i, tmp);
 		}
@@ -69,7 +70,7 @@ public class CVM extends AbstractCVM {
 		CVM cvm;
 		try {
 			cvm = new CVM();
-			cvm.startStandardLifeCycle(200000L);
+			cvm.startStandardLifeCycle(20000L);
 			Thread.sleep(10000L);
 			System.exit(0);
 		} catch (Exception e) {

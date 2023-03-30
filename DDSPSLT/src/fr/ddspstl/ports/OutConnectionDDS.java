@@ -1,5 +1,6 @@
 package fr.ddspstl.ports;
 
+import fr.ddspstl.addresses.INodeAddress;
 import fr.ddspstl.interfaces.ConnectDDSNode;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
@@ -12,14 +13,28 @@ public class OutConnectionDDS extends AbstractOutboundPort implements ConnectDDS
 		super(ConnectDDSNode.class, owner);
 	}
 
+
+
 	@Override
-	public String connect(String uri,String uriPropagation) throws Exception {
-		return ((ConnectDDSNode)getConnector()).connect(uri,uriPropagation);
+	public void connect(INodeAddress nodeAddress) throws Exception {
+		((ConnectDDSNode)getConnector()).connect(nodeAddress);
+
+		
 	}
 
 	@Override
-	public void disconnect(String uri) throws Exception {
-		((ConnectDDSNode)getConnector()).disconnect(uri);
+	public void connectPropagation(INodeAddress nodeAddress) throws Exception {
+		((ConnectDDSNode)getConnector()).connectPropagation(nodeAddress);
+
+		
 	}
+
+	@Override
+	public void disconnect(INodeAddress nodeAddress) throws Exception {
+		((ConnectDDSNode)getConnector()).disconnect(nodeAddress);
+		
+	}
+
+
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.omg.dds.sub.Sample.Iterator;
 import org.omg.dds.topic.Topic;
@@ -26,10 +27,14 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	private Map<Topic<T>, String> topicID;
 
 	protected DDSNode(int nbThreads, int nbSchedulableThreads, String uriConnectDDSNode,String uriConnectClient,
-			List<String> uriDDSNodes, Map<Topic<T>, Datas<T>> datas, Map<Topic<T>, String> topicID) throws Exception {
+			List<String> uriDDSNodes, Set<Topic<T>> topics, Map<Topic<T>, String> topicID) throws Exception {
 		super(nbThreads, nbSchedulableThreads);
 
-		this.datas = new HashMap<>(datas);
+		
+		this.datas = new HashMap<>();
+		for (Topic<T> topic : topics) {
+			datas.put( topic, new Datas<T>(topic));
+		}
 		this.topicID = new HashMap<>(topicID);
 		this.uriDDSNodes = new ArrayList<String>(uriDDSNodes);
 
@@ -66,7 +71,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
 	public void write(Topic<T> topic, T data) throws Exception {
 		Datas<T> dt = datas.get(topic);
-		dt.write(data);
+
 		propager(data, topic, AbstractPort.generatePortURI());
 	}
 

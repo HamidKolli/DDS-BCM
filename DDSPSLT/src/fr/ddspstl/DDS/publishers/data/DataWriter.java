@@ -73,8 +73,6 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	
 	@Override
 	public void finalise() throws Exception {
-		outPortWrite.doDisconnection();
-		outPortConnectClient.doDisconnection();
 		super.finalise();
 	}
 	

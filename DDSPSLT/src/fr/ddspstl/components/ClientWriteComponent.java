@@ -45,7 +45,7 @@ public class ClientWriteComponent extends ClientComponent{
 		System.out.println("debut writer");
 		
 		
-		Thread.sleep(1000L);
+		Thread.sleep(2000L);
 
 		System.out.println("j'ecrit");
 		dataWriter.write("Hello");
