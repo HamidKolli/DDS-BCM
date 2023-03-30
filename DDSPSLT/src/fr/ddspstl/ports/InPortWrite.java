@@ -19,14 +19,7 @@ public class InPortWrite<T> extends AbstractInboundPort implements WriteCI<T> {
 
 	@Override
 	public void write(Topic<T> topic, T data) throws Exception {
-		 getOwner().handleRequest(new AbstractComponent.AbstractService<Void>(getPluginURI()) {
-			@Override
-			public Void call() throws Exception {
-				((DDSPlugin)getServiceProviderReference()).write(topic,data);
-				 return null;
-			}
-		});
-		
+		 ((DDSPlugin) getOwnerPlugin(pluginURI)).write(topic,data);
 	}
 
 

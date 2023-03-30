@@ -24,10 +24,6 @@ public class Datas<T>  {
 		return samplesData;
 	}
 
-	public void write(T data) {
-		samplesData.add(new fr.ddspstl.DDS.samples.Sample<T>(topic.getEnvironment(), data));
-	}
-
 	public void write(T data, Time time) {
 		samplesData.add(new fr.ddspstl.DDS.samples.Sample<T>(topic.getEnvironment(), data, SampleState.READ, ViewState.NEW,
 				InstanceState.ALIVE, time));

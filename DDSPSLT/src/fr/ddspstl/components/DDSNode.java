@@ -1,11 +1,15 @@
 package fr.ddspstl.components;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import org.omg.dds.core.ServiceEnvironment;
+import org.omg.dds.core.Time;
 import org.omg.dds.sub.Sample.Iterator;
 import org.omg.dds.topic.Topic;
 import org.omg.dds.topic.TopicDescription;
@@ -71,7 +75,6 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
 	public void write(Topic<T> topic, T data) throws Exception {
 		Datas<T> dt = datas.get(topic);
-
 		propager(data, topic, AbstractPort.generatePortURI());
 	}
 
@@ -82,7 +85,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 			return;
 
 		topicID.put(topicName, id);
-		datas.get(topicName).write(newObject);
+		datas.get(topicName).write(newObject,Time.newTime((new Date()).getTime(), TimeUnit.MICROSECONDS, ServiceEnvironment.createInstance(getComponentLoader())));
 		plugin.propagerOut(newObject, topicName, id);
 
 	}

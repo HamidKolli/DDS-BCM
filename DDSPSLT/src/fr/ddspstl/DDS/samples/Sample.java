@@ -2,7 +2,9 @@ package fr.ddspstl.DDS.samples;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.omg.dds.core.ModifiableInstanceHandle;
@@ -119,7 +121,7 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 
 	public static class Iterator<T> implements org.omg.dds.sub.Sample.Iterator<T> {
 
-		private ArrayList<org.omg.dds.sub.Sample<T>> list;
+		private List<org.omg.dds.sub.Sample<T>> list;
 		private ListIterator<org.omg.dds.sub.Sample<T>> iterator;
 		private boolean close;
 		
@@ -182,13 +184,24 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 		@Override
 		public void set(org.omg.dds.sub.Sample<T> o) {
 			list.set(0, o);
+			Collections.sort(list, new Comparator<org.omg.dds.sub.Sample<T>>() {
+				@Override
+				public int compare(org.omg.dds.sub.Sample<T> o1, org.omg.dds.sub.Sample<T> o2) {
+					return (o1.getSourceTimestamp().compareTo(o.getSourceTimestamp()));
+				}
+			});
 			iterator = list.listIterator();
 		}
 
 		@Override
 		public void add(org.omg.dds.sub.Sample<T> o) {
-			System.out.println("hoho");
 			list.add(o);
+			Collections.sort(list, new Comparator<org.omg.dds.sub.Sample<T>>() {
+				@Override
+				public int compare(org.omg.dds.sub.Sample<T> o1, org.omg.dds.sub.Sample<T> o2) {
+					return (o1.getSourceTimestamp().compareTo(o.getSourceTimestamp()));
+				}
+			});
 			iterator = list.listIterator();
 		}
 
