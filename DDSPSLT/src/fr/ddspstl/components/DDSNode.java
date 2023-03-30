@@ -1,54 +1,75 @@
 package fr.ddspstl.components;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-import org.omg.dds.core.ServiceEnvironment;
 import org.omg.dds.core.Time;
-import org.omg.dds.sub.Sample.Iterator;
 import org.omg.dds.topic.Topic;
-import org.omg.dds.topic.TopicDescription;
 
-import fr.ddspstl.DDS.data.Datas;
+import fr.ddspstl.addresses.INodeAddress;
+import fr.ddspstl.addresses.NodeAddress;
 import fr.ddspstl.components.interfaces.IDDSNode;
-import fr.ddspstl.exceptions.DDSTopicNotFoundException;
+import fr.ddspstl.connectors.ConnectorConnectionDDS;
+import fr.ddspstl.connectors.ConnectorPropagation;
+import fr.ddspstl.interfaces.ConnectDDSNode;
+import fr.ddspstl.interfaces.Propagation;
 import fr.ddspstl.plugin.DDSPlugin;
+import fr.ddspstl.ports.InConnectionDDS;
+import fr.ddspstl.ports.InPortPropagation;
+import fr.ddspstl.ports.OutConnectionDDS;
+import fr.ddspstl.ports.OutPortPropagation;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.AbstractPort;
+import fr.sorbonne_u.components.annotations.OfferedInterfaces;
+import fr.sorbonne_u.components.annotations.RequiredInterfaces;
+import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 
+@RequiredInterfaces(required = { Propagation.class, ConnectDDSNode.class })
+@OfferedInterfaces(offered = { Propagation.class, ConnectDDSNode.class })
 public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
 	private DDSPlugin<T> plugin;
 	private List<String> uriDDSNodes;
-	// DDS
-	private Map<Topic<T>, Datas<T>> datas;
-	private Map<Topic<T>, String> topicID;
 
-	protected DDSNode(int nbThreads, int nbSchedulableThreads, String uriConnectDDSNode,String uriConnectClient,
+	private InPortPropagation<T> inPortPropagation;
+	private String uriConnectDDSNode;
+	private InConnectionDDS connectionDDS;
+	private Map<String, OutConnectionDDS> connectionOut;
+	private Map<INodeAddress, OutConnectionDDS> connectionOutWithAddresses;
+	private Map<INodeAddress, OutPortPropagation<T>> outPropagationPorts;
+	private INodeAddress nodeAddress;
+
+	protected DDSNode(int nbThreads, int nbSchedulableThreads, String uriConnectDDSNode, String uriConnectClient,
 			List<String> uriDDSNodes, Set<Topic<T>> topics, Map<Topic<T>, String> topicID) throws Exception {
 		super(nbThreads, nbSchedulableThreads);
 
-		
-		this.datas = new HashMap<>();
-		for (Topic<T> topic : topics) {
-			datas.put( topic, new Datas<T>(topic));
-		}
-		this.topicID = new HashMap<>(topicID);
 		this.uriDDSNodes = new ArrayList<String>(uriDDSNodes);
 
-		plugin = new DDSPlugin<T>(uriConnectDDSNode,uriConnectClient);
+		plugin = new DDSPlugin<T>(topics, topicID, uriConnectClient);
+
+		this.uriConnectDDSNode = uriConnectDDSNode;
+
+		this.connectionOut = new HashMap<>();
+		this.outPropagationPorts = new HashMap<>();
+		this.connectionOutWithAddresses = new HashMap<>();
 
 	}
 
 	@Override
 	public synchronized void start() throws ComponentStartException {
 		try {
+
+			inPortPropagation = new InPortPropagation<T>(this);
+			inPortPropagation.publishPort();
+
+			connectionDDS = new InConnectionDDS(uriConnectDDSNode, this);
+			connectionDDS.publishPort();
+
+			nodeAddress = new NodeAddress(connectionDDS.getPortURI(), inPortPropagation.getPortURI());
 
 			plugin.setPluginURI(AbstractPort.generatePortURI());
 			this.installPlugin(plugin);
@@ -58,36 +79,123 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		super.start();
 	}
 
+	public void connect() throws Exception {
+		for (String uri : uriDDSNodes) {
 
+			if (connectionOut.containsKey(uri)) {
+				return;
+			}
+			System.out.println("connect");
+			OutConnectionDDS cout = new OutConnectionDDS(this);
+			System.out.println("mon uri " + uriConnectDDSNode + "uri du voisin " + nodeAddress.getNodeURI());
+			this.doPortConnection(cout.getPortURI(), uri, ConnectorConnectionDDS.class.getCanonicalName());
+			System.out.println("port connected");
+			cout.connect(nodeAddress);
+			connectionOut.put(uri, cout);
+		}
+	}
+
+	public void connectPropagation(INodeAddress address) throws Exception {
+		OutPortPropagation<T> outPropagation = new OutPortPropagation<T>(this);
+		this.doPortConnection(outPropagation.getPortURI(), address.getPropagationURI(),
+				ConnectorPropagation.class.getCanonicalName());
+		outPropagationPorts.put(address, outPropagation);
+		OutConnectionDDS cout = connectionOut.get(address.getNodeURI());
+		connectionOutWithAddresses.put(address, cout);
+	}
+
+	public void connectBack(INodeAddress address) throws Exception {
+		OutConnectionDDS cout = new OutConnectionDDS(this);
+		this.doPortConnection(cout.getPortURI(), address.getNodeURI(), ConnectorConnectionDDS.class.getCanonicalName());
+		connectionOut.put(address.getNodeURI(), cout);
+		connectionOutWithAddresses.put(address, cout);
+		OutPortPropagation<T> outPropagation = new OutPortPropagation<T>(this);
+		this.doPortConnection(outPropagation.getPortURI(), address.getPropagationURI(),
+				ConnectorPropagation.class.getCanonicalName());
+		outPropagationPorts.put(address, outPropagation);
+		cout.connectPropagation(nodeAddress);
+
+	}
+
+	public void disconnectBack(INodeAddress address) throws Exception {
+		OutConnectionDDS out = connectionOut.remove(address.getNodeURI());
+		out.doDisconnection();
+		out.unpublishPort();
+		out.destroyPort();
+		OutPortPropagation<T> pOut = outPropagationPorts.remove(address);
+		pOut.doDisconnection();
+		pOut.unpublishPort();
+		pOut.destroyPort();
+
+	}
+
+	public void disconnect(INodeAddress uri) throws Exception {
+		OutConnectionDDS out = connectionOut.remove(uri.getNodeURI());
+		out.disconnect(uri);
+		out.doDisconnection();
+		out.unpublishPort();
+		out.destroyPort();
+		OutPortPropagation<T> pOut = outPropagationPorts.remove(uri);
+		pOut.doDisconnection();
+		pOut.unpublishPort();
+		pOut.destroyPort();
+	}
+
+	public void propagerIn(T newObject, Topic<T> topic, String id,Time time) throws Exception {
+		this.plugin.propager(newObject, topic, uriConnectDDSNode,time);
+	}
+
+	public void propagerOut(T newObject, Topic<T> topic, String id,Time time) throws Exception {
+		for (Map.Entry<INodeAddress, OutPortPropagation<T>> cp : outPropagationPorts.entrySet()) {
+			cp.getValue().propager(newObject, topic, id,time);
+		}
+	}
+
+	public void propager(T newObject, Topic<T> topic, String id,Time time) throws Exception {
+		propagerIn(newObject, topic, id,time);
+		propagerOut(newObject, topic, id,time);
+	}
+	
 	@Override
 	public void execute() throws Exception {
-		for (String uri : uriDDSNodes) {
-			this.plugin.connect(uri);
-		}
+
+		connect();
+
 		System.out.println("connexion fini ");
 		super.execute();
 	}
 
-	@SuppressWarnings("unchecked")
-	public Iterator<T> read(TopicDescription<T> topic) throws DDSTopicNotFoundException {
-		return datas.get(topic).read();
+	@Override
+	public synchronized void finalise() throws Exception {
+		for (Map.Entry<String, OutConnectionDDS> cp : connectionOut.entrySet()) {
+			cp.getValue().doDisconnection();
+		}
+		for (Map.Entry<INodeAddress, OutPortPropagation<T>> cp : outPropagationPorts.entrySet()) {
+			cp.getValue().doDisconnection();
+		}
+		super.finalise();
 	}
 
-	public void write(Topic<T> topic, T data) throws Exception {
-		Datas<T> dt = datas.get(topic);
-		propager(data, topic, AbstractPort.generatePortURI());
-	}
+	@Override
+	public synchronized void shutdown() throws ComponentShutdownException {
+		try {
+			connectionDDS.unpublishPort();
+			inPortPropagation.unpublishPort();
+			inPortPropagation.destroyPort();
+			connectionDDS.destroyPort();
+			for (Map.Entry<String, OutConnectionDDS> cp : connectionOut.entrySet()) {
+				cp.getValue().unpublishPort();
+				cp.getValue().destroyPort();
+			}
+			for (Map.Entry<INodeAddress, OutPortPropagation<T>> cp : outPropagationPorts.entrySet()) {
+				cp.getValue().unpublishPort();
+				cp.getValue().destroyPort();
+			}
+		} catch (Exception e) {
+			throw new ComponentShutdownException(e);
+		}
 
-	public void propager(T newObject, Topic<T> topicName, String id) throws Exception {
-		if (topicID.get(topicName) == null)
-			return;
-		if (topicID.get(topicName).equals(id))
-			return;
-
-		topicID.put(topicName, id);
-		datas.get(topicName).write(newObject,Time.newTime((new Date()).getTime(), TimeUnit.MICROSECONDS, ServiceEnvironment.createInstance(getComponentLoader())));
-		plugin.propagerOut(newObject, topicName, id);
-
+		super.shutdown();
 	}
 
 }

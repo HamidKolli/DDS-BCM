@@ -1,5 +1,6 @@
 package fr.ddspstl.ports;
 
+import org.omg.dds.core.Time;
 import org.omg.dds.topic.Topic;
 
 import fr.ddspstl.interfaces.Propagation;
@@ -14,8 +15,8 @@ public class OutPortPropagation<T> extends AbstractOutboundPort implements Propa
 		super(Propagation.class, owner);
 	}
 
-	public void propager(T newObject, Topic<T> topic, String id) throws Exception {
-		((Propagation)getConnector()).propager(newObject, topic, id);
+	public void propager(T newObject, Topic<T> topic, String id,Time time) throws Exception {
+		((Propagation)getConnector()).propager(newObject, topic, id,time);
 	}
 
 	

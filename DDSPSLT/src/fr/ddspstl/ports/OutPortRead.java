@@ -22,5 +22,11 @@ public class OutPortRead<TYPE> extends AbstractOutboundPort implements ReadCI<TY
 	}
 
 
+	@Override
+	public Iterator<TYPE> take(TopicDescription<TYPE> topic) throws Exception {
+		return ((ConnectorRead<TYPE>)getConnector()).take(topic);
+	}
+
+
 
 }

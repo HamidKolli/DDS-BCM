@@ -8,4 +8,5 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
 
 public interface ReadCI<TYPE> extends RequiredCI,OfferedCI{
 	public  Iterator<TYPE> read(TopicDescription<TYPE> topic)throws Exception ;
+	public  Iterator<TYPE> take(TopicDescription<TYPE> topic)throws Exception ;
 }
