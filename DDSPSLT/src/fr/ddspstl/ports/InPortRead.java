@@ -13,16 +13,18 @@ public class InPortRead<TYPE> extends AbstractInboundPort implements ReadCI<TYPE
 	private static final long serialVersionUID = 1L;
 
 	public InPortRead(ComponentI owner, String pluginURI) throws Exception {
-		super(ReadCI.class, owner, pluginURI, null);
+		super(ReadCI.class, owner, pluginURI,null);
 
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Iterator<TYPE> read(TopicDescription<TYPE> topic) throws Exception {
 
 		return ((DDSPlugin) getOwnerPlugin(pluginURI)).read(topic);
 
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Iterator<TYPE> take(TopicDescription<TYPE> topic) throws Exception {
 		

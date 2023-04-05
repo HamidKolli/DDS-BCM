@@ -15,6 +15,7 @@ public class OutPortWrite<T> extends AbstractOutboundPort implements WriteCI<T> 
 	}
 
 	
+	@SuppressWarnings("unchecked")
 	public  void write(Topic<T> topic, T data) throws Exception {
 		((WriteCI<T>)getConnector()).write(topic,data);
 		

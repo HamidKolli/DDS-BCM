@@ -17,11 +17,13 @@ public class OutPortRead<TYPE> extends AbstractOutboundPort implements ReadCI<TY
 	}
 
 
+	@SuppressWarnings("unchecked")
 	public  Iterator<TYPE> read(TopicDescription<TYPE> topic) throws Exception {
 		return ((ConnectorRead<TYPE>)getConnector()).read(topic);
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Iterator<TYPE> take(TopicDescription<TYPE> topic) throws Exception {
 		return ((ConnectorRead<TYPE>)getConnector()).take(topic);

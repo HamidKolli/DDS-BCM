@@ -1,10 +1,8 @@
 package fr.ddspstl.ports;
 
 import fr.ddspstl.addresses.INodeAddress;
-import fr.ddspstl.components.DDSNode;
 import fr.ddspstl.components.interfaces.IDDSNode;
 import fr.ddspstl.interfaces.ConnectDDSNode;
-import fr.ddspstl.plugin.DDSPlugin;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
@@ -13,14 +11,15 @@ public class InConnectionDDS extends AbstractInboundPort implements ConnectDDSNo
 
 	private static final long serialVersionUID = 1L;
 
-	public InConnectionDDS(String uri, ComponentI owner) throws Exception {
-		super(uri, ConnectDDSNode.class, owner);
+	public InConnectionDDS(String uri, ComponentI owner, String executorServicePropagationURI) throws Exception {
+		super(uri, ConnectDDSNode.class, owner,null,executorServicePropagationURI);
 	}
 
 	@Override
 	public void disconnect(INodeAddress address) throws Exception {
 
-		this.getOwner().runTask(new AbstractComponent.AbstractTask() {
+		this.getOwner().runTask(getExecutorServiceIndex(),new AbstractComponent.AbstractTask() {
+			@SuppressWarnings("rawtypes")
 			@Override
 			public void run() {
 				try {
@@ -35,8 +34,9 @@ public class InConnectionDDS extends AbstractInboundPort implements ConnectDDSNo
 
 	@Override
 	public void connect(INodeAddress address) throws Exception {
-		this.getOwner().runTask(new AbstractComponent.AbstractTask() {
+		this.getOwner().runTask(getExecutorServiceIndex(),new AbstractComponent.AbstractTask() {
 
+			@SuppressWarnings("rawtypes")
 			@Override
 			public void run() {
 				try {
@@ -51,8 +51,9 @@ public class InConnectionDDS extends AbstractInboundPort implements ConnectDDSNo
 
 	@Override
 	public void connectPropagation(INodeAddress address) throws Exception {
-		this.getOwner().runTask(new AbstractComponent.AbstractTask() {
+		this.getOwner().runTask(getExecutorServiceIndex(),new AbstractComponent.AbstractTask() {
 
+			@SuppressWarnings({ "rawtypes" })
 			@Override
 			public void run() {
 				try {

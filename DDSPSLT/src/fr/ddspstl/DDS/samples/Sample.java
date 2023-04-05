@@ -129,7 +129,7 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 		public Iterator() {
 			super();
 			list = new ArrayList<>();
-			
+			iterator = list.listIterator();
 			close = false;
 		}
 

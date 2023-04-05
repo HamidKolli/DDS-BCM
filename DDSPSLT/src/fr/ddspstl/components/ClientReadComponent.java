@@ -9,13 +9,15 @@ import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.PluginI;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 
-public class ClientReadComponent extends ClientComponent{
+public class ClientReadComponent extends ClientComponent {
 
 	private String topicName;
 	private Subscriber subscriber;
 	private DataReader<?> dataReader;
-	protected ClientReadComponent(int nbThreads, int nbSchedulableThreads,String uriDDSNode,DomainParticipant domainParticipant,String topicName) throws Exception {
-		super(nbThreads, nbSchedulableThreads,uriDDSNode,domainParticipant);
+
+	protected ClientReadComponent(int nbThreads, int nbSchedulableThreads, String uriDDSNode,
+			DomainParticipant domainParticipant, String topicName) throws Exception {
+		super(nbThreads, nbSchedulableThreads, uriDDSNode, domainParticipant);
 		this.topicName = topicName;
 		this.subscriber = (Subscriber) domainParticipant.createSubscriber();
 	}
@@ -23,11 +25,11 @@ public class ClientReadComponent extends ClientComponent{
 	@Override
 	public synchronized void start() throws ComponentStartException {
 		try {
-			org.omg.dds.topic.Topic<?> topic  =  domainParticipant.findTopic(topicName, null);
-			if(topic == null)
+			org.omg.dds.topic.Topic<?> topic = domainParticipant.findTopic(topicName, null);
+			if (topic == null)
 				throw new Exception("topic not found");
-			dataReader = ((Subscriber)subscriber).createDataReader(topic,uriDDSNode);
-			PluginI plugin  = (PluginI)dataReader;
+			dataReader = ((Subscriber) subscriber).createDataReader(topic, uriDDSNode);
+			PluginI plugin = (PluginI) dataReader;
 			plugin.setPluginURI(AbstractPort.generatePortURI());
 			this.installPlugin(plugin);
 		} catch (Exception e) {
@@ -35,30 +37,27 @@ public class ClientReadComponent extends ClientComponent{
 		}
 		super.start();
 	}
+
 	@Override
 	public void execute() throws Exception {
-		
+
 		System.out.println("debut reader");
-		
+
 		Thread.sleep(1000L);
-		
-		
-		//How to read a data from a topic
+
+		// How to read a data from a topic
 
 		Thread.sleep(5000L);
-		@SuppressWarnings("unchecked")
-		Iterator<?> data =  (Iterator<?>) dataReader.read();
-		
-		
-		while(data.hasNext()) {
-			System.out.println("haha");
+
+		System.out.println("je lis");
+
+		Iterator<?> data = (Iterator<?>) dataReader.read();
+		System.out.println("fin de la lecture "+ data);
+		while (data.hasNext()) {
 			System.out.println("la donnee " + data.next().getData());
 		}
-		
-		
-		
+
 		super.execute();
 	}
-	
 
 }

@@ -4,9 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-import org.omg.dds.core.ServiceEnvironment;
 import org.omg.dds.core.Time;
 import org.omg.dds.sub.Sample.Iterator;
 import org.omg.dds.topic.Topic;
@@ -32,11 +30,12 @@ public class DDSPlugin<T> extends AbstractPlugin {
 	private InPortRead<T> inPortRead;
 	private InPortWrite<T> inPortWrite;
 	private InPortConnectClient inPortConnectClient;
-	private Map<Topic<T>, Datas<T>> datas;
-	private Map<Topic<T>, String> topicID;
+	private Map<TopicDescription<T>, Datas<T>> datas;
+	private Map<TopicDescription<T>, String> topicID;
 	private String uriConnectClient;
+	private String executorServiceURI;
 
-	public DDSPlugin(Set<Topic<T>> topics, Map<Topic<T>, String> topicID, String uriConnectClient) {
+	public DDSPlugin(Set<Topic<T>> topics, Map<Topic<T>, String> topicID, String uriConnectClient,String executorServiceURI) {
 
 		this.uriConnectClient = uriConnectClient;
 		this.datas = new HashMap<>();
@@ -44,6 +43,7 @@ public class DDSPlugin<T> extends AbstractPlugin {
 			datas.put(topic, new Datas<T>(topic));
 		}
 		this.topicID = new HashMap<>(topicID);
+		this.executorServiceURI = executorServiceURI;
 	}
 
 	public String getReaderURI() throws Exception {
@@ -60,12 +60,12 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 	@SuppressWarnings("unchecked")
 	public void write(Topic<T> topic, T data) throws Exception {
-		((IDDSNode<T>)getOwner()).propager(data, topic, AbstractPort.generatePortURI(),Time.newTime((new Date()).getTime(), TimeUnit.MICROSECONDS,
-				ServiceEnvironment.createInstance(getOwner().getComponentLoader())));
+		System.out.println("write ddsNode");
+		((IDDSNode<T>) getOwner()).propager(data, topic, AbstractPort.generatePortURI(),
+				new fr.ddspstl.time.Time((new Date()).getTime()));
 	}
 
-	
-	public void propager(T newObject, Topic<T> topicName, String id,Time time) throws Exception {
+	public void propager(T newObject, TopicDescription<T> topicName, String id, Time time) throws Exception {
 		if (topicID.get(topicName) == null)
 			return;
 		if (topicID.get(topicName).equals(id))
@@ -73,15 +73,14 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 		topicID.put(topicName, id);
 		datas.get(topicName).write(newObject, time);
-		
+		System.out.println("fin propager in");
 
 	}
 
 	public Iterator<T> take(TopicDescription<T> topic) {
 		return datas.get(topic).take();
+
 	}
-
-
 
 	@Override
 	public void installOn(ComponentI owner) throws Exception {
@@ -98,7 +97,7 @@ public class DDSPlugin<T> extends AbstractPlugin {
 	public void initialise() throws Exception {
 
 		super.initialise();
-		inPortConnectClient = new InPortConnectClient(uriConnectClient, getOwner(), getPluginURI());
+		inPortConnectClient = new InPortConnectClient(uriConnectClient, getOwner(), getPluginURI(),executorServiceURI);
 		inPortConnectClient.publishPort();
 
 		inPortRead = new InPortRead<T>(getOwner(), getPluginURI());

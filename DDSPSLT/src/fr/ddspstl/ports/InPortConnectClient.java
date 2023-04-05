@@ -10,19 +10,14 @@ public class InPortConnectClient extends AbstractInboundPort implements ConnectC
 
 	private static final long serialVersionUID = 1L;
 
-	public InPortConnectClient(String uri, ComponentI owner,String pluginURI) throws Exception {
-		super(uri, ConnectClient.class, owner,pluginURI,null);
+	public InPortConnectClient(String uri, ComponentI owner,String pluginURI, String executorServiceURI) throws Exception {
+		super(uri, ConnectClient.class, owner,pluginURI,executorServiceURI);
 	}
-
-
-
-
-
 
 	@Override
 	public String getReaderURI() throws Exception {
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<String>(getPluginURI()) {
-			@SuppressWarnings("unchecked")
+		return getOwner().handleRequest(getExecutorServiceIndex(),new AbstractComponent.AbstractService<String>(getPluginURI()) {
+			@SuppressWarnings({ "rawtypes" })
 			@Override
 			public String call() throws Exception {
 				return ((DDSPlugin)getServiceProviderReference()).getReaderURI();
@@ -34,8 +29,8 @@ public class InPortConnectClient extends AbstractInboundPort implements ConnectC
 
 	@Override
 	public String getWriterURI() throws Exception {
-		return getOwner().handleRequest(new AbstractComponent.AbstractService<String>(getPluginURI()) {
-			@SuppressWarnings("unchecked")
+		return getOwner().handleRequest(getExecutorServiceIndex(),new AbstractComponent.AbstractService<String>(getPluginURI()) {
+			@SuppressWarnings({  "rawtypes" })
 			@Override
 			public String call() throws Exception {
 				return ((DDSPlugin)getServiceProviderReference()).getWriterURI();

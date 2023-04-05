@@ -19,6 +19,7 @@ public class ClientWriteComponent extends ClientComponent{
 		this.publisher = (Publisher) domainParticipant.createPublisher();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized void start() throws ComponentStartException {
 		org.omg.dds.topic.Topic<?> topic;
@@ -49,6 +50,7 @@ public class ClientWriteComponent extends ClientComponent{
 
 		System.out.println("j'ecrit");
 		dataWriter.write("Hello");
+		System.out.println("fin d'ecriture");
 		super.execute();
 	}
 

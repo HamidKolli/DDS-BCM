@@ -2,6 +2,7 @@ package fr.ddspstl.components.interfaces;
 
 import org.omg.dds.core.Time;
 import org.omg.dds.topic.Topic;
+import org.omg.dds.topic.TopicDescription;
 
 import fr.ddspstl.addresses.INodeAddress;
 
@@ -17,10 +18,10 @@ public interface IDDSNode<T> {
 
 	public void disconnect(INodeAddress uri) throws Exception ;
 	
-	public void propagerIn(T newObject, Topic<T> topic, String id,Time time) throws Exception ;
+	public void propagerIn(T newObject, TopicDescription<T> topic, String id,Time time) throws Exception ;
 	
-	public void propagerOut(T newObject, Topic<T> topic, String id,Time time) throws Exception;
+	public void propagerOut(T newObject, TopicDescription<T> topic, String id,Time time) throws Exception;
 	
-	public void propager(T newObject, Topic<T> topic, String id, Time modifiableTime) throws Exception;
+	public void propager(T newObject, TopicDescription<T> topic, String id, Time modifiableTime) throws Exception;
 
 }
