@@ -1,4 +1,4 @@
-package fr.ddspstl.components.ddsRootNodes;
+package fr.ddspstl.components.ddsNodeRootSpider;
 
 import java.util.Map;
 import java.util.Set;
@@ -76,7 +76,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 			propagationRoot = new OutPortPropagation<>(this);
 			propagationRoot.publishPort();
 
-			nodeAddress = new NodeAddress(connectionDDS.getPortURI(), inPortPropagation.getPortURI());
+			nodeAddress = new NodeAddress(connectionDDS.getPortURI(), inPortPropagation.getPortURI(),AbstractPort.generatePortURI());
 
 			plugin.setPluginURI(AbstractPort.generatePortURI());
 			this.installPlugin(plugin);
@@ -161,6 +161,12 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	@Override
 	public void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception {
 		propagerOut(newObject, topic, id, time);
+	}
+
+	@Override
+	public void lockFailFunction(TopicDescription<T> topic) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

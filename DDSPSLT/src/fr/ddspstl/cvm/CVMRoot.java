@@ -12,8 +12,8 @@ import org.omg.dds.topic.Topic;
 
 import fr.ddspstl.components.ClientReadComponent;
 import fr.ddspstl.components.ClientWriteComponent;
-import fr.ddspstl.components.ddsRootNodes.DDSNode;
-import fr.ddspstl.components.ddsRootNodes.DDSRoot;
+import fr.ddspstl.components.ddsNodeRootSpider.DDSNode;
+import fr.ddspstl.components.ddsNodeRootSpider.DDSRoot;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.cvm.AbstractCVM;

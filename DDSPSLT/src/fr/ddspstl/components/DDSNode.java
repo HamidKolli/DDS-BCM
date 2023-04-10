@@ -37,6 +37,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	private static final int NB_THREAD_PROPAGATION = 5;
 	private static final int NB_THREAD_CONNECTION = 5;
 	private DDSPlugin<T> plugin;
+	
 	private List<String> uriDDSNodes;
 
 	private InPortPropagation<T> inPortPropagation;
@@ -56,6 +57,8 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		this.uriConnectDDSNode = uriConnectDDSNode;
 		this.connectionOut = new HashMap<>();
 		this.outPropagationPorts = new HashMap<>();
+		
+		
 	}
 
 	@Override
@@ -75,8 +78,14 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 			connectionDDS = new InConnectionDDS(uriConnectDDSNode, this,executorServicePropagationURI);
 			connectionDDS.publishPort();
 			inPortPropagation.publishPort();
-			nodeAddress = new NodeAddress(connectionDDS.getPortURI(), inPortPropagation.getPortURI());
+			
+			
+			
+			nodeAddress = new NodeAddress(connectionDDS.getPortURI(), inPortPropagation.getPortURI(),AbstractPort.generatePortURI());
 
+			
+			
+			
 			plugin.setPluginURI(AbstractPort.generatePortURI());
 			this.installPlugin(plugin);
 		} catch (Exception e) {
@@ -221,6 +230,12 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		}
 
 		super.shutdown();
+	}
+
+	@Override
+	public void lockFailFunction(TopicDescription<T> topic) {
+		
+		
 	}
 
 }

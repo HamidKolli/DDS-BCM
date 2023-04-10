@@ -1,4 +1,4 @@
-package fr.ddspstl.components.ddsRootNodes;
+package fr.ddspstl.components.ddsNodeRootSpider;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,7 +68,7 @@ public class DDSRoot<T> extends AbstractComponent implements IDDSNode<T>{
 
 			connectionDDS.publishPort();
 
-			nodeAddress = new NodeAddress(connectionDDS.getPortURI(), inPortPropagation.getPortURI());
+			nodeAddress = new NodeAddress(connectionDDS.getPortURI(), inPortPropagation.getPortURI(),AbstractPort.generatePortURI());
 
 		} catch (Exception e) {
 			throw new ComponentStartException(e);
@@ -167,6 +167,12 @@ public class DDSRoot<T> extends AbstractComponent implements IDDSNode<T>{
 
 	@Override
 	public void propager(T newObject, TopicDescription<T> topic, String id,Time time) throws Exception {
+	}
+
+	@Override
+	public void lockFailFunction(TopicDescription<T> topic) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	
