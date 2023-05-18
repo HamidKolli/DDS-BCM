@@ -78,6 +78,7 @@ public class DDSPlugin<T> extends AbstractPlugin {
 	}
 
 	public Iterator<T> take(TopicDescription<T> topic) {
+		
 		return datas.get(topic).take();
 
 	}

@@ -22,25 +22,30 @@ public class InPortLock extends AbstractInboundPort implements PropagationLock {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public <T> void lock(TopicDescription<T> topic, String idPropagation,Time timestamp) throws Exception {
-		getOwner().runTask(getExecutorServiceIndex(), (e) -> {
+		getOwner().handleRequest(getExecutorServiceIndex(), (e) -> {
 			try {
 				((LockPlugin)getOwnerPlugin(pluginURI)).propagateLock(topic, idPropagation,timestamp);
+				return null;
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
+			return e;
 		});
 
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public <T> void unlock(TopicDescription<T> topic) throws Exception {
-		getOwner().runTask(getExecutorServiceIndex(), (e) -> {
+	public <T> void unlock(TopicDescription<T> topic, String idPropagation,String idPropagationUnlock) throws Exception {
+		getOwner().handleRequest(getExecutorServiceIndex(), (e) -> {
 			try {
-				((LockPlugin)getOwnerPlugin(pluginURI)).propagateUnlock(topic);
+				((LockPlugin)getOwnerPlugin(pluginURI)).propagateUnlock(topic,idPropagation,idPropagationUnlock);
+				return null;
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
+			return e;
+			
 		});
 
 	}

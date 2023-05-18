@@ -48,7 +48,7 @@ public class CVMRoot extends AbstractCVM {
 
 		String uriRoot = AbstractPort.generatePortURI();
 
-		AbstractComponent.createComponent(DDSRoot.class.getCanonicalName(), new Object[] { 1, 0, uriRoot });
+		AbstractComponent.createComponent(DDSRoot.class.getCanonicalName(), new Object[] { 1, 0, uriRoot, topics });
 
 		for (int i = 0; i < uris.size(); i++) {
 

@@ -38,6 +38,7 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	private Publisher publisher;
 	private DataWriterQos qos;
 	private DataWriterListener<T> listener;
+	@SuppressWarnings("unused")
 	private Collection<Class<? extends Status>> statuses;
 	private OutPortWrite<T> outPortWrite;	
 	private OutPortConnectClient outPortConnectClient;

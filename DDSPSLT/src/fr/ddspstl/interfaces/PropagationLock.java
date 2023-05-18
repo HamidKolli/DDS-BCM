@@ -10,5 +10,5 @@ public interface PropagationLock extends OfferedCI, RequiredCI {
 	
 	public <T> void lock(TopicDescription<T> topic, String idPropagation, Time timestamp) throws Exception;
 
-	public <T> void unlock(TopicDescription<T> topic) throws Exception;
+	public <T> void unlock(TopicDescription<T> topic, String idPropagation,String idPropagationUnlock) throws Exception;
 }

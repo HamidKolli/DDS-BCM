@@ -188,6 +188,7 @@ public class Publisher implements fr.ddspstl.DDS.publishers.interfaces.Publisher
 		return domainParticipant;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <TYPE> DataWriter<TYPE>  createDataWriter(Topic<TYPE>  topic, String uriPortSortant) {
 		DataWriter<TYPE> d = new DataWriter<>(topic, this,uriPortSortant);
 		dataWriters.put(topic.getName(), (org.omg.dds.pub.DataWriter<Object>) d);

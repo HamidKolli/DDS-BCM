@@ -232,10 +232,6 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		super.shutdown();
 	}
 
-	@Override
-	public void lockFailFunction(TopicDescription<T> topic) {
-		
-		
-	}
+
 
 }

@@ -150,7 +150,8 @@ public class Topic<T> implements org.omg.dds.topic.Topic<T> {
 		if (!(obj instanceof Topic)) {
 			return false;
 		}
-		Topic other = (Topic) obj;
+		@SuppressWarnings("unchecked")
+		Topic<T> other = (Topic<T>) obj;
 		if (typeName == null) {
 			if (other.typeName != null) {
 				return false;

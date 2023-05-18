@@ -22,8 +22,8 @@ public class OutPortLock extends AbstractOutboundPort implements PropagationLock
 	}
 
 	@Override
-	public <T> void unlock(TopicDescription<T> topic) throws Exception {
-		((PropagationLock) getConnector()).unlock(topic);
+	public <T> void unlock(TopicDescription<T> topic,String idPropagation,String idPropagationUnlock) throws Exception {
+		((PropagationLock) getConnector()).unlock(topic,idPropagation,idPropagationUnlock);
 	}
 
 }

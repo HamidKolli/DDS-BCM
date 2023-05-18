@@ -1,5 +1,6 @@
 package fr.ddspstl.components.ddsNodeRootSpider;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import fr.ddspstl.connectors.ConnectorPropagation;
 import fr.ddspstl.interfaces.ConnectDDSNode;
 import fr.ddspstl.interfaces.Propagation;
 import fr.ddspstl.plugin.DDSPlugin;
+import fr.ddspstl.plugin.LockPlugin;
 import fr.ddspstl.ports.InConnectionDDS;
 import fr.ddspstl.ports.InPortPropagation;
 import fr.ddspstl.ports.OutConnectionDDS;
@@ -32,8 +34,9 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
 	private static final int NB_THREAD_CLIENT = 4;
 	private static final int NB_THREAD_PROPAGATION = 2;
-	private static final int NB_THREAD_CONNECTION = 0;
+	private static final int NB_THREAD_CONNECTION = 4;
 	private DDSPlugin<T> plugin;
+	private LockPlugin<T> lockPlugin;
 	private String uriDDSRoot;
 	private String uriConnectDDSNode;
 	private OutConnectionDDS connectRoot;
@@ -41,6 +44,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	private InConnectionDDS connectionDDS;
 	private InPortPropagation<T> inPortPropagation;
 	private INodeAddress nodeAddress;
+	private Set<Topic<T>> topics;
 
 	protected DDSNode(int nbThreads, int nbSchedulableThreads, String uriConnectDDSNode, String uriConnectClient,
 			String uriDDSNode, Set<Topic<T>> topics, Map<Topic<T>, String> topicID) {
@@ -48,9 +52,9 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		uriDDSRoot = uriDDSNode;
 		String executorServiceURI = AbstractPort.generatePortURI();
 		createNewExecutorService(executorServiceURI, NB_THREAD_CLIENT, false);
+		
 		plugin = new DDSPlugin<T>(topics, topicID, uriConnectClient,executorServiceURI);
-
-
+		this.topics = new HashSet<>(topics);
 		this.uriConnectDDSNode = uriConnectDDSNode;
 	}
 
@@ -80,6 +84,16 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
 			plugin.setPluginURI(AbstractPort.generatePortURI());
 			this.installPlugin(plugin);
+			
+			String executorServicePropagationLockURI = AbstractPort.generatePortURI();
+			createNewExecutorService(executorServicePropagationLockURI, NB_THREAD_CONNECTION, false);
+			
+			
+			lockPlugin = new LockPlugin<>(nodeAddress, topics, executorServicePropagationLockURI);
+			lockPlugin.setPluginURI(AbstractPort.generatePortURI());
+			this.installPlugin(lockPlugin);
+			
+			
 		} catch (Exception e) {
 			throw new ComponentStartException(e);
 		}
@@ -105,18 +119,18 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		try {
 			connectionDDS.unpublishPort();
 			inPortPropagation.unpublishPort();
-			inPortPropagation.destroyPort();
-			connectionDDS.destroyPort();
-
 			connectRoot.unpublishPort();
 			propagationRoot.unpublishPort();
+			
+			inPortPropagation.destroyPort();
+			connectionDDS.destroyPort();
 			connectRoot.destroyPort();
 			propagationRoot.destroyPort();
-
+			super.shutdown();
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e);
 		}
-		super.shutdown();
+		
 	}
 
 	@Override
@@ -131,6 +145,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		System.out.println("connect propagation");
 		doPortConnection(propagationRoot.getPortURI(), address.getPropagationURI(),
 				ConnectorPropagation.class.getCanonicalName());
+		lockPlugin.connect(address);
 	}
 
 	@Override
@@ -144,6 +159,15 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	@Override
 	public void disconnect(INodeAddress uri) throws Exception {
 		connectRoot.disconnect(nodeAddress);
+		connectRoot.doDisconnection();
+		connectRoot.unpublishPort();
+		connectRoot.destroyPort();
+		
+		propagationRoot.doDisconnection();
+		propagationRoot.unpublishPort();
+		propagationRoot.destroyPort();
+		
+		lockPlugin.disconnect(uri);
 	}
 
 	@Override
@@ -160,13 +184,11 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
 	@Override
 	public void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception {
+		lockPlugin.propagateLockIn(topic);
 		propagerOut(newObject, topic, id, time);
+		lockPlugin.propagateUnlockIn(topic, id);
 	}
 
-	@Override
-	public void lockFailFunction(TopicDescription<T> topic) {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 }

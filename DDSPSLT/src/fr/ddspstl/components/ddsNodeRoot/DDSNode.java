@@ -213,13 +213,14 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	}
 
 	public void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception {
-		lockPlugin.propagateLock(topic, id, time);
+		
+		lockPlugin.lock(topic);
 		if (topicsClients.get(topic).size() > 1)
 			propagerIn(newObject, topic, id, time);
 		else
 			propagerOut(newObject, topic, id, time);
 		
-		lockPlugin.propagateUnlock(topic);
+		lockPlugin.unlock(topic);
 	}
 
 	@Override
@@ -264,9 +265,5 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		super.shutdown();
 	}
 
-	@Override
-	public void lockFailFunction(TopicDescription<T> topic) throws Exception {
-		lockPlugin.propagateUnlock(topic);
-	}
 
 }

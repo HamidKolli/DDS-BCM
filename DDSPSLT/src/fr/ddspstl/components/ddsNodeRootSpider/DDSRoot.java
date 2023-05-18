@@ -1,10 +1,13 @@
 package fr.ddspstl.components.ddsNodeRootSpider;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.omg.dds.core.Time;
+import org.omg.dds.topic.Topic;
 import org.omg.dds.topic.TopicDescription;
 
 import fr.ddspstl.addresses.INodeAddress;
@@ -14,6 +17,7 @@ import fr.ddspstl.connectors.ConnectorConnectionDDS;
 import fr.ddspstl.connectors.ConnectorPropagation;
 import fr.ddspstl.interfaces.ConnectDDSNode;
 import fr.ddspstl.interfaces.Propagation;
+import fr.ddspstl.plugin.LockPlugin;
 import fr.ddspstl.ports.InConnectionDDS;
 import fr.ddspstl.ports.InPortPropagation;
 import fr.ddspstl.ports.OutConnectionDDS;
@@ -35,14 +39,17 @@ public class DDSRoot<T> extends AbstractComponent implements IDDSNode<T>{
 	private String uriConnectDDSNode;
 	private InConnectionDDS connectionDDS;
 	private InPortPropagation<T> inPortPropagation;
+	private LockPlugin<T> lockPlugin;
 	private ConcurrentMap<INodeAddress, OutConnectionDDS> connectionOutWithAddresses;
 	private ConcurrentMap<INodeAddress, OutPortPropagation<T>> outPropagationPorts;
+	private Set<Topic<T>> topics;
 	
-	protected DDSRoot(int nbThreads, int nbSchedulableThreads,String uriConnection) {
+	protected DDSRoot(int nbThreads, int nbSchedulableThreads,String uriConnection, Set<Topic<T>> topics) {
 		super(nbThreads, nbSchedulableThreads);
 		uriConnectDDSNode = uriConnection;
 		connectionOutWithAddresses = new ConcurrentHashMap<>();
 		outPropagationPorts = new ConcurrentHashMap<>();
+		this.topics = new HashSet<>(topics);
 		
 	}
 
@@ -63,13 +70,17 @@ public class DDSRoot<T> extends AbstractComponent implements IDDSNode<T>{
 			createNewExecutorService(executorServiceConnectionURI, NB_THREAD_CONNECTION, false);
 			
 			connectionDDS = new InConnectionDDS(uriConnectDDSNode, this,executorServicePropagationURI);
-			
-			inPortPropagation.publishPort();
-
 			connectionDDS.publishPort();
 
 			nodeAddress = new NodeAddress(connectionDDS.getPortURI(), inPortPropagation.getPortURI(),AbstractPort.generatePortURI());
 
+			String executorServicePropagationLockURI = AbstractPort.generatePortURI();
+			createNewExecutorService(executorServicePropagationLockURI, NB_THREAD_CONNECTION, false);
+			
+			lockPlugin = new LockPlugin<>(nodeAddress, topics, executorServicePropagationLockURI);
+			lockPlugin.setPluginURI(AbstractPort.generatePortURI());
+			this.installPlugin(lockPlugin);
+			
 		} catch (Exception e) {
 			throw new ComponentStartException(e);
 		}
@@ -155,6 +166,7 @@ public class DDSRoot<T> extends AbstractComponent implements IDDSNode<T>{
 
 	@Override
 	public synchronized void propagerIn(T newObject, TopicDescription<T> topic, String id,Time time) throws Exception {
+		
 		propagerOut(newObject, topic, id,time);
 	}
 
@@ -169,11 +181,7 @@ public class DDSRoot<T> extends AbstractComponent implements IDDSNode<T>{
 	public void propager(T newObject, TopicDescription<T> topic, String id,Time time) throws Exception {
 	}
 
-	@Override
-	public void lockFailFunction(TopicDescription<T> topic) {
-		// TODO Auto-generated method stub
-		
-	}
+
 	
 	
 	

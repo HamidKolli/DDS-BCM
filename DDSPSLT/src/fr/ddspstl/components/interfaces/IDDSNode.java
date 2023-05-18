@@ -23,6 +23,6 @@ public interface IDDSNode<T> {
 	
 	public void propager(T newObject, TopicDescription<T> topic, String id, Time modifiableTime) throws Exception;
 
-	public void lockFailFunction(TopicDescription<T> topic) throws Exception;
+	
 
 }
