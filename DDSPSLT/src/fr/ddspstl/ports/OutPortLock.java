@@ -16,8 +16,8 @@ public class OutPortLock extends AbstractOutboundPort implements PropagationLock
 	}
 
 	@Override
-	public <T> void lock(TopicDescription<T> topic, String idPropagation, Time timestamp) throws Exception {
-		((PropagationLock) getConnector()).lock(topic, idPropagation,timestamp);
+	public <T> boolean lock(TopicDescription<T> topic, String idPropagation, Time timestamp) throws Exception {
+		return ((PropagationLock) getConnector()).lock(topic, idPropagation,timestamp);
 
 	}
 

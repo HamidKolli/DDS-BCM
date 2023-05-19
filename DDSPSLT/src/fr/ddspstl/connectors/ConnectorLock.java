@@ -9,8 +9,8 @@ import fr.sorbonne_u.components.connectors.AbstractConnector;
 public class ConnectorLock extends AbstractConnector implements PropagationLock {
 
 	@Override
-	public <T> void lock(TopicDescription<T> topic, String idPropagation, Time timestamp) throws Exception {
-		((PropagationLock) this.offering).lock(topic, idPropagation, timestamp);
+	public <T> boolean lock(TopicDescription<T> topic, String idPropagation, Time timestamp) throws Exception {
+		return ((PropagationLock) this.offering).lock(topic, idPropagation, timestamp);
 	}
 
 	@Override

@@ -12,7 +12,6 @@ import org.omg.dds.topic.Topic;
 import org.omg.dds.topic.TopicDescription;
 
 import fr.ddspstl.addresses.INodeAddress;
-import fr.ddspstl.components.interfaces.LockFailFunction;
 import fr.ddspstl.connectors.ConnectorLock;
 import fr.ddspstl.interfaces.PropagationLock;
 import fr.ddspstl.ports.InPortLock;
@@ -33,7 +32,6 @@ public class LockPlugin<T> extends AbstractPlugin {
 	private ConcurrentMap<TopicDescription<T>, Time> topicsTimestamp;
 	private Set<Topic<T>> topics;
 	private INodeAddress address;
-	private LockFailFunction<T> function;
 	private  String executorServiceURI;
 
 	public LockPlugin(INodeAddress address, Set<Topic<T>> topics, String executorServiceURI) throws Exception {
@@ -111,14 +109,12 @@ public class LockPlugin<T> extends AbstractPlugin {
 		propagateLock(topic, AbstractPort.generatePortURI(), new fr.ddspstl.time.Time(new Date().getTime()));
 	}
 
-	public void setFunctionFailLock(LockFailFunction<T> fun) {
-		this.function = fun;
-	}
 
-	public void propagateLock(TopicDescription<T> topic, String idPropagation, Time timestamp) throws Exception {
+
+	public boolean propagateLock(TopicDescription<T> topic, String idPropagation, Time timestamp) throws Exception {
 
 		if (topicsID.containsKey(topic) && topicsID.get(topic).equals(idPropagation))
-			return;
+			return true;
 
 		topicsID.put(topic, idPropagation);
 
@@ -130,14 +126,16 @@ public class LockPlugin<T> extends AbstractPlugin {
 				if (topicsTimestamp.get(topic).compareTo(timestamp) > 0) {
 					lock(topic);
 				} else {
-					if (function != null)
-						function.lockFailFunction(topic, idPropagation);
+					return false;
 				}
 			}
 		}
+		boolean b = true;
 		for (OutPortLock port : ports.values()) {
-			port.lock(topic, idPropagation, timestamp);
+			b &=port.lock(topic, idPropagation, timestamp);
 		}
+		return b;
+		
 
 	}
 
