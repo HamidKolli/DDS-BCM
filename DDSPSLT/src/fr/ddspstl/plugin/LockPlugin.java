@@ -8,7 +8,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.omg.dds.core.Time;
-import org.omg.dds.topic.Topic;
 import org.omg.dds.topic.TopicDescription;
 
 import fr.ddspstl.addresses.INodeAddress;
@@ -30,11 +29,11 @@ public class LockPlugin<T> extends AbstractPlugin {
 	private ConcurrentMap<TopicDescription<T>, String> topicsID;
 	private ConcurrentMap<TopicDescription<T>, String> topicsIDUnlock;
 	private ConcurrentMap<TopicDescription<T>, Time> topicsTimestamp;
-	private Set<Topic<T>> topics;
+	private Set<TopicDescription<T>> topics;
 	private INodeAddress address;
 	private  String executorServiceURI;
 
-	public LockPlugin(INodeAddress address, Set<Topic<T>> topics, String executorServiceURI) throws Exception {
+	public LockPlugin(INodeAddress address, Set<TopicDescription<T>> topics, String executorServiceURI) throws Exception {
 		this.topics = topics;
 		this.address = address;
 		this.executorServiceURI = executorServiceURI;
@@ -56,7 +55,7 @@ public class LockPlugin<T> extends AbstractPlugin {
 	public void initialise() throws Exception {
 		super.initialise();
 
-		for (Topic<T> topic : topics) {
+		for (TopicDescription<T> topic : topics) {
 			topicsLock.put(topic, new ReentrantLock());
 		}
 		

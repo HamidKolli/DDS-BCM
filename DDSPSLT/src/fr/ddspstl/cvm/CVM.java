@@ -39,6 +39,7 @@ public class CVM extends AbstractCVM {
 		uris.add(AbstractPort.generatePortURI());
 		uris.add(AbstractPort.generatePortURI());
 		uris.add(AbstractPort.generatePortURI());
+
 		
 		List<String> urisForClient = new ArrayList<>();
 		urisForClient.add(AbstractPort.generatePortURI());

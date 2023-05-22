@@ -58,14 +58,14 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 	private String executorServiceReadWriteURI;
 
-	public DDSPlugin(Set<Topic<T>> topics, Map<TopicDescription<T>, OutPortPropagation<T>> propagationPortToNextRoot,
+	public DDSPlugin(Set<TopicDescription<T>> set, Map<TopicDescription<T>, OutPortPropagation<T>> propagationPortToNextRoot,
 			Map<TopicDescription<T>, OutPortReadDDS<T>> readPortToRoot,
 			Map<TopicDescription<T>, OutPortWrite<T>> writePortToRoot, INodeAddress addresses,
 			String executorServiceURI, String executorServicePropagationURI, String executorServiceReadWriteURI) {
 
 		this.address = addresses;
 		this.datas = new ConcurrentHashMap<>();
-		for (Topic<T> topic : topics) {
+		for (TopicDescription<T> topic : set) {
 			datas.put(topic, new Datas<T>(topic));
 		}
 		this.topicIDWrite = new ConcurrentHashMap<>();
@@ -81,6 +81,8 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		this.executorServiceReadWriteURI = executorServiceReadWriteURI;
 
 	}
+
+
 
 	public String getReaderURI() throws Exception {
 		return inPortRead.getPortURI();
@@ -240,24 +242,32 @@ public class DDSPlugin<T> extends AbstractPlugin {
 	@Override
 	public void finalise() throws Exception {
 		super.finalise();
+
+		if (outPortReadDDS.connected())
+			outPortReadDDS.doDisconnection();
+
 	}
 
 	@Override
 	public void uninstall() throws Exception {
+
 		inPortConnectClient.unpublishPort();
 
 		inPortRead.unpublishPort();
+
 		inPortWrite.unpublishPort();
 
-		inPortConnectClient.destroyPort();
+		outPortReadDDS.unpublishPort();
 
-		inPortRead.destroyPort();
-		inPortWrite.destroyPort();
+		inPortReadDDS.unpublishPort();
+
+		inPortWriteDDS.unpublishPort();
+
+		inPortPropagation.unpublishPort();
 
 		super.uninstall();
 	}
-	
-	
+
 	// deconnexion de tout les port et depublication de tout les ports
 	// regler la classe ddsnode
 	// regler les connexion et les uris
