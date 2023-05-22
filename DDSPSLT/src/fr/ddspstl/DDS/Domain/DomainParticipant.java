@@ -182,7 +182,7 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 		
 		return (Topic<TYPE>) createTopic(topicName, new TypeSupportString(getEnvironment(), type.getName()));
 	}
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 	@Override
 	public <TYPE> Topic<TYPE> createTopic(String topicName, Class<TYPE> type, TopicQos qos,
 			TopicListener<TYPE> listener, Collection<Class<? extends Status>> statuses) {

@@ -145,6 +145,8 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		this.installPlugin(plugin);
 		super.execute();
 	}
+	
+
 
 
 

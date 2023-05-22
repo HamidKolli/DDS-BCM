@@ -58,7 +58,8 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 	private String executorServiceReadWriteURI;
 
-	public DDSPlugin(Set<TopicDescription<T>> set, Map<TopicDescription<T>, OutPortPropagation<T>> propagationPortToNextRoot,
+	public DDSPlugin(Set<TopicDescription<T>> set,
+			Map<TopicDescription<T>, OutPortPropagation<T>> propagationPortToNextRoot,
 			Map<TopicDescription<T>, OutPortReadDDS<T>> readPortToRoot,
 			Map<TopicDescription<T>, OutPortWrite<T>> writePortToRoot, INodeAddress addresses,
 			String executorServiceURI, String executorServicePropagationURI, String executorServiceReadWriteURI) {
@@ -81,8 +82,6 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		this.executorServiceReadWriteURI = executorServiceReadWriteURI;
 
 	}
-
-
 
 	public String getReaderURI() throws Exception {
 		return inPortRead.getPortURI();
@@ -246,6 +245,18 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		if (outPortReadDDS.connected())
 			outPortReadDDS.doDisconnection();
 
+		for (OutPortPropagation<T> port : propagationPortToNextRoot.values()) {
+			port.doDisconnection();
+		}
+
+		for (OutPortReadDDS<T> port : readPortToRoot.values()) {
+			port.doDisconnection();
+		}
+
+		for (OutPortWrite<T> port : writePortToRoot.values()) {
+			port.doDisconnection();
+		}
+
 	}
 
 	@Override
@@ -264,6 +275,18 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		inPortWriteDDS.unpublishPort();
 
 		inPortPropagation.unpublishPort();
+
+		for (OutPortPropagation<T> port : propagationPortToNextRoot.values()) {
+			port.unpublishPort();
+		}
+
+		for (OutPortReadDDS<T> port : readPortToRoot.values()) {
+			port.unpublishPort();
+		}
+
+		for (OutPortWrite<T> port : writePortToRoot.values()) {
+			port.unpublishPort();
+		}
 
 		super.uninstall();
 	}

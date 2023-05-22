@@ -171,16 +171,6 @@ public class LockPlugin<T> extends AbstractPlugin {
 				ConnectorLock.class.getCanonicalName());
 	}
 
-	public void disconnect(INodeAddress address) throws Exception {
-		if (!ports.containsKey(address))
-			return;
-		if (!ports.get(address).connected())
-			return;
 
-		ports.get(address).doDisconnection();
-		ports.get(address).unpublishPort();
-		ports.get(address).destroyPort();
-
-	}
 
 }
