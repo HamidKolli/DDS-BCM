@@ -37,16 +37,35 @@ import org.omg.dds.type.dynamic.DynamicType;
 
 import fr.ddspstl.DDS.Exemples.TypeSupportString;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ *
+ * Classe représentant un DomainParticipant
+ */
 public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 
 	private int domainId;
 	private Map<String, Topic<Object>> topics;
 	private ServiceEnvironment serviceEnvironment;
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param serviceEnvironment : .
+	 */
 	public DomainParticipant(ServiceEnvironment serviceEnvironment) {
 		this((new Random()).nextInt(), serviceEnvironment);
 	}
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param domainID : Id du domaine
+	 * @param serviceEnvironment : .
+	 */
 	public DomainParticipant(int domainID, ServiceEnvironment serviceEnvironment) {
 		this.domainId = domainID;
 		this.serviceEnvironment = serviceEnvironment;
@@ -125,6 +144,9 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 
 	}
 
+	/**
+	 * @see org.omg.dds.domain.DomainParticipant#getEnvironment()
+	 */
 	@Override
 	public ServiceEnvironment getEnvironment() {
 		return serviceEnvironment;
@@ -151,6 +173,9 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 
 	// Subscriber
 
+	/**
+	 * @see org.omg.dds.domain.DomainParticipant#createSubscriber()
+	 */
 	@Override
 	public Subscriber createSubscriber() {
 		return new fr.ddspstl.DDS.subscribers.Subscriber(this);
@@ -176,6 +201,10 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 	}
 
 	// Topic
+	
+	/**
+	 * @see org.omg.dds.domain.DomainParticipant#createTopic(String, Class)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> Topic<TYPE> createTopic(String topicName, Class<TYPE> type) {
@@ -190,6 +219,9 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 		return null;
 	}
 
+	/**
+	 * @see org.omg.dds.domain.DomainParticipant#createTopic(String, TypeSupport)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> Topic<TYPE> createTopic(String topicName, TypeSupport<TYPE> type) {
@@ -232,6 +264,9 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 		return null;
 	}
 
+	/**
+	 * @see org.omg.dds.domain.DomainParticipant#findTopic(String, Duration)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> Topic<TYPE> findTopic(String topicName, Duration timeout) throws TimeoutException {
@@ -243,6 +278,9 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 		return null;
 	}
 
+	/**
+	 * @see org.omg.dds.domain.DomainParticipant#lookupTopicDescription(String)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> TopicDescription<TYPE> lookupTopicDescription(String name) {
@@ -300,6 +338,9 @@ public class DomainParticipant implements org.omg.dds.domain.DomainParticipant {
 
 	}
 
+	/**
+	 * @see org.omg.dds.domain.DomainParticipant#getDomainId()
+	 */
 	@Override
 	public int getDomainId() {
 		return domainId;

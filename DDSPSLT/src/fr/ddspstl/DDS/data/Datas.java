@@ -7,12 +7,26 @@ import org.omg.dds.sub.SampleState;
 import org.omg.dds.sub.ViewState;
 import org.omg.dds.topic.TopicDescription;
 
+
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ * @param <T> : le type de la donnée
+ * 
+ * Classe Datas représentant la donnée
+ */
+
 public class Datas<T>  {
 	
 	private Sample.Iterator<T> samplesData;
 	private TopicDescription<T> topic;
 
 	
+	/**
+	 * @param topic : le topic auquel les données appartiennent
+	 */
 	public Datas(TopicDescription<T> topic) {
 		super();
 	
@@ -21,17 +35,32 @@ public class Datas<T>  {
 	}
 
 	
+	/**
+	 * methode read : effectue un read sur la donnée
+	 * 
+	 * @return Sample.Iterator<T> : la donnée retournée
+	 */
 	public Sample.Iterator<T> read() {
 		return samplesData;
 	}
 
-	
+	/**
+	 * methode take : effectue un take sur la donnée
+	 * 
+	 * @return Sample.Iterator<T> : la donnée retournée
+	 */
 	public Sample.Iterator<T> take() {
 		Sample.Iterator<T> tmp = samplesData;
 		samplesData =  new fr.ddspstl.DDS.samples.Sample.Iterator<T>();
 		return tmp;
 	}
 	
+	/**
+	 * methode write : effectue un write
+	 * 
+	 * @param data : la donnée à écrire
+	 * @param time : le timestamp de l'ecriture
+	 */
 	public void write(T data, Time time) {
 		samplesData.add(new fr.ddspstl.DDS.samples.Sample<T>(topic.getEnvironment(), data, SampleState.READ, ViewState.NEW,
 				InstanceState.ALIVE, time));

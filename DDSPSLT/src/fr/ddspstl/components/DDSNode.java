@@ -23,6 +23,16 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ * @param <T> : le type de la donnée
+ *
+ * Composant représentant un noeud DDS
+ */
+
 public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
 	private static final int NB_THREAD_CLIENT = 4;
@@ -37,6 +47,16 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	private Map<TopicDescription<T>, INodeAddress> rootOfTopics;
 	private Map<TopicDescription<T>, INodeAddress> nextRoot;
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param nbThreads : nb de threads
+	 * @param nbSchedulableThreads : nb de chedulableThreads
+	 * @param address : les différentes adresses/Uris liées au noeud
+	 * @param rootOfTopics : Map qui associe a chaque topic, un noeud Root
+	 * @param nextRoot : le prochain noeud Root à qui propager
+	 * @throws Exception
+	 */
 	protected DDSNode(int nbThreads, int nbSchedulableThreads, INodeAddress address,
 			Map<TopicDescription<T>, INodeAddress> rootOfTopics, Map<TopicDescription<T>, INodeAddress> nextRoot)
 			throws Exception {
@@ -48,6 +68,12 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
 	}
 
+	
+	/**
+	 * 
+	 * @see fr.sorbonne_u.components.AbstractComponent#start()
+	 *
+	 */
 	@Override
 	public synchronized void start() throws ComponentStartException {
 		try {
@@ -65,6 +91,12 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		super.start();
 	}
 
+	
+
+	/**
+	 * @see fr.ddspstl.components.interfaces.IDDSNode#propager(Object, TopicDescription, String, Time)
+	 *
+	 */
 	public void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception {
 		pluginLock.lock(topic);
 		plugin.propager(newObject, topic, id, time);
@@ -72,6 +104,10 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
 	}
 
+	/**
+	 * @see fr.ddspstl.components.interfaces.IDDSNode#read(TopicDescription)
+	 *
+	 */
 	public Iterator<T> read(TopicDescription<T> topic) {
 		pluginLock.lock(topic);
 		Iterator<T> result = plugin.readData(topic);
@@ -81,6 +117,10 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 
 	}
 
+	/**
+	 * @see fr.ddspstl.components.interfaces.IDDSNode#consommer(TopicDescription, String, boolean)
+	 *
+	 */
 	@Override
 	public Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception {
 		String propagationLockURI = AbstractPort.generatePortURI();
@@ -93,6 +133,12 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		return new fr.ddspstl.DDS.samples.Sample.Iterator<T>();
 	}
 
+	
+	/**
+	 * 
+	 * @see fr.sorbonne_u.components.AbstractComponent#execute()
+	 *
+	 */
 	@Override
 	public void execute() throws Exception {
 

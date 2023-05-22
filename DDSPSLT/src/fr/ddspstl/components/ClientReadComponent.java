@@ -9,12 +9,29 @@ import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.PluginI;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ *
+ * Sous-Composant de Client, représentant un ClientReader
+ */
 public class ClientReadComponent extends ClientComponent {
 
 	private String topicName;
 	private Subscriber subscriber;
 	private DataReader<?> dataReader;
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param nbThreads : nb de threads
+	 * @param nbSchedulableThreads : nb de chedulableThreads
+	 * @param uriDDSNode : l'URI du noeud DDS auquel il est rattaché
+	 * @param domainParticipant : Le domainParticipant
+	 * @param topicName : Le nom du topic
+	 * @throws Exception
+	 */
 	protected ClientReadComponent(int nbThreads, int nbSchedulableThreads, String uriDDSNode,
 			DomainParticipant domainParticipant, String topicName) throws Exception {
 		super(nbThreads, nbSchedulableThreads, uriDDSNode, domainParticipant);
@@ -22,6 +39,12 @@ public class ClientReadComponent extends ClientComponent {
 		this.subscriber = (Subscriber) domainParticipant.createSubscriber();
 	}
 
+	
+	/**
+	 * 
+	 * @see fr.sorbonne_u.components.AbstractComponent#start()
+	 *
+	 */
 	@Override
 	public synchronized void start() throws ComponentStartException {
 		try {
@@ -38,6 +61,11 @@ public class ClientReadComponent extends ClientComponent {
 		super.start();
 	}
 
+	/**
+	 * 
+	 * @see fr.sorbonne_u.components.AbstractComponent#execute()
+	 *
+	 */
 	@Override
 	public void execute() throws Exception {
 

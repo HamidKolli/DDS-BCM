@@ -9,27 +9,50 @@ import org.omg.dds.domain.DomainParticipantFactoryQos;
 import org.omg.dds.domain.DomainParticipantListener;
 import org.omg.dds.domain.DomainParticipantQos;
 
+
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ *
+ * Classe Factory d'un DomainParticipant
+ */
 public class DomainParticipantFactory extends org.omg.dds.domain.DomainParticipantFactory{
 
 	private ServiceEnvironment serviceEnvironment;
 	
 	
 	
+	/**
+	 * Constructeur
+	 * 
+	 * @param serviceEnvironment : .
+	 */
 	public DomainParticipantFactory(ServiceEnvironment serviceEnvironment) {
 		super();
 		this.serviceEnvironment = serviceEnvironment;
 	}
 
+	/**
+	 * @see org.omg.dds.domain.DomainParticipantFactory#getEnvironment()
+	 */
 	@Override
 	public ServiceEnvironment getEnvironment() {
 		return serviceEnvironment;
 	}
 
+	/**
+	 * @see org.omg.dds.domain.DomainParticipantFactory#createParticipant()
+	 */
 	@Override
 	public DomainParticipant createParticipant() {
 		return new fr.ddspstl.DDS.Domain.DomainParticipant(getEnvironment());
 	}
 
+	/**
+	 * @see org.omg.dds.domain.DomainParticipantFactory#createParticipant(int)
+	 */
 	@Override
 	public DomainParticipant createParticipant(int domainId) {
 		return new fr.ddspstl.DDS.Domain.DomainParticipant(domainId,getEnvironment());

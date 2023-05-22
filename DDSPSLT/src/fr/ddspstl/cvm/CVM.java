@@ -17,12 +17,21 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 
+/**
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ *
+ *			Classe CVM principale (le main en quelque sorte)
+ */
 public class CVM extends AbstractCVM {
 
 	public CVM() throws Exception {
 		super();
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.cvm.AbstractCVM#deploy()
+	 */
 	@Override
 	public void deploy() throws Exception {
 
