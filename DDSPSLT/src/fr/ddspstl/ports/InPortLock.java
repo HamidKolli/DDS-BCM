@@ -8,6 +8,14 @@ import fr.ddspstl.plugin.LockPlugin;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ *
+ * Classe InPortLock
+ */
 public class InPortLock extends AbstractInboundPort implements PropagationLock {
 
 	/**
@@ -15,10 +23,22 @@ public class InPortLock extends AbstractInboundPort implements PropagationLock {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param uri : l'uri du port
+	 * @param owner : l'owner du port
+	 * @param pluginURI : l'uri du plugin
+	 * @param executorServiceURI : l'uri de l'executor service
+	 * @throws Exception
+	 */
 	public InPortLock(String uri, ComponentI owner, String pluginURI, String executorServiceURI) throws Exception {
 		super(uri, PropagationLock.class, owner, pluginURI, executorServiceURI);
 	}
 
+	/**
+	 * @see fr.ddspstl.interfaces.PropagationLock#lock(TopicDescription, String, Time)
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public <T> boolean lock(TopicDescription<T> topic, String idPropagation,Time timestamp) throws Exception {
@@ -33,6 +53,9 @@ public class InPortLock extends AbstractInboundPort implements PropagationLock {
 
 	}
 
+	/**
+	 * @see fr.ddspstl.interfaces.PropagationLock#unlock(TopicDescription, String, String)
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public <T> void unlock(TopicDescription<T> topic, String idPropagation,String idPropagationUnlock) throws Exception {

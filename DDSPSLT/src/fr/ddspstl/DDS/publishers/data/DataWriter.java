@@ -31,6 +31,16 @@ import fr.ddspstl.ports.OutPortWrite;
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
 
+
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ * @param <T> : type de la donnée
+ *
+ * Plugin représentant un DataWriter
+ */
 public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.DataWriter<T> {
 
 	private static final long serialVersionUID = 1L;
@@ -45,6 +55,13 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	private String inPortDDSNodeURI;
 	private String inPortWriteURI;
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param datas : l'ensemble des données
+	 * @param publisher : le publisher associé
+	 * @param inPortDDSNode : l'URI du port entrant du noeud DDS
+	 */
 	public DataWriter(Topic<T> datas, Publisher publisher,String inPortDDSNode) {
 		super();
 		this.topic =  datas;
@@ -53,7 +70,10 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	}
 
 	
-	
+
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#installOn(ComponentI)
+	 */
 	@Override
 	public void installOn(ComponentI owner) throws Exception {
 		super.installOn(owner);
@@ -61,7 +81,9 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 		this.addRequiredInterface(ConnectClient.class);
 	}
 	
-	
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#initialise()
+	 */
 	@Override
 	public void initialise() throws Exception {
 		super.initialise();
@@ -72,11 +94,17 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 		
 	}
 	
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#finalise()
+	 */
 	@Override
 	public void finalise() throws Exception {
 		super.finalise();
 	}
 	
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#uninstall()
+	 */
 	public void uninstall() throws Exception {
 		outPortWrite.unpublishPort();
 		outPortWrite.destroyPort();
@@ -86,11 +114,17 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	}
 	
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#getListener()
+	 */
 	@Override
 	public DataWriterListener<T> getListener() {
 		return listener;
 	}
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#setListener(java.util.EventListener)
+	 */
 	@Override
 	public void setListener(DataWriterListener<T> listener) {
 		this.listener = listener;
@@ -103,11 +137,17 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 
 	}
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#getQos()
+	 */
 	@Override
 	public DataWriterQos getQos() {
 		return qos;
 	}
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#setQos(org.omg.dds.core.EntityQos)
+	 */
 	@Override
 	public void setQos(DataWriterQos qos) {
 		this.qos = qos;
@@ -118,16 +158,25 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 
 	}
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#enable()
+	 */
 	@Override
 	public void enable() {
 		topic.enable();
 	}
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#getStatusChanges()
+	 */
 	@Override
 	public Set<Class<? extends Status>> getStatusChanges() {
 		return topic.getStatusChanges();
 	}
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#getInstanceHandle()
+	 */
 	@Override
 	public InstanceHandle getInstanceHandle() {
 		return topic.getInstanceHandle();
@@ -138,11 +187,17 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 
 	}
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#retain()
+	 */
 	@Override
 	public void retain() {
 		topic.retain();
 	}
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#getEnvironment()
+	 */
 	@Override
 	public ServiceEnvironment getEnvironment() {
 		return getParent().getEnvironment();
@@ -154,6 +209,9 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 		return null;
 	}
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#getTopic()
+	 */
 	@Override
 	public Topic<T> getTopic() {
 		return topic;
@@ -258,6 +316,9 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 
 	}
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#write(Object)
+	 */
 	@Override
 	public void write(T instanceData) throws TimeoutException {
 		try {
@@ -358,6 +419,9 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 		return null;
 	}
 
+	/**
+	 * @see org.omg.dds.pub.DataWriter#getParent()
+	 */
 	@Override
 	public Publisher getParent() {
 		return publisher;

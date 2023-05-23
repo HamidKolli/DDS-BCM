@@ -5,6 +5,14 @@ import java.util.concurrent.TimeUnit;
 import org.omg.dds.core.ModifiableTime;
 import org.omg.dds.core.ServiceEnvironment;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ *
+ * Classe Time
+ */
 public class Time extends org.omg.dds.core.Time{
 
 	/**
@@ -17,11 +25,19 @@ public class Time extends org.omg.dds.core.Time{
 	
 	
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param timestamp : le timestamp
+	 */
 	public Time(long timestamp) {
 		super();
 		this.timestamp = timestamp;
 	}
 
+	/**
+	 * @see org.omg.dds.core.Time#compareTo(org.omg.dds.core.Time)
+	 */
 	@Override
 	public int compareTo(org.omg.dds.core.Time o) {
 		assert o == null;
@@ -38,6 +54,9 @@ public class Time extends org.omg.dds.core.Time{
 		return null;
 	}
 
+	/**
+	 * @see org.omg.dds.core.Time#getTime(TimeUnit)
+	 */
 	@Override
 	public long getTime(TimeUnit inThisUnit) {
 		return timestamp;

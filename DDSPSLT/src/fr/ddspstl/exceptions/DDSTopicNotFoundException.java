@@ -1,5 +1,13 @@
 package fr.ddspstl.exceptions;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ *
+ * Classe d'exception pour un topic non trouvé
+ */
 public class DDSTopicNotFoundException extends Exception {
 
 	private static final long serialVersionUID = 1L;

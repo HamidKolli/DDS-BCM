@@ -14,6 +14,15 @@ import org.omg.dds.sub.InstanceState;
 import org.omg.dds.sub.SampleState;
 import org.omg.dds.sub.ViewState;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ * @param <T> : type de la donnée
+ *
+ * Classe représentant un Sample
+ */
 public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 
 	private static final long serialVersionUID = 1L;
@@ -25,12 +34,28 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 	private InstanceState instanceState;
 	private Time time;
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param serviceEnvironment : le Service Environment
+	 * @param data : la donnée
+	 */
 	public Sample(ServiceEnvironment serviceEnvironment, T data) {
 		super();
 		this.serviceEnvironment = serviceEnvironment;
 		this.data = data;
 	}
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param serviceEnvironment : le Service Environment
+	 * @param data : la donnée
+	 * @param sampleState : le Sample State
+	 * @param viewState : le View State
+	 * @param instanceState : L'instance State
+	 * @param time2 : le timeStamp
+	 */
 	public Sample(ServiceEnvironment serviceEnvironment, T data, SampleState sampleState, ViewState viewState,
 			InstanceState instanceState, Time time2) {
 		super();
@@ -42,31 +67,49 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 		this.time = time2;
 	}
 
+	/**
+	 * @see org.omg.dds.sub.Sample#getEnvironment()
+	 */
 	@Override
 	public ServiceEnvironment getEnvironment() {
 		return serviceEnvironment;
 	}
 
+	/**
+	 * @see org.omg.dds.sub.Sample#getData()
+	 */
 	@Override
 	public T getData() {
 		return data;
 	}
 
+	/**
+	 * @see org.omg.dds.sub.Sample#getSampleState()
+	 */
 	@Override
 	public SampleState getSampleState() {
 		return sampleState;
 	}
 
+	/**
+	 * @see org.omg.dds.sub.Sample#getViewState()
+	 */
 	@Override
 	public ViewState getViewState() {
 		return viewState;
 	}
 
+	/**
+	 * @see org.omg.dds.sub.Sample#getInstanceState()
+	 */
 	@Override
 	public InstanceState getInstanceState() {
 		return instanceState;
 	}
 
+	/**
+	 * @see org.omg.dds.sub.Sample#getSourceTimestamp()
+	 */
 	@Override
 	public Time getSourceTimestamp() {
 		return time;
@@ -114,6 +157,9 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 		return 0;
 	}
 
+	/**
+	 * @see org.omg.dds.sub.Sample#clone()
+	 */
 	@Override
 	public Sample<T> clone() {
 		return new Sample<T>(serviceEnvironment, data,sampleState,viewState,instanceState,time);

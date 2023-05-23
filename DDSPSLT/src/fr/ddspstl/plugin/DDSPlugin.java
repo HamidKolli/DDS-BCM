@@ -32,6 +32,15 @@ import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.ComponentI;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ * @param <T> : type de la donnée
+ *
+ * Plugin pour les noeuds DDS
+ */
 public class DDSPlugin<T> extends AbstractPlugin {
 
 	private static final long serialVersionUID = 1L;
@@ -58,6 +67,18 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 	private String executorServiceReadWriteURI;
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param set : l'ensemble des TopicDescription
+	 * @param propagationPortToNextRoot : Map retournant le port suivant auquel propager
+	 * @param readPortToRoot : Map retournant le port de lecture
+	 * @param writePortToRoot : Map retournant le port d'ecriture
+	 * @param addresses : adresse du noeud
+	 * @param executorServiceURI : L'uri De l'executorService
+	 * @param executorServicePropagationURI : L'uri De l'executorService pour la propagation
+	 * @param executorServiceReadWriteURI : L'uri De l'executorService pour le read/write
+	 */
 	public DDSPlugin(Set<TopicDescription<T>> set,
 			Map<TopicDescription<T>, OutPortPropagation<T>> propagationPortToNextRoot,
 			Map<TopicDescription<T>, OutPortReadDDS<T>> readPortToRoot,
@@ -83,14 +104,34 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 	}
 
+	/**
+	 * getter
+	 * 
+	 * @return String : l'URi du port Reader
+	 * @throws Exception
+	 */
 	public String getReaderURI() throws Exception {
 		return inPortRead.getPortURI();
 	}
 
+	/**
+	 * getter 
+	 * 
+	 * @return String : l'Uri du port wrtiter
+	 * @throws Exception
+	 */
 	public String getWriterURI() throws Exception {
 		return inPortWrite.getPortURI();
 	}
 
+
+	/**
+	 * Methode read : effectue un read
+	 * 
+	 * @param topic : le topic dans lequel lire
+	 * @return Iterator<T>: la donnée lue
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	public Iterator<T> read(TopicDescription<T> topic) throws Exception {
 		if (datas.containsKey(topic))
@@ -111,6 +152,13 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		return datas.get(topic).read();
 	}
 
+	/**
+	 * Methode write : effectue un write
+	 * 
+	 * @param topic : le topic dans lequel ecrire
+	 * @param data : la donnée à ecrire
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	public void write(Topic<T> topic, T data) throws Exception {
 		if (datas.containsKey(topic)) {
@@ -122,6 +170,13 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		writePortToRoot.get(topic).write(topic, data);
 	}
 
+	/**
+	 * Methode take : effectue un take
+	 * 
+	 * @param topic : le topic dans lequel take
+	 * @return Iterator<T> : la donnée prise
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	public Iterator<T> take(TopicDescription<T> topic) throws Exception {
 		if (datas.containsKey(topic)) {
@@ -139,6 +194,14 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		return result.get(requestId);
 	}
 
+	/**
+	 * Methode take
+	 * 
+	 * @param topic : le topic
+	 * @param address : l'adresse du noeud
+	 * @param requestID : l'ID de la requete
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	public void take(TopicDescription<T> topic, INodeAddress address, String requestID) throws Exception {
 		if (!datas.containsKey(topic)) {
@@ -154,6 +217,14 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 	}
 
+	/**
+	 * methode read
+	 * 
+	 * @param topic : le topic
+	 * @param address : l'adresse du noeud
+	 * @param requestID : l'ID de la requete
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	public void read(TopicDescription<T> topic, INodeAddress address, String requestID) throws Exception {
 		if (!datas.containsKey(topic)) {
@@ -166,6 +237,13 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 	}
 
+	/**
+	 * Methode accept result : accepte le resultat du read/take
+	 * 
+	 * @param result : la donnée acceptée
+	 * @param requestID : l'ID de la requete
+	 * @throws DDSTopicNotFoundException
+	 */
 	public void acceptResult(Iterator<T> result, String requestID) throws DDSTopicNotFoundException {
 		if (!this.clientLock.containsKey(requestID)) {
 			throw new DDSTopicNotFoundException("RequestID not found");
@@ -174,6 +252,15 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		clientLock.get(requestID).release();
 	}
 
+	/**
+	 * methode de propagation
+	 * 
+	 * @param newObject : la donnée à propager
+	 * @param topicName : le nom du topic
+	 * @param id : l'ID de la requete
+	 * @param time : le TimeStamp
+	 * @throws Exception
+	 */
 	public void propager(T newObject, TopicDescription<T> topicName, String id, Time time) throws Exception {
 
 		if (topicIDWrite.get(topicName) != null && topicIDWrite.get(topicName).equals(id))
@@ -186,6 +273,15 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 	}
 
+	/**
+	 * methode qui consomme la donnée
+	 * 
+	 * @param topic : le topic concerné
+	 * @param id : l'ID de la requete
+	 * @param isFirst : booleen regardant si cette requete est la premiere
+	 * @return Iterator<T> : la donnée consommée
+	 * @throws Exception
+	 */
 	public Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception {
 		if (topicIDTake.containsKey(topic) && topicIDTake.get(topic).equals(id))
 			return datas.get(topic).take();
@@ -197,6 +293,9 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#installOn(ComponentI)
+	 */
 	@Override
 	public void installOn(ComponentI owner) throws Exception {
 
@@ -208,6 +307,9 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		this.addOfferedInterface(ConnectClient.class);
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#initialise()
+	 */
 	@Override
 	public void initialise() throws Exception {
 
@@ -238,6 +340,9 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		inPortPropagation.publishPort();
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#finalise()
+	 */
 	@Override
 	public void finalise() throws Exception {
 		super.finalise();
@@ -259,6 +364,9 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#uninstall()
+	 */
 	@Override
 	public void uninstall() throws Exception {
 

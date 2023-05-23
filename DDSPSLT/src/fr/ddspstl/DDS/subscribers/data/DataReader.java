@@ -38,6 +38,15 @@ import fr.ddspstl.ports.OutPortRead;
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ * @param <T> : type de la donnée
+ *
+ * Plugin représentant un DataReader
+ */
 public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.DataReader<T> {
 
 	private static final long serialVersionUID = 1L;
@@ -47,12 +56,22 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 	private String uriPortDDSnode;
 	private OutPortConnectClient outPortConnectClient;
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param topic : le topic
+	 * @param subscriber : le subscriber
+	 * @param uriPortDDSNode : l'uri du port du noeud dds
+	 */
 	public DataReader(TopicDescription<T> topic, Subscriber subscriber, String uriPortDDSNode) {
 		this.topic = topic;
 		this.subscriber = subscriber;
 		this.uriPortDDSnode = uriPortDDSNode;
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#installOn(ComponentI)
+	 */
 	@Override
 	public void installOn(ComponentI owner) throws Exception {
 		super.installOn(owner);
@@ -61,6 +80,9 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#initialise()
+	 */
 	@Override
 	public void initialise() throws Exception {
 		super.initialise();
@@ -75,6 +97,9 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 		super.finalise();
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#uninstall()
+	 */
 	public void uninstall() throws Exception {
 		portRead.unpublishPort();
 		portRead.destroyPort();
@@ -138,6 +163,9 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 
 	}
 
+	/**
+	 * @see org.omg.dds.sub.DataReader#getEnvironment()
+	 */
 	public ServiceEnvironment getEnvironment() {
 		return getParent().getEnvironment();
 	}
@@ -168,6 +196,9 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 
 	}
 
+	/**
+	 * @see org.omg.dds.sub.DataReader#getTopicDescription()
+	 */
 	public TopicDescription<T> getTopicDescription() {
 		return topic;
 	}
@@ -222,6 +253,9 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 		return null;
 	}
 
+	/**
+	 * @see org.omg.dds.sub.DataReader#read()
+	 */
 	public Iterator<T> read() {
 		try {
 			getOwner().doPortConnection(outPortConnectClient.getPortURI(), uriPortDDSnode, ConnectorClient.class.getCanonicalName());
@@ -319,6 +353,9 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 		return null;
 	}
 
+	/**
+	 * @see org.omg.dds.sub.DataReader#getParent()
+	 */
 	public Subscriber getParent() {
 		return subscriber;
 	}

@@ -19,6 +19,15 @@ import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.ComponentI;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ * @param <T> : type de la donnée
+ *
+ * Plugin pour les lock
+ */
 public class LockPlugin<T> extends AbstractPlugin {
 
 	private static final long serialVersionUID = 1L;
@@ -33,6 +42,14 @@ public class LockPlugin<T> extends AbstractPlugin {
 	private INodeAddress address;
 	private  String executorServiceURI;
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param address : l'adresse du noeud
+	 * @param topics : l'ensemble des topics
+	 * @param executorServiceURI : l'uri de l'executorService
+	 * @throws Exception
+	 */
 	public LockPlugin(INodeAddress address, Set<TopicDescription<T>> topics, String executorServiceURI) throws Exception {
 		this.topics = topics;
 		this.address = address;
@@ -44,6 +61,10 @@ public class LockPlugin<T> extends AbstractPlugin {
 		topicsIDUnlock = new ConcurrentHashMap<>();
 	}
 
+	
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#installOn(ComponentI)
+	 */
 	@Override
 	public void installOn(ComponentI owner) throws Exception {
 		super.installOn(owner);
@@ -51,6 +72,9 @@ public class LockPlugin<T> extends AbstractPlugin {
 		this.addRequiredInterface(PropagationLock.class);
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#initialise()
+	 */
 	@Override
 	public void initialise() throws Exception {
 		super.initialise();
@@ -64,6 +88,9 @@ public class LockPlugin<T> extends AbstractPlugin {
 
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#finalise()
+	 */
 	@Override
 	public void finalise() throws Exception {
 		super.finalise();
@@ -73,6 +100,9 @@ public class LockPlugin<T> extends AbstractPlugin {
 		}
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#uninstall()
+	 */
 	@Override
 	public void uninstall() throws Exception {
 		super.uninstall();
@@ -84,6 +114,12 @@ public class LockPlugin<T> extends AbstractPlugin {
 
 	}
 
+	/**
+	 * Methode tryLock : verifie si un topic est deja lock ou non
+	 * 
+	 * @param topic : le nom du topic
+	 * @return booleen : le resultat du try
+	 */
 	public boolean trylock(TopicDescription<T> topic) {
 		if (topicsLock.containsKey(topic)) {
 			return topicsLock.get(topic).tryLock();
@@ -91,6 +127,11 @@ public class LockPlugin<T> extends AbstractPlugin {
 		return false;
 	}
 
+	/**
+	 * Methode Lock : lock un topic
+	 * 
+	 * @param topic : le topic a lock
+	 */
 	public void lock(TopicDescription<T> topic) {
 		if (topicsLock.containsKey(topic)) {
 			topicsLock.get(topic).lock();
@@ -98,18 +139,39 @@ public class LockPlugin<T> extends AbstractPlugin {
 
 	}
 
+	/**
+	 * Methode unlock : unlock un topic
+	 * 
+	 * @param topic : le topic a unlock
+	 */
 	public void unlock(TopicDescription<T> topic) {
 		if (topicsLock.containsKey(topic)) {
 			topicsLock.get(topic).unlock();
 		}
 	}
 
+	
+	/**
+	 * Methode propagateLockIn : propage le lock
+	 * 
+	 * @param topic : le topic
+	 * @throws Exception
+	 */
 	public void propagateLockIn(TopicDescription<T> topic) throws Exception {
 		propagateLock(topic, AbstractPort.generatePortURI(), new fr.ddspstl.time.Time(new Date().getTime()));
 	}
 
 
 
+	/**
+	 * Methode propagateLock : propage le lock
+	 * 
+	 * @param topic : le topic
+	 * @param idPropagation : l'ID de la propagation
+	 * @param timestamp : le timeStamp de la propagation
+	 * @return boolean : booleen retournant si la propagation apu se faire
+	 * @throws Exception
+	 */
 	public boolean propagateLock(TopicDescription<T> topic, String idPropagation, Time timestamp) throws Exception {
 
 		if (topicsID.containsKey(topic) && topicsID.get(topic).equals(idPropagation))
@@ -138,10 +200,25 @@ public class LockPlugin<T> extends AbstractPlugin {
 
 	}
 
+	/**
+	 * Methode propagateUnlockIn : propage le unlock
+	 * 
+	 * @param topic : le topic
+	 * @param idPropagation : l'ID de la propagation
+	 * @throws Exception
+	 */
 	public void propagateUnlockIn(TopicDescription<T> topic, String idPropagation) throws Exception {
 		propagateUnlock(topic, idPropagation, AbstractPort.generatePortURI());
 	}
 
+	/**
+	 * Methode propagateUnlock : propage le Unlock
+	 * 
+	 * @param topic : le topic
+	 * @param idPropagation : l'id de la propagation
+	 * @param idPropagationUnlock : l'id de la propagation du unlock
+	 * @throws Exception
+	 */
 	public void propagateUnlock(TopicDescription<T> topic, String idPropagation, String idPropagationUnlock)
 			throws Exception {
 		if (topicsIDUnlock.containsKey(topic) && topicsIDUnlock.get(topic).equals(idPropagationUnlock))
@@ -161,6 +238,12 @@ public class LockPlugin<T> extends AbstractPlugin {
 		}
 	}
 
+	/**
+	 * Methode Connect
+	 * 
+	 * @param address : l'adresse du noeud auquel se connecter
+	 * @throws Exception
+	 */
 	public void connect(INodeAddress address) throws Exception {
 		if (ports.containsKey(address))
 			return;
