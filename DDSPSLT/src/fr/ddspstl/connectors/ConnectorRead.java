@@ -1,6 +1,5 @@
 package fr.ddspstl.connectors;
 
-import org.omg.dds.core.Time;
 import org.omg.dds.sub.Sample.Iterator;
 import org.omg.dds.topic.TopicDescription;
 
@@ -15,16 +14,15 @@ import fr.sorbonne_u.components.connectors.AbstractConnector;
  * 
  * Classe Connecteur pour un read
  */
-public class ConnectorRead<TYPE> extends AbstractConnector implements ReadCI<TYPE> {
+public class ConnectorRead extends AbstractConnector implements ReadCI {
 
 
 	/**
 	 * 
 	 * @see fr.ddspstl.interfaces.ReadCI#read(TopicDescription)
 	 */
-	@SuppressWarnings("unchecked")
-	public  Iterator<TYPE> read(TopicDescription<TYPE> topic) throws Exception {
-		return ((ReadCI<TYPE> )this.offering).read(topic);
+	public <TYPE> Iterator<TYPE> read(TopicDescription<TYPE> topic) throws Exception {
+		return ((ReadCI)this.offering).read(topic);
 
 	}
 
@@ -32,10 +30,9 @@ public class ConnectorRead<TYPE> extends AbstractConnector implements ReadCI<TYP
 	 * 
 	 * @see fr.ddspstl.interfaces.ReadCI#take(TopicDescription)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public Iterator<TYPE> take(TopicDescription<TYPE> topic) throws Exception {
-		return ((ReadCI<TYPE>)this.offering).take(topic);
+	public <TYPE> Iterator<TYPE> take(TopicDescription<TYPE> topic) throws Exception {
+		return ((ReadCI)this.offering).take(topic);
 	}
 
 }

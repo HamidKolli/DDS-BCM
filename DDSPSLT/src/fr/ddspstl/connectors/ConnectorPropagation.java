@@ -16,7 +16,7 @@ import fr.sorbonne_u.components.connectors.AbstractConnector;
  *
  * Classe Connecteur pour une propagation
  */
-public class ConnectorPropagation<T> extends AbstractConnector implements Propagation<T> {
+public class ConnectorPropagation extends AbstractConnector implements Propagation {
 
 	
 	
@@ -24,10 +24,9 @@ public class ConnectorPropagation<T> extends AbstractConnector implements Propag
 	 * 
 	 * @see fr.ddspstl.interfaces.Propagation#propager(Object, TopicDescription, String, Time)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception {
-		((Propagation<T>) this.offering).propager(newObject, topic, id, time);
+	public <T> void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception {
+		((Propagation) this.offering).propager(newObject, topic, id, time);
 
 	}
 
@@ -35,10 +34,9 @@ public class ConnectorPropagation<T> extends AbstractConnector implements Propag
 	 * 
 	 * @see fr.ddspstl.interfaces.Propagation#consommer(TopicDescription, String, boolean)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception {
-		return ((Propagation<T>) this.offering).consommer(topic, id, isFirst);
+	public <T> Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception {
+		return ((Propagation) this.offering).consommer(topic, id, isFirst);
 	}
 
 }

@@ -16,7 +16,7 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
  *
  * Interface Implantée par un ConnectorPropagation
  */
-public interface Propagation<T> extends OfferedCI, RequiredCI {
+public interface Propagation extends OfferedCI, RequiredCI {
 	
 	
 	/**
@@ -28,7 +28,7 @@ public interface Propagation<T> extends OfferedCI, RequiredCI {
 	 * @param time : le timestamp
 	 * @throws Exception
 	 */
-	public void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception;
+	public <T> void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception;
 
 	/**
 	 * methode consommer : consomme la donnée
@@ -39,5 +39,5 @@ public interface Propagation<T> extends OfferedCI, RequiredCI {
 	 * @return Iterator<T> : la donnée lue
 	 * @throws Exception
 	 */
-	public Iterator<T> consommer(TopicDescription<T> topic, String id,boolean isFirst) throws Exception;
+	public <T> Iterator<T> consommer(TopicDescription<T> topic, String id,boolean isFirst) throws Exception;
 }

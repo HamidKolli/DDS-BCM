@@ -28,24 +28,27 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
  * @author Hamid KOLLI
  * @author Yanis ALAYOUD
  * 
- * @param <T> : le type de la donnée
  *
  * Composant représentant un noeud DDS
  */
 
-public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
+public class DDSNode extends AbstractComponent implements IDDSNode {
 
+	public static final String DIR_LOGGER_NAME = "loggers/";
+	public static final String FILE_LOGGER_NAME = "node_";
+	public static final String LOGGER_TAG = "DDSNode | ";
+	
 	private static final int NB_THREAD_CLIENT = 4;
 	private static final int NB_THREAD_LOCK = 4;
 	private static final int NB_THREAD_PROPAGATION = 5;
 	private static final int NB_THREAD_CONNECTION = 5;
 
-	private DDSPlugin<T> plugin;
-	private LockPlugin<T> pluginLock;
+	private DDSPlugin plugin;
+	private LockPlugin pluginLock;
 
 	private INodeAddress nodeAddress;
-	private Map<TopicDescription<T>, INodeAddress> rootOfTopics;
-	private Map<TopicDescription<T>, INodeAddress> nextRoot;
+	private Map<TopicDescription<?>, INodeAddress> rootOfTopics;
+	private Map<TopicDescription<?>, INodeAddress> nextRoot;
 
 	/**
 	 * Constructeur
@@ -58,7 +61,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	 * @throws Exception
 	 */
 	protected DDSNode(int nbThreads, int nbSchedulableThreads, INodeAddress address,
-			Map<TopicDescription<T>, INodeAddress> rootOfTopics, Map<TopicDescription<T>, INodeAddress> nextRoot)
+			Map<TopicDescription<?>, INodeAddress> rootOfTopics, Map<TopicDescription<?>, INodeAddress> nextRoot)
 			throws Exception {
 		super(nbThreads, nbSchedulableThreads);
 
@@ -81,7 +84,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 			String executorServiceLockURI = AbstractPort.generatePortURI();
 			createNewExecutorService(executorServiceLockURI, NB_THREAD_LOCK, false);
 			new HashSet<>(nextRoot.values());
-			pluginLock = new LockPlugin<T>(nodeAddress, nextRoot.keySet(), executorServiceLockURI);
+			pluginLock = new LockPlugin(nodeAddress, nextRoot.keySet(), executorServiceLockURI);
 			pluginLock.setPluginURI(AbstractPort.generatePortURI());
 			this.installPlugin(pluginLock);
 
@@ -97,21 +100,25 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	 * @see fr.ddspstl.components.interfaces.IDDSNode#propager(Object, TopicDescription, String, Time)
 	 *
 	 */
-	public void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception {
+	public <T> void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception {
+		logMessage(LOGGER_TAG + "Propager topic :" + topic.getName());
 		pluginLock.lock(topic);
 		plugin.propager(newObject, topic, id, time);
 		pluginLock.unlock(topic);
-
+		logMessage(LOGGER_TAG + "Fin propager topic :" + topic.getName());
 	}
 
 	/**
 	 * @see fr.ddspstl.components.interfaces.IDDSNode#read(TopicDescription)
 	 *
 	 */
-	public Iterator<T> read(TopicDescription<T> topic) {
+	@SuppressWarnings("unchecked")
+	public <T> Iterator<T> read(TopicDescription<T> topic) {
+		logMessage(LOGGER_TAG + "Read topic :" + topic.getName());
 		pluginLock.lock(topic);
-		Iterator<T> result = plugin.readData(topic);
+		Iterator<T> result = (Iterator<T>) plugin.readData(topic);
 		pluginLock.unlock(topic);
+		logMessage(LOGGER_TAG + "Fin read topic :" + topic.getName());
 
 		return result;
 
@@ -121,16 +128,20 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	 * @see fr.ddspstl.components.interfaces.IDDSNode#consommer(TopicDescription, String, boolean)
 	 *
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception {
+	public <T> Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception {
+		logMessage(LOGGER_TAG + "Consommer topic :" + topic.getName());
 		String propagationLockURI = AbstractPort.generatePortURI();
 		if (pluginLock.propagateLock(topic, propagationLockURI, new fr.ddspstl.time.Time((new Date()).getTime()))) {
-			Iterator<T> result = plugin.consommer(topic, id, isFirst);
+			Iterator<T> result = (Iterator<T>) plugin.consommer(topic, id, isFirst);
 			pluginLock.propagateUnlock(topic, propagationLockURI, AbstractPort.generatePortURI());
 			return result;
 		}
 		pluginLock.propagateUnlock(topic, propagationLockURI, AbstractPort.generatePortURI());
+		logMessage(LOGGER_TAG + "Fin consommer topic :" + topic.getName());
 		return new fr.ddspstl.DDS.samples.Sample.Iterator<T>();
+		
 	}
 
 	
@@ -141,7 +152,7 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 	 */
 	@Override
 	public void execute() throws Exception {
-
+		logMessage(LOGGER_TAG + "Connexion");
 		String executorServicePropagationURI = AbstractPort.generatePortURI();
 		createNewExecutorService(executorServicePropagationURI, NB_THREAD_PROPAGATION, false);
 
@@ -151,10 +162,10 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 		String executorServiceURI = AbstractPort.generatePortURI();
 		createNewExecutorService(executorServiceURI, NB_THREAD_CLIENT, false);
 
-		Map<TopicDescription<T>, OutPortPropagation<T>> propagationPortToNextRoot = new ConcurrentHashMap<>();
+		Map<TopicDescription<?>, OutPortPropagation> propagationPortToNextRoot = new ConcurrentHashMap<>();
 
-		for (Map.Entry<TopicDescription<T>, INodeAddress> topic : nextRoot.entrySet()) {
-			OutPortPropagation<T> port = new OutPortPropagation<>(this);
+		for (Map.Entry<TopicDescription<?>, INodeAddress> topic : nextRoot.entrySet()) {
+			OutPortPropagation port = new OutPortPropagation(this);
 			port.publishPort();
 			doPortConnection(port.getPortURI(), topic.getValue().getPropagationURI(),
 					ConnectorPropagation.class.getCanonicalName());
@@ -163,10 +174,10 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 			pluginLock.connect(topic.getValue());
 		}
 
-		Map<TopicDescription<T>, OutPortReadDDS<T>> readPortToRoot = new ConcurrentHashMap<>();
+		Map<TopicDescription<?>, OutPortReadDDS> readPortToRoot = new ConcurrentHashMap<>();
 
-		for (Map.Entry<TopicDescription<T>, INodeAddress> topic : rootOfTopics.entrySet()) {
-			OutPortReadDDS<T> port = new OutPortReadDDS<>(this);
+		for (Map.Entry<TopicDescription<?>, INodeAddress> topic : rootOfTopics.entrySet()) {
+			OutPortReadDDS port = new OutPortReadDDS(this);
 			port.publishPort();
 			doPortConnection(port.getPortURI(), topic.getValue().getReadURI(),
 					ConnectorReadDDS.class.getCanonicalName());
@@ -175,21 +186,29 @@ public class DDSNode<T> extends AbstractComponent implements IDDSNode<T> {
 			pluginLock.connect(topic.getValue());
 		}
 
-		Map<TopicDescription<T>, OutPortWrite<T>> writePortToRoot = new ConcurrentHashMap<>();
-		for (Map.Entry<TopicDescription<T>, INodeAddress> topic : rootOfTopics.entrySet()) {
-			OutPortWrite<T> port = new OutPortWrite<>(this);
+		Map<TopicDescription<?>, OutPortWrite> writePortToRoot = new ConcurrentHashMap<>();
+		for (Map.Entry<TopicDescription<?>, INodeAddress> topic : rootOfTopics.entrySet()) {
+			OutPortWrite port = new OutPortWrite(this);
 			port.publishPort();
 			doPortConnection(port.getPortURI(), topic.getValue().getWriteURI(),
 					ConnectorWrite.class.getCanonicalName());
 			writePortToRoot.put(topic.getKey(), port);
 		}
 		
-		plugin = new DDSPlugin<T>(nextRoot.keySet(), propagationPortToNextRoot, readPortToRoot, writePortToRoot,
+		plugin = new DDSPlugin(nextRoot.keySet(), propagationPortToNextRoot, readPortToRoot, writePortToRoot,
 				nodeAddress, executorServiceURI, executorServicePropagationURI, executorServiceReadWriteURI);
-
+		logMessage(LOGGER_TAG + "Installer le plugin dds");
 		plugin.setPluginURI(AbstractPort.generatePortURI());
 		this.installPlugin(plugin);
 		super.execute();
+		logMessage(LOGGER_TAG + "Fin connexion");
+	}
+	
+	@Override
+	public synchronized void finalise() throws Exception {
+		logMessage(LOGGER_TAG + "Fin");
+		printExecutionLogOnFile(DIR_LOGGER_NAME + FILE_LOGGER_NAME + nodeAddress.getNodeURI());
+		super.finalise();
 	}
 	
 

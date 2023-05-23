@@ -32,42 +32,44 @@ import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.ComponentI;
 
-public class DDSPlugin<T> extends AbstractPlugin {
+public class DDSPlugin extends AbstractPlugin {
 
 	private static final long serialVersionUID = 1L;
 
-	private InPortRead<T> inPortRead;
-	private InPortWrite<T> inPortWrite;
+	public static final String LOGGER_TAG = "DDSPlugin | ";
+
+	private InPortRead inPortRead;
+	private InPortWrite inPortWrite;
 	private InPortConnectClient inPortConnectClient;
-	private Map<TopicDescription<T>, Datas<T>> datas;
-	private Map<TopicDescription<T>, String> topicIDWrite;
-	private Map<TopicDescription<T>, String> topicIDTake;
-	private Map<TopicDescription<T>, OutPortPropagation<T>> propagationPortToNextRoot;
-	private Map<TopicDescription<T>, OutPortReadDDS<T>> readPortToRoot;
-	private Map<TopicDescription<T>, OutPortWrite<T>> writePortToRoot;
+	private Map<TopicDescription<?>, Datas<?>> datas;
+	private Map<TopicDescription<?>, String> topicIDWrite;
+	private Map<TopicDescription<?>, String> topicIDTake;
+	private Map<TopicDescription<?>, OutPortPropagation> propagationPortToNextRoot;
+	private Map<TopicDescription<?>, OutPortReadDDS> readPortToRoot;
+	private Map<TopicDescription<?>, OutPortWrite> writePortToRoot;
 	private Map<String, Semaphore> clientLock;
-	private Map<String, Iterator<T>> result;
-	private OutPortReadDDS<T> outPortReadDDS;
+	private Map<String, Iterator<?>> result;
+	private OutPortReadDDS outPortReadDDS;
 	private INodeAddress address;
-	private InPortPropagation<T> inPortPropagation;
-	private InPortReadDDS<T> inPortReadDDS;
-	private InPortWriteDDS<T> inPortWriteDDS;
+	private InPortPropagation inPortPropagation;
+	private InPortReadDDS inPortReadDDS;
+	private InPortWriteDDS inPortWriteDDS;
 
 	private String executorServiceURI;
 	private String executorServicePropagationURI;
 
 	private String executorServiceReadWriteURI;
 
-	public DDSPlugin(Set<TopicDescription<T>> set,
-			Map<TopicDescription<T>, OutPortPropagation<T>> propagationPortToNextRoot,
-			Map<TopicDescription<T>, OutPortReadDDS<T>> readPortToRoot,
-			Map<TopicDescription<T>, OutPortWrite<T>> writePortToRoot, INodeAddress addresses,
-			String executorServiceURI, String executorServicePropagationURI, String executorServiceReadWriteURI) {
+	public DDSPlugin(Set<TopicDescription<?>> set,
+			Map<TopicDescription<?>, OutPortPropagation> propagationPortToNextRoot,
+			Map<TopicDescription<?>, OutPortReadDDS> readPortToRoot,
+			Map<TopicDescription<?>, OutPortWrite> writePortToRoot, INodeAddress addresses, String executorServiceURI,
+			String executorServicePropagationURI, String executorServiceReadWriteURI) {
 
 		this.address = addresses;
 		this.datas = new ConcurrentHashMap<>();
-		for (TopicDescription<T> topic : set) {
-			datas.put(topic, new Datas<T>(topic));
+		for (TopicDescription<?> topic : set) {
+			datas.put(topic, new Datas<>(topic));
 		}
 		this.topicIDWrite = new ConcurrentHashMap<>();
 		this.topicIDTake = new ConcurrentHashMap<>();
@@ -84,18 +86,23 @@ public class DDSPlugin<T> extends AbstractPlugin {
 	}
 
 	public String getReaderURI() throws Exception {
+		getOwner().logMessage(LOGGER_TAG + " getReaderURI");
 		return inPortRead.getPortURI();
 	}
 
 	public String getWriterURI() throws Exception {
+		getOwner().logMessage(LOGGER_TAG + " getWriterURI");
 		return inPortWrite.getPortURI();
 	}
 
 	@SuppressWarnings("unchecked")
-	public Iterator<T> read(TopicDescription<T> topic) throws Exception {
-		if (datas.containsKey(topic))
-			return ((IDDSNode<T>) getOwner()).read(topic);
+	public <T> Iterator<T> read(TopicDescription<T> topic) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + " read topic : " + topic.getName());
 
+		if (datas.containsKey(topic))
+			return ((IDDSNode) getOwner()).read(topic);
+
+		getOwner().logMessage(LOGGER_TAG + " read topic : " + topic.getName() + " get from topic");
 		String requestId = AbstractPort.generatePortURI();
 		Semaphore s = new Semaphore(0);
 
@@ -103,30 +110,38 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 		readPortToRoot.get(topic).read(topic, address, requestId);
 		s.acquire();
+		getOwner().logMessage(LOGGER_TAG + "Fin read topic : " + topic.getName());
 
-		return result.get(requestId);
+		return (Iterator<T>) result.get(requestId);
 	}
 
-	public Iterator<T> readData(TopicDescription<T> topic) {
+	public Iterator<?> readData(TopicDescription<?> topic) {
+		getOwner().logMessage(LOGGER_TAG + "Fin readData topic : " + topic.getName());
 		return datas.get(topic).read();
 	}
 
-	@SuppressWarnings("unchecked")
-	public void write(Topic<T> topic, T data) throws Exception {
+	public <T> void write(Topic<T> topic, T data) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Write topic : " + topic.getName());
+
 		if (datas.containsKey(topic)) {
-			((IDDSNode<T>) getOwner()).propager(data, topic, AbstractPort.generatePortURI(),
+			((IDDSNode) getOwner()).propager(data, topic, AbstractPort.generatePortURI(),
 					new fr.ddspstl.time.Time((new Date()).getTime()));
+			getOwner().logMessage(LOGGER_TAG + "Fin write topic : " + topic.getName());
+
 			return;
 		}
+		getOwner().logMessage(LOGGER_TAG + "Fin write topic : " + topic.getName());
 
 		writePortToRoot.get(topic).write(topic, data);
 	}
 
-	@SuppressWarnings("unchecked")
-	public Iterator<T> take(TopicDescription<T> topic) throws Exception {
-		if (datas.containsKey(topic)) {
-			return ((IDDSNode<T>) getOwner()).consommer(topic, AbstractPort.generatePortURI(), true);
-		}
+	public Iterator<?> take(TopicDescription<?> topic) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Take topic : " + topic.getName());
+
+		if (datas.containsKey(topic))
+			return ((IDDSNode) getOwner()).consommer(topic, AbstractPort.generatePortURI(), true);
+
+		getOwner().logMessage(LOGGER_TAG + "Take topic : " + topic.getName() + " get from topic");
 
 		String requestId = AbstractPort.generatePortURI();
 		Semaphore s = new Semaphore(0);
@@ -135,47 +150,55 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 		readPortToRoot.get(topic).take(topic, address, requestId);
 		s.acquire();
+		getOwner().logMessage(LOGGER_TAG + "Fin take topic : " + topic.getName());
 
 		return result.get(requestId);
 	}
 
-	@SuppressWarnings("unchecked")
-	public void take(TopicDescription<T> topic, INodeAddress address, String requestID) throws Exception {
+	public void take(TopicDescription<?> topic, INodeAddress address, String requestID) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Take root topic : " + topic.getName());
 		if (!datas.containsKey(topic)) {
 			throw new DDSTopicNotFoundException("Topic not found");
 		}
 		getOwner().doPortConnection(outPortReadDDS.getPortURI(), address.getReadURI(),
 				ConnectorReadDDS.class.getCanonicalName());
 
-		outPortReadDDS.acceptResult(((IDDSNode<T>) getOwner()).consommer(topic, AbstractPort.generatePortURI(), true),
+		outPortReadDDS.acceptResult(((IDDSNode) getOwner()).consommer(topic, AbstractPort.generatePortURI(), true),
 				requestID);
 
 		outPortReadDDS.doDisconnection();
+		getOwner().logMessage(LOGGER_TAG + "Fin take root topic : " + topic.getName());
 
 	}
 
-	@SuppressWarnings("unchecked")
-	public void read(TopicDescription<T> topic, INodeAddress address, String requestID) throws Exception {
+	public void read(TopicDescription<?> topic, INodeAddress address, String requestID) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Read root topic : " + topic.getName());
+
 		if (!datas.containsKey(topic)) {
 			throw new DDSTopicNotFoundException("Topic not found");
 		}
 		getOwner().doPortConnection(outPortReadDDS.getPortURI(), address.getReadURI(),
 				ConnectorReadDDS.class.getCanonicalName());
-		outPortReadDDS.acceptResult(((IDDSNode<T>) getOwner()).read(topic), requestID);
+		outPortReadDDS.acceptResult(((IDDSNode) getOwner()).read(topic), requestID);
 		outPortReadDDS.doDisconnection();
+		getOwner().logMessage(LOGGER_TAG + "Fin read root topic : " + topic.getName());
+
 
 	}
 
-	public void acceptResult(Iterator<T> result, String requestID) throws DDSTopicNotFoundException {
+	public void acceptResult(Iterator<?> result, String requestID) throws DDSTopicNotFoundException {
+		getOwner().logMessage(LOGGER_TAG + "AcceptResult" );
+
 		if (!this.clientLock.containsKey(requestID)) {
 			throw new DDSTopicNotFoundException("RequestID not found");
 		}
 		this.result.put(requestID, result);
 		clientLock.get(requestID).release();
+		getOwner().logMessage(LOGGER_TAG + "Fin acceptResult" );
 	}
 
-	public void propager(T newObject, TopicDescription<T> topicName, String id, Time time) throws Exception {
-
+	public <T> void propager(T newObject, TopicDescription<T> topicName, String id, Time time) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Propager topic : " + topicName.getName() );
 		if (topicIDWrite.get(topicName) != null && topicIDWrite.get(topicName).equals(id))
 			return;
 
@@ -183,16 +206,18 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		datas.get(topicName).write(newObject, time);
 
 		propagationPortToNextRoot.get(topicName).propager(newObject, topicName, id, time);
-
+		getOwner().logMessage(LOGGER_TAG + "Fin propager topic : " + topicName.getName() );
 	}
 
-	public Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception {
+	public Iterator<?> consommer(TopicDescription<?> topic, String id, boolean isFirst) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Consommer topic : " + topic.getName() );
 		if (topicIDTake.containsKey(topic) && topicIDTake.get(topic).equals(id))
 			return datas.get(topic).take();
 
 		topicIDTake.put(topic, id);
 		if (!isFirst)
 			datas.get(topic).take();
+		getOwner().logMessage(LOGGER_TAG + "Fin Consommer topic : " + topic.getName());
 		return propagationPortToNextRoot.get(topic).consommer(topic, id, false);
 
 	}
@@ -216,24 +241,24 @@ public class DDSPlugin<T> extends AbstractPlugin {
 				executorServiceURI);
 		inPortConnectClient.publishPort();
 
-		inPortRead = new InPortRead<T>(getOwner(), getPluginURI());
+		inPortRead = new InPortRead(getOwner(), getPluginURI());
 		inPortRead.publishPort();
 
-		inPortWrite = new InPortWrite<T>(getOwner(), getPluginURI());
+		inPortWrite = new InPortWrite(getOwner(), getPluginURI());
 		inPortWrite.publishPort();
 
-		outPortReadDDS = new OutPortReadDDS<>(getOwner());
+		outPortReadDDS = new OutPortReadDDS(getOwner());
 		outPortReadDDS.publishPort();
 
-		inPortReadDDS = new InPortReadDDS<>(address.getReadURI(), getOwner(), getPluginURI(),
+		inPortReadDDS = new InPortReadDDS(address.getReadURI(), getOwner(), getPluginURI(),
 				executorServiceReadWriteURI);
 		inPortReadDDS.publishPort();
 
-		inPortWriteDDS = new InPortWriteDDS<>(address.getWriteURI(), getOwner(), getPluginURI(),
+		inPortWriteDDS = new InPortWriteDDS(address.getWriteURI(), getOwner(), getPluginURI(),
 				executorServiceReadWriteURI);
 		inPortWriteDDS.publishPort();
 
-		inPortPropagation = new InPortPropagation<>(address.getPropagationURI(), getOwner(), getPluginURI(),
+		inPortPropagation = new InPortPropagation(address.getPropagationURI(), getOwner(), getPluginURI(),
 				executorServicePropagationURI);
 		inPortPropagation.publishPort();
 	}
@@ -245,15 +270,15 @@ public class DDSPlugin<T> extends AbstractPlugin {
 		if (outPortReadDDS.connected())
 			outPortReadDDS.doDisconnection();
 
-		for (OutPortPropagation<T> port : propagationPortToNextRoot.values()) {
+		for (OutPortPropagation port : propagationPortToNextRoot.values()) {
 			port.doDisconnection();
 		}
 
-		for (OutPortReadDDS<T> port : readPortToRoot.values()) {
+		for (OutPortReadDDS port : readPortToRoot.values()) {
 			port.doDisconnection();
 		}
 
-		for (OutPortWrite<T> port : writePortToRoot.values()) {
+		for (OutPortWrite port : writePortToRoot.values()) {
 			port.doDisconnection();
 		}
 
@@ -276,24 +301,19 @@ public class DDSPlugin<T> extends AbstractPlugin {
 
 		inPortPropagation.unpublishPort();
 
-		for (OutPortPropagation<T> port : propagationPortToNextRoot.values()) {
+		for (OutPortPropagation port : propagationPortToNextRoot.values()) {
 			port.unpublishPort();
 		}
 
-		for (OutPortReadDDS<T> port : readPortToRoot.values()) {
+		for (OutPortReadDDS port : readPortToRoot.values()) {
 			port.unpublishPort();
 		}
 
-		for (OutPortWrite<T> port : writePortToRoot.values()) {
+		for (OutPortWrite port : writePortToRoot.values()) {
 			port.unpublishPort();
 		}
 
 		super.uninstall();
 	}
-
-	// deconnexion de tout les port et depublication de tout les ports
-	// regler la classe ddsnode
-	// regler les connexion et les uris
-	// cvm et configuration
 
 }

@@ -8,7 +8,7 @@ import fr.ddspstl.interfaces.ReadDDSCI;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 
-public class OutPortReadDDS<T> extends AbstractOutboundPort implements ReadDDSCI<T>{
+public class OutPortReadDDS extends AbstractOutboundPort implements ReadDDSCI{
 
 
 	private static final long serialVersionUID = 1L;
@@ -17,24 +17,21 @@ public class OutPortReadDDS<T> extends AbstractOutboundPort implements ReadDDSCI
 		super(ReadDDSCI.class, owner);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void read(TopicDescription<T> topic,INodeAddress address , String requestID) throws Exception {
-		((ReadDDSCI<T>)this.getConnector()).read(topic,address, requestID);
+	public void read(TopicDescription<?> topic,INodeAddress address , String requestID) throws Exception {
+		((ReadDDSCI)this.getConnector()).read(topic,address, requestID);
 		
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void take(TopicDescription<T> topic,INodeAddress address , String requestID) throws Exception {
-		((ReadDDSCI<T>)this.getConnector()).take(topic,address, requestID);
+	public void take(TopicDescription<?> topic,INodeAddress address , String requestID) throws Exception {
+		((ReadDDSCI)this.getConnector()).take(topic,address, requestID);
 		
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void acceptResult(Iterator<T> result, String requestID) throws Exception {
-		((ReadDDSCI<T>)this.getConnector()).acceptResult(result, requestID);
+	public void acceptResult(Iterator<?> result, String requestID) throws Exception {
+		((ReadDDSCI)this.getConnector()).acceptResult(result, requestID);
 		
 	}
 

@@ -11,7 +11,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
-public class InPortPropagation<T> extends AbstractInboundPort implements Propagation<T> {
+public class InPortPropagation extends AbstractInboundPort implements Propagation {
 
 	private static final long serialVersionUID = 1L;
 
@@ -20,13 +20,12 @@ public class InPortPropagation<T> extends AbstractInboundPort implements Propaga
 	}
 
 	@Override
-	public void propager(T newObject, TopicDescription<T> topicName, String id, Time time) throws Exception {
+	public <T> void propager(T newObject, TopicDescription<T> topicName, String id, Time time) throws Exception {
 		getOwner().runTask(getExecutorServiceIndex(), new AbstractComponent.AbstractTask() {
-			@SuppressWarnings("unchecked")
 			@Override
 			public void run() {
 				try {
-					((IDDSNode<T>) getOwner()).propager(newObject, topicName, id, time);
+					((IDDSNode) getOwner()).propager(newObject, topicName, id, time);
 				} catch (Exception e) {
 				}
 
@@ -36,9 +35,9 @@ public class InPortPropagation<T> extends AbstractInboundPort implements Propaga
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception {
-		return getOwner().handleRequest(getExecutorServiceIndex(), (e) -> {
-			return ((DDSPlugin<T>) getOwnerPlugin(getPluginURI())).consommer(topic, id, isFirst);
+	public <T> Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception {
+		return (Iterator<T>) getOwner().handleRequest(getExecutorServiceIndex(), (e) -> {
+			return ((DDSPlugin) getOwnerPlugin(getPluginURI())).consommer(topic, id, isFirst);
 		});
 
 	}

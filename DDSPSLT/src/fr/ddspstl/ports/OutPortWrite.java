@@ -6,7 +6,7 @@ import fr.ddspstl.interfaces.WriteCI;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 
-public class OutPortWrite<T> extends AbstractOutboundPort implements WriteCI<T> {
+public class OutPortWrite extends AbstractOutboundPort implements WriteCI {
 
 	private static final long serialVersionUID = 1L;
 
@@ -15,9 +15,8 @@ public class OutPortWrite<T> extends AbstractOutboundPort implements WriteCI<T> 
 	}
 
 	
-	@SuppressWarnings("unchecked")
-	public  void write(Topic<T> topic, T data) throws Exception {
-		((WriteCI<T>)getConnector()).write(topic,data);
+	public <T> void write(Topic<T> topic, T data) throws Exception {
+		((WriteCI)getConnector()).write(topic,data);
 		
 	}
 

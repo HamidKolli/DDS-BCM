@@ -8,7 +8,7 @@ import fr.ddspstl.interfaces.Propagation;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 
-public class OutPortPropagation<T> extends AbstractOutboundPort implements Propagation<T> {
+public class OutPortPropagation extends AbstractOutboundPort implements Propagation {
 
 	private static final long serialVersionUID = 1L;
 
@@ -16,15 +16,13 @@ public class OutPortPropagation<T> extends AbstractOutboundPort implements Propa
 		super(Propagation.class, owner);
 	}
 
-	@SuppressWarnings("unchecked")
-	public void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception {
-		((Propagation<T>) getConnector()).propager(newObject, topic, id, time);
+	public <T> void propager(T newObject, TopicDescription<T> topic, String id, Time time) throws Exception {
+		((Propagation) getConnector()).propager(newObject, topic, id, time);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception {
-		return ((Propagation<T>) getConnector()).consommer(topic, id, isFirst);
+	public <T> Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception {
+		return ((Propagation) getConnector()).consommer(topic, id, isFirst);
 	}
 
 }

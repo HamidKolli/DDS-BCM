@@ -14,9 +14,6 @@ public class Time extends org.omg.dds.core.Time{
 	
 	private long timestamp;
 
-	
-	
-
 	public Time(long timestamp) {
 		super();
 		this.timestamp = timestamp;

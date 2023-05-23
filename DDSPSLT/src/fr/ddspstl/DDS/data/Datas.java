@@ -61,8 +61,9 @@ public class Datas<T>  {
 	 * @param data : la donnée à écrire
 	 * @param time : le timestamp de l'ecriture
 	 */
-	public void write(T data, Time time) {
-		samplesData.add(new fr.ddspstl.DDS.samples.Sample<T>(topic.getEnvironment(), data, SampleState.READ, ViewState.NEW,
+	@SuppressWarnings("unchecked")
+	public void write(Object data, Time time) {
+		samplesData.add(new fr.ddspstl.DDS.samples.Sample<T>(topic.getEnvironment(),(T) data, SampleState.READ, ViewState.NEW,
 				InstanceState.ALIVE, time));
 	}
 

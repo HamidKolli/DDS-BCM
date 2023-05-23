@@ -40,7 +40,7 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	private DataWriterListener<T> listener;
 	@SuppressWarnings("unused")
 	private Collection<Class<? extends Status>> statuses;
-	private OutPortWrite<T> outPortWrite;	
+	private OutPortWrite outPortWrite;	
 	private OutPortConnectClient outPortConnectClient;
 	private String inPortDDSNodeURI;
 	private String inPortWriteURI;
@@ -65,7 +65,7 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	@Override
 	public void initialise() throws Exception {
 		super.initialise();
-		outPortWrite = new OutPortWrite<T>(getOwner());
+		outPortWrite = new OutPortWrite(getOwner());
 		outPortWrite.publishPort();
 		outPortConnectClient = new OutPortConnectClient(getOwner());
 		outPortConnectClient.publishPort();

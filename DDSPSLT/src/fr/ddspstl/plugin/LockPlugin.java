@@ -1,6 +1,5 @@
 package fr.ddspstl.plugin;
 
-import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -16,24 +15,26 @@ import fr.ddspstl.interfaces.PropagationLock;
 import fr.ddspstl.ports.InPortLock;
 import fr.ddspstl.ports.OutPortLock;
 import fr.sorbonne_u.components.AbstractPlugin;
-import fr.sorbonne_u.components.AbstractPort;
 import fr.sorbonne_u.components.ComponentI;
 
-public class LockPlugin<T> extends AbstractPlugin {
+public class LockPlugin extends AbstractPlugin {
 
 	private static final long serialVersionUID = 1L;
 
-	private ConcurrentMap<TopicDescription<T>, Lock> topicsLock;
+	public static final String LOGGER_TAG = "LockPlugin | ";
+
+	private ConcurrentMap<TopicDescription<?>, Lock> topicsLock;
 	private InPortLock inPortLock;
 	private ConcurrentMap<INodeAddress, OutPortLock> ports;
-	private ConcurrentMap<TopicDescription<T>, String> topicsID;
-	private ConcurrentMap<TopicDescription<T>, String> topicsIDUnlock;
-	private ConcurrentMap<TopicDescription<T>, Time> topicsTimestamp;
-	private Set<TopicDescription<T>> topics;
+	private ConcurrentMap<TopicDescription<?>, String> topicsID;
+	private ConcurrentMap<TopicDescription<?>, String> topicsIDUnlock;
+	private ConcurrentMap<TopicDescription<?>, Time> topicsTimestamp;
+	private Set<TopicDescription<?>> topics;
 	private INodeAddress address;
-	private  String executorServiceURI;
+	private String executorServiceURI;
 
-	public LockPlugin(INodeAddress address, Set<TopicDescription<T>> topics, String executorServiceURI) throws Exception {
+	public LockPlugin(INodeAddress address, Set<TopicDescription<?>> topics, String executorServiceURI)
+			throws Exception {
 		this.topics = topics;
 		this.address = address;
 		this.executorServiceURI = executorServiceURI;
@@ -55,10 +56,10 @@ public class LockPlugin<T> extends AbstractPlugin {
 	public void initialise() throws Exception {
 		super.initialise();
 
-		for (TopicDescription<T> topic : topics) {
+		for (TopicDescription<?> topic : topics) {
 			topicsLock.put(topic, new ReentrantLock());
 		}
-		
+
 		inPortLock = new InPortLock(address.getPropagationLockURI(), getOwner(), getPluginURI(), executorServiceURI);
 		inPortLock.publishPort();
 
@@ -84,33 +85,39 @@ public class LockPlugin<T> extends AbstractPlugin {
 
 	}
 
-	public boolean trylock(TopicDescription<T> topic) {
+	public boolean trylock(TopicDescription<?> topic) {
+		getOwner().logMessage(LOGGER_TAG + "Try lock topic :" + topic.getName());
 		if (topicsLock.containsKey(topic)) {
+			getOwner().logMessage(LOGGER_TAG + "Fin try lock topic :" + topic.getName() + " Succes : true");
 			return topicsLock.get(topic).tryLock();
 		}
+		getOwner().logMessage(LOGGER_TAG + "Fin try lock topic :" + topic.getName() + " Succes : false");
 		return false;
 	}
 
-	public void lock(TopicDescription<T> topic) {
+	public void lock(TopicDescription<?> topic) {
+
 		if (topicsLock.containsKey(topic)) {
+			getOwner().logMessage(LOGGER_TAG + "Lock topic :" + topic.getName());
 			topicsLock.get(topic).lock();
+			getOwner().logMessage(LOGGER_TAG + "Fin lock topic :" + topic.getName() + " Succes : true");
+			return;
 		}
+		getOwner().logMessage(LOGGER_TAG + "Lock topic :" + topic.getName() + " not found");
 
 	}
 
-	public void unlock(TopicDescription<T> topic) {
+	public void unlock(TopicDescription<?> topic) {
 		if (topicsLock.containsKey(topic)) {
+			getOwner().logMessage(LOGGER_TAG + "Unlock topic :" + topic.getName());
 			topicsLock.get(topic).unlock();
+			getOwner().logMessage(LOGGER_TAG + "fin unLock topic :" + topic.getName());
 		}
+		getOwner().logMessage(LOGGER_TAG + "unlock topic :" + topic.getName() + " not found");
 	}
 
-	public void propagateLockIn(TopicDescription<T> topic) throws Exception {
-		propagateLock(topic, AbstractPort.generatePortURI(), new fr.ddspstl.time.Time(new Date().getTime()));
-	}
-
-
-
-	public boolean propagateLock(TopicDescription<T> topic, String idPropagation, Time timestamp) throws Exception {
+	public boolean propagateLock(TopicDescription<?> topic, String idPropagation, Time timestamp) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Propagate Lock topic :" + topic.getName() + " id = " + idPropagation);
 
 		if (topicsID.containsKey(topic) && topicsID.get(topic).equals(idPropagation))
 			return true;
@@ -131,19 +138,20 @@ public class LockPlugin<T> extends AbstractPlugin {
 		}
 		boolean b = true;
 		for (OutPortLock port : ports.values()) {
-			b &=port.lock(topic, idPropagation, timestamp);
+			b &= port.lock(topic, idPropagation, timestamp);
 		}
+		getOwner().logMessage(
+				LOGGER_TAG + "Propagate Lock topic :" + topic.getName() + " id = " + idPropagation + " succes " + b);
+
 		return b;
-		
 
 	}
 
-	public void propagateUnlockIn(TopicDescription<T> topic, String idPropagation) throws Exception {
-		propagateUnlock(topic, idPropagation, AbstractPort.generatePortURI());
-	}
-
-	public void propagateUnlock(TopicDescription<T> topic, String idPropagation, String idPropagationUnlock)
+	public void propagateUnlock(TopicDescription<?> topic, String idPropagation, String idPropagationUnlock)
 			throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Propagate unlock topic :" + topic.getName() + " id propagation = "
+				+ idPropagation + " id propagationUnlock = " + idPropagationUnlock);
+
 		if (topicsIDUnlock.containsKey(topic) && topicsIDUnlock.get(topic).equals(idPropagationUnlock))
 			return;
 
@@ -159,6 +167,9 @@ public class LockPlugin<T> extends AbstractPlugin {
 		for (OutPortLock port : ports.values()) {
 			port.unlock(topic, idPropagation, idPropagationUnlock);
 		}
+		getOwner().logMessage(LOGGER_TAG + "Fin propagate unlock topic :" + topic.getName() + " id propagation = "
+				+ idPropagation + " id propagationUnlock = " + idPropagationUnlock);
+
 	}
 
 	public void connect(INodeAddress address) throws Exception {
@@ -170,7 +181,5 @@ public class LockPlugin<T> extends AbstractPlugin {
 		getOwner().doPortConnection(tmp.getPortURI(), address.getPropagationLockURI(),
 				ConnectorLock.class.getCanonicalName());
 	}
-
-
 
 }

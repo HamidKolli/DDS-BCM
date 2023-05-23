@@ -11,18 +11,17 @@ import fr.sorbonne_u.components.connectors.AbstractConnector;
  *
  * @param <T> : le type de la donnée
  * 
- * Classe Connecteur pour les opérations de Write
+ *            Classe Connecteur pour les opérations de Write
  */
-public class ConnectorWrite<T> extends AbstractConnector implements WriteCI<T> {
+public class ConnectorWrite extends AbstractConnector implements WriteCI {
 
 	/**
 	 * 
 	 * @see fr.ddspstl.interfaces.WriteCI#write(Topic, Object)
 	 */
-	@SuppressWarnings("unchecked")
-	public  void write(Topic<T> topic, T data) throws Exception {
-		((WriteCI<T>)this.offering).write(topic,data);
-		
+	public <T> void write(Topic<T> topic, T data) throws Exception {
+		((WriteCI) this.offering).write(topic, data);
+
 	}
 
 }

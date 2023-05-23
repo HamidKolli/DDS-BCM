@@ -17,7 +17,7 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
  *
  * Interface Implantée par un ConnectorReadDDS
  */
-public interface ReadDDSCI<T> extends OfferedCI, RequiredCI {
+public interface ReadDDSCI extends OfferedCI, RequiredCI {
 	
 	/**
 	 * methode read : effetcue un read
@@ -27,7 +27,7 @@ public interface ReadDDSCI<T> extends OfferedCI, RequiredCI {
 	 * @param requestID : ID de la requete read
 	 * @throws Exception
 	 */
-	public void read(TopicDescription<T> topic,INodeAddress address , String requestID) throws Exception;
+	public void read(TopicDescription<?> topic,INodeAddress address , String requestID) throws Exception;
 
 	/**
 	 * methode take : effectue un take
@@ -37,7 +37,7 @@ public interface ReadDDSCI<T> extends OfferedCI, RequiredCI {
 	 * @param requestID : ID de la requete take
 	 * @throws Exception
 	 */
-	public void take(TopicDescription<T> topic,INodeAddress address , String requestID) throws Exception;
+	public void take(TopicDescription<?> topic,INodeAddress address , String requestID) throws Exception;
 
 	/**
 	 * methode acceptResult : methode de retour du read/take
@@ -46,5 +46,5 @@ public interface ReadDDSCI<T> extends OfferedCI, RequiredCI {
 	 * @param requestID : ID de la requete
 	 * @throws Exception
 	 */
-	public void acceptResult(Iterator<T> result, String requestID) throws Exception;
+	public void acceptResult(Iterator<?> result, String requestID) throws Exception;
 }

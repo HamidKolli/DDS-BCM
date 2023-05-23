@@ -17,7 +17,6 @@ public class InPortConnectClient extends AbstractInboundPort implements ConnectC
 	@Override
 	public String getReaderURI() throws Exception {
 		return getOwner().handleRequest(getExecutorServiceIndex(),new AbstractComponent.AbstractService<String>(getPluginURI()) {
-			@SuppressWarnings({ "rawtypes" })
 			@Override
 			public String call() throws Exception {
 				return ((DDSPlugin)getServiceProviderReference()).getReaderURI();
@@ -30,7 +29,6 @@ public class InPortConnectClient extends AbstractInboundPort implements ConnectC
 	@Override
 	public String getWriterURI() throws Exception {
 		return getOwner().handleRequest(getExecutorServiceIndex(),new AbstractComponent.AbstractService<String>(getPluginURI()) {
-			@SuppressWarnings({  "rawtypes" })
 			@Override
 			public String call() throws Exception {
 				return ((DDSPlugin)getServiceProviderReference()).getWriterURI();

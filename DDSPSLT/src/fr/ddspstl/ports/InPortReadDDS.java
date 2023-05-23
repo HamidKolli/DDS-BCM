@@ -10,7 +10,7 @@ import fr.ddspstl.plugin.DDSPlugin;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
-public class InPortReadDDS<T> extends AbstractInboundPort implements ReadDDSCI<T> {
+public class InPortReadDDS extends AbstractInboundPort implements ReadDDSCI {
 
 	private static final long serialVersionUID = 1L;
 
@@ -18,24 +18,22 @@ public class InPortReadDDS<T> extends AbstractInboundPort implements ReadDDSCI<T
 		super(uri, ReadDDSCI.class, owner, pluginURI, executorServiceURI);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void read(TopicDescription<T> topic,INodeAddress address , String requestID) throws Exception {
+	public void read(TopicDescription<?> topic,INodeAddress address , String requestID) throws Exception {
 		getOwner().runTask(getExecutorServiceIndex(), (e) -> {
 			try {
-				((DDSPlugin<T>)getOwnerPlugin(getPluginURI())).read(topic,address,requestID);
+				((DDSPlugin)getOwnerPlugin(getPluginURI())).read(topic,address,requestID);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			} 
 		});
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void take(TopicDescription<T> topic,INodeAddress address , String requestID) throws Exception {
+	public void take(TopicDescription<?> topic,INodeAddress address , String requestID) throws Exception {
 		getOwner().runTask(getExecutorServiceIndex(), (e) -> {
 			try {
-				((DDSPlugin<T>)getOwnerPlugin(getPluginURI())).take(topic,address,requestID);
+				((DDSPlugin)getOwnerPlugin(getPluginURI())).take(topic,address,requestID);
 				
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -43,12 +41,11 @@ public class InPortReadDDS<T> extends AbstractInboundPort implements ReadDDSCI<T
 		});
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void acceptResult(Iterator<T> result, String requestID) throws Exception {
+	public void acceptResult(Iterator<?> result, String requestID) throws Exception {
 		getOwner().runTask(getExecutorServiceIndex(), (e) -> {
 			try {
-				((DDSPlugin<T>)getOwnerPlugin(getPluginURI())).acceptResult(result,requestID);
+				((DDSPlugin)getOwnerPlugin(getPluginURI())).acceptResult(result,requestID);
 				
 			} catch (DDSTopicNotFoundException e1) {
 				e1.printStackTrace();

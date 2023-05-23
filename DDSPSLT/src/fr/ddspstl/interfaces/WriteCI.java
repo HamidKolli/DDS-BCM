@@ -14,7 +14,7 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
  *
  * Interface Implantée par un ConnectorWrite
  */
-public interface WriteCI<T> extends RequiredCI,OfferedCI{
+public interface WriteCI extends RequiredCI,OfferedCI{
 	/**
 	 * methode write : effectue un write dans un topic
 	 * 
@@ -22,5 +22,5 @@ public interface WriteCI<T> extends RequiredCI,OfferedCI{
 	 * @param data : la donnée à écrire
 	 * @throws Exception
 	 */
-	public void write(Topic<T> topic,T data) throws Exception ;
+	public <T> void write(Topic<T> topic,T data) throws Exception ;
 }

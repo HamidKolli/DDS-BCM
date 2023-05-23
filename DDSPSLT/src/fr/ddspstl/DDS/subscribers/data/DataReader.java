@@ -43,7 +43,7 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 	private static final long serialVersionUID = 1L;
 	private TopicDescription<T> topic;
 	private Subscriber subscriber;
-	private OutPortRead<T> portRead;
+	private OutPortRead portRead;
 	private String uriPortDDSnode;
 	private OutPortConnectClient outPortConnectClient;
 
@@ -64,7 +64,7 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 	@Override
 	public void initialise() throws Exception {
 		super.initialise();
-		portRead = new OutPortRead<>(getOwner());
+		portRead = new OutPortRead(getOwner());
 		portRead.publishPort();
 		outPortConnectClient = new OutPortConnectClient(getOwner());
 		outPortConnectClient.publishPort();

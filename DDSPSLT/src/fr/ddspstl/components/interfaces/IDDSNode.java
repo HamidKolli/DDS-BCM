@@ -13,7 +13,7 @@ import org.omg.dds.topic.TopicDescription;
  *
  * Interface implantée par un noeud DDS
  */
-public interface IDDSNode<T> {
+public interface IDDSNode {
 
 
 	/**
@@ -21,22 +21,22 @@ public interface IDDSNode<T> {
 	 * 
 	 * @param newObject : la nouvelle donnée à propager
 	 * @param topic : le topic auquel il appartient
-	 * @param id : .
+	 * @param id : l'identifiant de la requete
 	 * @param modifiableTime : le timestamp
 	 * @throws Exception
 	 */
-	public void propager(T newObject, TopicDescription<T> topic, String id, Time modifiableTime) throws Exception;
+	public <T> void propager(T newObject, TopicDescription<T> topic, String id, Time modifiableTime) throws Exception;
 
 	/**
 	 * methode consommer : s'occupe de commencer le take
 	 * 
 	 * @param topic : le topic dans lequel on va chercher
-	 * @param id : .
-	 * @param b : .
+	 * @param id : l'identifiant de la requete
+	 * @param isFirst : true si c'est le noeud qui lance la requete, false sinon
 	 * @return Iterator<T> : la donnée lue
 	 * @throws Exception
 	 */
-	public Iterator<T> consommer(TopicDescription<T> topic, String id, boolean b) throws Exception;
+	public <T> Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception;
 
 	/**
 	 * methode read : s'occupe de lire la donnée
@@ -45,6 +45,6 @@ public interface IDDSNode<T> {
 	 * @return Iterator<T> : la donnée lue
 	 * @throws Exception
 	 */
-	public Iterator<T> read(TopicDescription<T> topic) throws Exception;
+	public <T> Iterator<T> read(TopicDescription<T> topic) throws Exception;
 
 }

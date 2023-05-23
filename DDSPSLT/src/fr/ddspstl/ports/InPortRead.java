@@ -8,7 +8,7 @@ import fr.ddspstl.plugin.DDSPlugin;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
-public class InPortRead<TYPE> extends AbstractInboundPort implements ReadCI<TYPE> {
+public class InPortRead extends AbstractInboundPort implements ReadCI {
 
 	private static final long serialVersionUID = 1L;
 
@@ -17,18 +17,16 @@ public class InPortRead<TYPE> extends AbstractInboundPort implements ReadCI<TYPE
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Iterator<TYPE> read(TopicDescription<TYPE> topic) throws Exception {
+	public <T> Iterator<T> read(TopicDescription<T> topic) throws Exception {
 
 		return ((DDSPlugin) getOwnerPlugin(pluginURI)).read(topic);
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings("unchecked")
 	@Override
-	public Iterator<TYPE> take(TopicDescription<TYPE> topic) throws Exception {
-		
-		return ((DDSPlugin) getOwnerPlugin(pluginURI)).take(topic);
+	public <T> Iterator<T> take(TopicDescription<T> topic) throws Exception {
+		return (Iterator<T>) ((DDSPlugin) getOwnerPlugin(pluginURI)).take(topic);
 	}
 
 }
