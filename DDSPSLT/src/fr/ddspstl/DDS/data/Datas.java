@@ -20,7 +20,7 @@ import org.omg.dds.topic.TopicDescription;
 
 public class Datas<T>  {
 	
-	private Sample.Iterator<T> samplesData;
+	private fr.ddspstl.DDS.samples.Sample.Iterator<T> samplesData;
 	private TopicDescription<T> topic;
 
 	
@@ -39,9 +39,10 @@ public class Datas<T>  {
 	 * methode read : effectue un read sur la donnée
 	 * 
 	 * @return Sample.Iterator<T> : la donnée retournée
+	 * @throws CloneNotSupportedException 
 	 */
-	public Sample.Iterator<T> read() {
-		return samplesData;
+	public Sample.Iterator<T> read() throws CloneNotSupportedException {
+		return samplesData.clone();
 	}
 
 	/**

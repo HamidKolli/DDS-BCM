@@ -58,7 +58,8 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	public void installOn(ComponentI owner) throws Exception {
 		super.installOn(owner);
 		this.addRequiredInterface(WriteCI.class);
-		this.addRequiredInterface(ConnectClient.class);
+		if (getOwner().getRequiredInterface(ConnectClient.class) == null)
+			this.addRequiredInterface(ConnectClient.class);
 	}
 	
 	
@@ -259,8 +260,9 @@ public class DataWriter<T> extends AbstractPlugin implements org.omg.dds.pub.Dat
 	}
 
 	@Override
-	public void write(T instanceData) throws TimeoutException {
+	public synchronized void write(T instanceData) throws TimeoutException {
 		try {
+			
 			getOwner().doPortConnection(outPortConnectClient.getPortURI(), inPortDDSNodeURI, ConnectorClient.class.getCanonicalName());
 			inPortWriteURI = outPortConnectClient.getWriterURI();
 			getOwner().doPortConnection(outPortWrite.getPortURI(), inPortWriteURI, ConnectorWrite.class.getCanonicalName());

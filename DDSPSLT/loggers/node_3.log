@@ -1,0 +1,94 @@
+1684932857994|DDSNode | Installer le plugin dds
+1684932858037|DDSNode | Connexion
+1684932858038|DDSNode | Fin connexion
+1684932859063|DDSPlugin | Write topic : Notification
+1684932859065|DDSPlugin | Propager topic : Notification
+1684932859065|DDSNode | Write topic :Notification
+1684932859067|LockPlugin | Lock topic :Notification
+1684932859067|LockPlugin | Fin lock topic :Notification Succes : true
+1684932859070|LockPlugin | Unlock topic :Notification
+1684932859073|LockPlugin | fin unLock topic :Notification
+1684932859073|LockPlugin | unlock topic :Notification not found
+1684932859073|DDSNode | Fin Write topic :Notification
+1684932859079|DDSPlugin | Fin propager topic : Notification
+1684932859079|DDSPlugin | Fin write topic : Notification
+1684932859090|DDSPlugin | Propager topic : Notes
+1684932859090|DDSNode | Write topic :Notes
+1684932859090|LockPlugin | Lock topic :Notes
+1684932859090|LockPlugin | Fin lock topic :Notes Succes : true
+1684932859090|LockPlugin | Unlock topic :Notes
+1684932859090|LockPlugin | fin unLock topic :Notes
+1684932859090|LockPlugin | unlock topic :Notes not found
+1684932859090|DDSNode | Fin Write topic :Notes
+1684932859091|DDSPlugin | Fin propager topic : Notes
+1684932859139|DDSPlugin | Write topic : Notification
+1684932859139|DDSPlugin | Propager topic : Notification
+1684932859139|DDSNode | Write topic :Notification
+1684932859139|LockPlugin | Lock topic :Notification
+1684932859139|LockPlugin | Fin lock topic :Notification Succes : true
+1684932859139|LockPlugin | Unlock topic :Notification
+1684932859139|LockPlugin | fin unLock topic :Notification
+1684932859139|LockPlugin | unlock topic :Notification not found
+1684932859139|DDSNode | Fin Write topic :Notification
+1684932859140|DDSPlugin | Fin propager topic : Notification
+1684932859140|DDSPlugin | Fin write topic : Notification
+1684932859144|DDSPlugin |  getWriterURI
+1684932859144|DDSPlugin | Write topic : Notes
+1684932859144|DDSPlugin | Propager topic : Notes
+1684932859144|DDSNode | Write topic :Notes
+1684932859144|LockPlugin | Lock topic :Notes
+1684932859144|LockPlugin | Fin lock topic :Notes Succes : true
+1684932859144|LockPlugin | Unlock topic :Notes
+1684932859144|LockPlugin | fin unLock topic :Notes
+1684932859144|LockPlugin | unlock topic :Notes not found
+1684932859144|DDSNode | Fin Write topic :Notes
+1684932859146|DDSPlugin | Fin propager topic : Notes
+1684932859146|DDSPlugin | Fin write topic : Notes
+1684932862085|DDSPlugin | Take root topic : Notification
+1684932862086|DDSNode | Consommer topic :Notification
+1684932862086|LockPlugin | Propagate Lock topic :Notification id = 67d4addc-ef4d-4c4f-9548-517b164a2d0b
+1684932862088|LockPlugin | Try lock topic :Notification
+1684932862088|LockPlugin | Fin try lock topic :Notification Succes : true
+1684932862109|LockPlugin | Propagate Lock topic :Notification id = 67d4addc-ef4d-4c4f-9548-517b164a2d0b
+1684932862113|LockPlugin | Propagate Lock topic :Notification id = 67d4addc-ef4d-4c4f-9548-517b164a2d0b succes true
+1684932862113|DDSPlugin | Consommer topic : Notification
+1684932862113|DDSPlugin | Fin Consommer topic : Notification
+1684932862119|DDSPlugin | Consommer topic : Notification
+1684932862119|DDSNode | Take topic :Notification
+1684932862119|DDSNode | Fin Take topic :Notification
+1684932862119|LockPlugin | Propagate unlock topic :Notification id propagation = 67d4addc-ef4d-4c4f-9548-517b164a2d0b id propagationUnlock = c1786184-278d-4ea6-9906-bec8dd4d15f2
+1684932862120|LockPlugin | Unlock topic :Notification
+1684932862120|LockPlugin | fin unLock topic :Notification
+1684932862120|LockPlugin | unlock topic :Notification not found
+1684932862127|LockPlugin | Propagate unlock topic :Notification id propagation = 67d4addc-ef4d-4c4f-9548-517b164a2d0b id propagationUnlock = c1786184-278d-4ea6-9906-bec8dd4d15f2
+1684932862128|LockPlugin | Fin propagate unlock topic :Notification id propagation = 67d4addc-ef4d-4c4f-9548-517b164a2d0b id propagationUnlock = c1786184-278d-4ea6-9906-bec8dd4d15f2
+1684932862130|DDSPlugin | Fin take root topic : Notification
+1684932862140|DDSPlugin | Take root topic : Notification
+1684932862141|DDSNode | Consommer topic :Notification
+1684932862141|LockPlugin | Propagate Lock topic :Notification id = 0f65155a-43b3-4fce-9b4c-e24d6911eb9b
+1684932862141|LockPlugin | Try lock topic :Notification
+1684932862141|LockPlugin | Fin try lock topic :Notification Succes : true
+1684932862143|LockPlugin | Propagate Lock topic :Notification id = 0f65155a-43b3-4fce-9b4c-e24d6911eb9b
+1684932862144|LockPlugin | Propagate Lock topic :Notification id = 0f65155a-43b3-4fce-9b4c-e24d6911eb9b succes true
+1684932862144|DDSPlugin | Consommer topic : Notification
+1684932862144|DDSPlugin | Fin Consommer topic : Notification
+1684932862145|DDSPlugin | Consommer topic : Notification
+1684932862145|DDSNode | Take topic :Notification
+1684932862145|DDSNode | Fin Take topic :Notification
+1684932862145|LockPlugin | Propagate unlock topic :Notification id propagation = 0f65155a-43b3-4fce-9b4c-e24d6911eb9b id propagationUnlock = 8265fe3e-a7d0-4ef3-b2d1-1786c140d544
+1684932862145|LockPlugin | Unlock topic :Notification
+1684932862145|LockPlugin | fin unLock topic :Notification
+1684932862145|LockPlugin | unlock topic :Notification not found
+1684932862146|LockPlugin | Propagate unlock topic :Notification id propagation = 0f65155a-43b3-4fce-9b4c-e24d6911eb9b id propagationUnlock = 8265fe3e-a7d0-4ef3-b2d1-1786c140d544
+1684932862146|LockPlugin | Fin propagate unlock topic :Notification id propagation = 0f65155a-43b3-4fce-9b4c-e24d6911eb9b id propagationUnlock = 8265fe3e-a7d0-4ef3-b2d1-1786c140d544
+1684932862147|DDSPlugin | Fin take root topic : Notification
+1684932862150|DDSPlugin |  getReaderURI
+1684932862150|DDSPlugin |  read topic : Notes
+1684932862150|DDSNode | Read topic :Notes
+1684932862150|LockPlugin | Lock topic :Notes
+1684932862150|LockPlugin | Fin lock topic :Notes Succes : true
+1684932862150|LockPlugin | Unlock topic :Notes
+1684932862150|LockPlugin | fin unLock topic :Notes
+1684932862150|LockPlugin | unlock topic :Notes not found
+1684932862150|DDSNode | Fin read topic :Notes
+1684932878071|DDSNode | Fin

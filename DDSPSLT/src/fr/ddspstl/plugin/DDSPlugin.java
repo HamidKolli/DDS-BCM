@@ -5,19 +5,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.omg.dds.core.Time;
 import org.omg.dds.sub.Sample.Iterator;
 import org.omg.dds.topic.Topic;
 import org.omg.dds.topic.TopicDescription;
 
-import fr.ddspstl.DDS.data.Datas;
 import fr.ddspstl.addresses.INodeAddress;
 import fr.ddspstl.components.interfaces.IDDSNode;
+import fr.ddspstl.connectors.ConnectorPropagation;
 import fr.ddspstl.connectors.ConnectorReadDDS;
+import fr.ddspstl.connectors.ConnectorWrite;
 import fr.ddspstl.exceptions.DDSTopicNotFoundException;
 import fr.ddspstl.interfaces.ConnectClient;
+import fr.ddspstl.interfaces.Propagation;
 import fr.ddspstl.interfaces.ReadCI;
+import fr.ddspstl.interfaces.ReadDDSCI;
 import fr.ddspstl.interfaces.WriteCI;
 import fr.ddspstl.ports.InPortConnectClient;
 import fr.ddspstl.ports.InPortPropagation;
@@ -41,12 +46,12 @@ public class DDSPlugin extends AbstractPlugin {
 	private InPortRead inPortRead;
 	private InPortWrite inPortWrite;
 	private InPortConnectClient inPortConnectClient;
-	private Map<TopicDescription<?>, Datas<?>> datas;
-	private Map<TopicDescription<?>, String> topicIDWrite;
-	private Map<TopicDescription<?>, String> topicIDTake;
+
+	private Map<String, TopicDescription<?>> topicIDWrite;
+	private Map<String, TopicDescription<?>> topicIDTake;
 	private Map<TopicDescription<?>, OutPortPropagation> propagationPortToNextRoot;
-	private Map<TopicDescription<?>, OutPortReadDDS> readPortToRoot;
-	private Map<TopicDescription<?>, OutPortWrite> writePortToRoot;
+	private Map<TopicDescription<?>, OutPortReadDDS> readPortFromRoot;
+	private Map<TopicDescription<?>, OutPortWrite> writePortFromRoot;
 	private Map<String, Semaphore> clientLock;
 	private Map<String, Iterator<?>> result;
 	private OutPortReadDDS outPortReadDDS;
@@ -54,23 +59,20 @@ public class DDSPlugin extends AbstractPlugin {
 	private InPortPropagation inPortPropagation;
 	private InPortReadDDS inPortReadDDS;
 	private InPortWriteDDS inPortWriteDDS;
+	private Lock lockOutPort;
 
 	private String executorServiceURI;
 	private String executorServicePropagationURI;
 
 	private String executorServiceReadWriteURI;
+	private Set<TopicDescription<?>> topics;
 
-	public DDSPlugin(Set<TopicDescription<?>> set,
-			Map<TopicDescription<?>, OutPortPropagation> propagationPortToNextRoot,
-			Map<TopicDescription<?>, OutPortReadDDS> readPortToRoot,
-			Map<TopicDescription<?>, OutPortWrite> writePortToRoot, INodeAddress addresses, String executorServiceURI,
+	public DDSPlugin(Set<TopicDescription<?>> set, INodeAddress addresses, String executorServiceURI,
 			String executorServicePropagationURI, String executorServiceReadWriteURI) {
 
 		this.address = addresses;
-		this.datas = new ConcurrentHashMap<>();
-		for (TopicDescription<?> topic : set) {
-			datas.put(topic, new Datas<>(topic));
-		}
+		this.lockOutPort = new ReentrantLock();
+
 		this.topicIDWrite = new ConcurrentHashMap<>();
 		this.topicIDTake = new ConcurrentHashMap<>();
 		this.clientLock = new ConcurrentHashMap<>();
@@ -78,147 +80,11 @@ public class DDSPlugin extends AbstractPlugin {
 		this.executorServiceURI = executorServiceURI;
 		this.executorServicePropagationURI = executorServicePropagationURI;
 
-		this.propagationPortToNextRoot = propagationPortToNextRoot;
-		this.readPortToRoot = readPortToRoot;
-		this.writePortToRoot = writePortToRoot;
+		this.propagationPortToNextRoot = new ConcurrentHashMap<>();
+		this.readPortFromRoot = new ConcurrentHashMap<>();
+		this.writePortFromRoot = new ConcurrentHashMap<>();
 		this.executorServiceReadWriteURI = executorServiceReadWriteURI;
-
-	}
-
-	public String getReaderURI() throws Exception {
-		getOwner().logMessage(LOGGER_TAG + " getReaderURI");
-		return inPortRead.getPortURI();
-	}
-
-	public String getWriterURI() throws Exception {
-		getOwner().logMessage(LOGGER_TAG + " getWriterURI");
-		return inPortWrite.getPortURI();
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> Iterator<T> read(TopicDescription<T> topic) throws Exception {
-		getOwner().logMessage(LOGGER_TAG + " read topic : " + topic.getName());
-
-		if (datas.containsKey(topic))
-			return ((IDDSNode) getOwner()).read(topic);
-
-		getOwner().logMessage(LOGGER_TAG + " read topic : " + topic.getName() + " get from topic");
-		String requestId = AbstractPort.generatePortURI();
-		Semaphore s = new Semaphore(0);
-
-		clientLock.put(requestId, s);
-
-		readPortToRoot.get(topic).read(topic, address, requestId);
-		s.acquire();
-		getOwner().logMessage(LOGGER_TAG + "Fin read topic : " + topic.getName());
-
-		return (Iterator<T>) result.get(requestId);
-	}
-
-	public Iterator<?> readData(TopicDescription<?> topic) {
-		getOwner().logMessage(LOGGER_TAG + "Fin readData topic : " + topic.getName());
-		return datas.get(topic).read();
-	}
-
-	public <T> void write(Topic<T> topic, T data) throws Exception {
-		getOwner().logMessage(LOGGER_TAG + "Write topic : " + topic.getName());
-
-		if (datas.containsKey(topic)) {
-			((IDDSNode) getOwner()).propager(data, topic, AbstractPort.generatePortURI(),
-					new fr.ddspstl.time.Time((new Date()).getTime()));
-			getOwner().logMessage(LOGGER_TAG + "Fin write topic : " + topic.getName());
-
-			return;
-		}
-		getOwner().logMessage(LOGGER_TAG + "Fin write topic : " + topic.getName());
-
-		writePortToRoot.get(topic).write(topic, data);
-	}
-
-	public Iterator<?> take(TopicDescription<?> topic) throws Exception {
-		getOwner().logMessage(LOGGER_TAG + "Take topic : " + topic.getName());
-
-		if (datas.containsKey(topic))
-			return ((IDDSNode) getOwner()).consommer(topic, AbstractPort.generatePortURI(), true);
-
-		getOwner().logMessage(LOGGER_TAG + "Take topic : " + topic.getName() + " get from topic");
-
-		String requestId = AbstractPort.generatePortURI();
-		Semaphore s = new Semaphore(0);
-
-		clientLock.put(requestId, s);
-
-		readPortToRoot.get(topic).take(topic, address, requestId);
-		s.acquire();
-		getOwner().logMessage(LOGGER_TAG + "Fin take topic : " + topic.getName());
-
-		return result.get(requestId);
-	}
-
-	public void take(TopicDescription<?> topic, INodeAddress address, String requestID) throws Exception {
-		getOwner().logMessage(LOGGER_TAG + "Take root topic : " + topic.getName());
-		if (!datas.containsKey(topic)) {
-			throw new DDSTopicNotFoundException("Topic not found");
-		}
-		getOwner().doPortConnection(outPortReadDDS.getPortURI(), address.getReadURI(),
-				ConnectorReadDDS.class.getCanonicalName());
-
-		outPortReadDDS.acceptResult(((IDDSNode) getOwner()).consommer(topic, AbstractPort.generatePortURI(), true),
-				requestID);
-
-		outPortReadDDS.doDisconnection();
-		getOwner().logMessage(LOGGER_TAG + "Fin take root topic : " + topic.getName());
-
-	}
-
-	public void read(TopicDescription<?> topic, INodeAddress address, String requestID) throws Exception {
-		getOwner().logMessage(LOGGER_TAG + "Read root topic : " + topic.getName());
-
-		if (!datas.containsKey(topic)) {
-			throw new DDSTopicNotFoundException("Topic not found");
-		}
-		getOwner().doPortConnection(outPortReadDDS.getPortURI(), address.getReadURI(),
-				ConnectorReadDDS.class.getCanonicalName());
-		outPortReadDDS.acceptResult(((IDDSNode) getOwner()).read(topic), requestID);
-		outPortReadDDS.doDisconnection();
-		getOwner().logMessage(LOGGER_TAG + "Fin read root topic : " + topic.getName());
-
-
-	}
-
-	public void acceptResult(Iterator<?> result, String requestID) throws DDSTopicNotFoundException {
-		getOwner().logMessage(LOGGER_TAG + "AcceptResult" );
-
-		if (!this.clientLock.containsKey(requestID)) {
-			throw new DDSTopicNotFoundException("RequestID not found");
-		}
-		this.result.put(requestID, result);
-		clientLock.get(requestID).release();
-		getOwner().logMessage(LOGGER_TAG + "Fin acceptResult" );
-	}
-
-	public <T> void propager(T newObject, TopicDescription<T> topicName, String id, Time time) throws Exception {
-		getOwner().logMessage(LOGGER_TAG + "Propager topic : " + topicName.getName() );
-		if (topicIDWrite.get(topicName) != null && topicIDWrite.get(topicName).equals(id))
-			return;
-
-		topicIDWrite.put(topicName, id);
-		datas.get(topicName).write(newObject, time);
-
-		propagationPortToNextRoot.get(topicName).propager(newObject, topicName, id, time);
-		getOwner().logMessage(LOGGER_TAG + "Fin propager topic : " + topicName.getName() );
-	}
-
-	public Iterator<?> consommer(TopicDescription<?> topic, String id, boolean isFirst) throws Exception {
-		getOwner().logMessage(LOGGER_TAG + "Consommer topic : " + topic.getName() );
-		if (topicIDTake.containsKey(topic) && topicIDTake.get(topic).equals(id))
-			return datas.get(topic).take();
-
-		topicIDTake.put(topic, id);
-		if (!isFirst)
-			datas.get(topic).take();
-		getOwner().logMessage(LOGGER_TAG + "Fin Consommer topic : " + topic.getName());
-		return propagationPortToNextRoot.get(topic).consommer(topic, id, false);
+		topics = set;
 
 	}
 
@@ -231,6 +97,12 @@ public class DDSPlugin extends AbstractPlugin {
 		this.addOfferedInterface(WriteCI.class);
 		this.addOfferedInterface(ReadCI.class);
 		this.addOfferedInterface(ConnectClient.class);
+		this.addOfferedInterface(Propagation.class);
+		this.addOfferedInterface(ReadDDSCI.class);
+
+		this.addRequiredInterface(Propagation.class);
+		this.addRequiredInterface(ReadDDSCI.class);
+		this.addRequiredInterface(WriteCI.class);
 	}
 
 	@Override
@@ -263,6 +135,179 @@ public class DDSPlugin extends AbstractPlugin {
 		inPortPropagation.publishPort();
 	}
 
+	public void connect(INodeAddress address, TopicDescription<?> topic) throws Exception {
+		OutPortWrite port = new OutPortWrite(getOwner());
+		port.publishPort();
+		getOwner().doPortConnection(port.getPortURI(), address.getWriteURI(), ConnectorWrite.class.getCanonicalName());
+		writePortFromRoot.put(topic, port);
+
+		OutPortReadDDS port2 = new OutPortReadDDS(getOwner());
+		port2.publishPort();
+		getOwner().doPortConnection(port2.getPortURI(), address.getReadURI(),
+				ConnectorReadDDS.class.getCanonicalName());
+		readPortFromRoot.put(topic, port2);
+	}
+
+	public void connectRoot(INodeAddress address, TopicDescription<?> topic) throws Exception {
+		OutPortPropagation port = new OutPortPropagation(getOwner());
+		port.publishPort();
+		getOwner().doPortConnection(port.getPortURI(), address.getPropagationURI(),
+				ConnectorPropagation.class.getCanonicalName());
+		propagationPortToNextRoot.put(topic, port);
+	}
+
+	public String getReaderURI() throws Exception {
+		getOwner().logMessage(LOGGER_TAG + " getReaderURI");
+		return inPortRead.getPortURI();
+	}
+
+	public String getWriterURI() throws Exception {
+		getOwner().logMessage(LOGGER_TAG + " getWriterURI");
+		return inPortWrite.getPortURI();
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> Iterator<T> read(TopicDescription<T> topic) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + " read topic : " + topic.getName());
+
+		if (topics.contains(topic))
+			return ((IDDSNode) getOwner()).read(topic);
+		if (!readPortFromRoot.containsKey(topic))
+			throw new DDSTopicNotFoundException("Topic not found, please check your cvm config");
+		getOwner().logMessage(LOGGER_TAG + " read topic : " + topic.getName() + " get from topic");
+		String requestId = AbstractPort.generatePortURI();
+		Semaphore s = new Semaphore(0);
+
+		clientLock.put(requestId, s);
+
+		readPortFromRoot.get(topic).read(topic, address, requestId);
+		s.acquire();
+		getOwner().logMessage(LOGGER_TAG + "Fin read topic : " + topic.getName());
+
+		return (Iterator<T>) result.get(requestId);
+	}
+
+	public Iterator<?> take(TopicDescription<?> topic) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Take topic : " + topic.getName());
+
+		if (topics.contains(topic))
+			return ((IDDSNode) getOwner()).consommer(topic, AbstractPort.generatePortURI(), true);
+
+		if (!readPortFromRoot.containsKey(topic))
+			throw new DDSTopicNotFoundException("Topic not found, please check your cvm config");
+
+		getOwner().logMessage(LOGGER_TAG + "Take topic : " + topic.getName() + " get from topic");
+
+		String requestId = AbstractPort.generatePortURI();
+		Semaphore s = new Semaphore(0);
+
+		clientLock.put(requestId, s);
+
+		readPortFromRoot.get(topic).take(topic, address, requestId);
+		s.acquire();
+		getOwner().logMessage(LOGGER_TAG + "Fin take topic : " + topic.getName());
+
+		return result.get(requestId);
+	}
+
+	public void take(TopicDescription<?> topic, INodeAddress address, String requestID) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Take root topic : " + topic.getName());
+
+		if (!topics.contains(topic)) {
+			throw new DDSTopicNotFoundException("Topic not found");
+		}
+
+		Iterator<?> res = ((IDDSNode) getOwner()).consommer(topic, AbstractPort.generatePortURI(), true);
+
+		lockOutPort.lock();
+
+		getOwner().doPortConnection(outPortReadDDS.getPortURI(), address.getReadURI(),
+				ConnectorReadDDS.class.getCanonicalName());
+
+		outPortReadDDS.acceptResult(res, requestID);
+
+		outPortReadDDS.doDisconnection();
+		lockOutPort.unlock();
+
+		getOwner().logMessage(LOGGER_TAG + "Fin take root topic : " + topic.getName());
+
+	}
+
+	public void read(TopicDescription<?> topic, INodeAddress address, String requestID) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Read root topic : " + topic.getName());
+
+		if (!topics.contains(topic)) {
+			throw new DDSTopicNotFoundException("Topic not found");
+		}
+		
+		Iterator<?> res = ((IDDSNode) getOwner()).read(topic);
+		lockOutPort.lock();
+		getOwner().doPortConnection(outPortReadDDS.getPortURI(), address.getReadURI(),
+				ConnectorReadDDS.class.getCanonicalName());
+		outPortReadDDS.acceptResult(res, requestID);
+		outPortReadDDS.doDisconnection();
+		lockOutPort.unlock();
+		
+		getOwner().logMessage(LOGGER_TAG + "Fin read root topic : " + topic.getName());
+
+	}
+
+	public void acceptResult(Iterator<?> result, String requestID) throws DDSTopicNotFoundException {
+		getOwner().logMessage(LOGGER_TAG + "AcceptResult");
+
+		if (!this.clientLock.containsKey(requestID)) {
+			throw new DDSTopicNotFoundException("RequestID not found");
+		}
+		this.result.put(requestID, result);
+		clientLock.get(requestID).release();
+		getOwner().logMessage(LOGGER_TAG + "Fin acceptResult");
+	}
+
+	public <T> void propagerIn(T newObject, TopicDescription<T> topicName, String id, Time time) throws Exception {
+		if (topicIDWrite.get(id) != null && topicIDWrite.get(id).equals(topicName))
+			return;
+		propager(newObject, topicName, id, time);
+	}
+
+	public <T> void write(Topic<T> topic, T data) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Write topic : " + topic.getName());
+		if (topics.contains(topic)) {
+			propager(data, topic, AbstractPort.generatePortURI(), new fr.ddspstl.time.Time((new Date()).getTime()));
+			getOwner().logMessage(LOGGER_TAG + "Fin write topic : " + topic.getName());
+			return;
+		}
+		if (!writePortFromRoot.containsKey(topic))
+			throw new DDSTopicNotFoundException("Topic not found, please check your cvm config");
+		writePortFromRoot.get(topic).write(topic, data);
+		getOwner().logMessage(LOGGER_TAG + "Fin write topic : " + topic.getName());
+
+	}
+
+	public <T> void propager(T newObject, TopicDescription<T> topicName, String id, Time time) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Propager topic : " + topicName.getName());
+		if (topicIDWrite.get(id) != null && topicIDWrite.get(id).equals(topicName))
+			return;
+
+		topicIDWrite.put(id, topicName);
+		((IDDSNode) getOwner()).write(topicName, newObject, time);
+
+		propagationPortToNextRoot.get(topicName).propager(newObject, topicName, id, time);
+		getOwner().logMessage(LOGGER_TAG + "Fin propager topic : " + topicName.getName());
+	}
+
+	public Iterator<?> consommer(TopicDescription<?> topic, String id, boolean isFirst) throws Exception {
+		getOwner().logMessage(LOGGER_TAG + "Consommer topic : " + topic.getName());
+		if (topicIDTake.containsKey(id) && topicIDTake.get(id).equals(topic))
+			return ((IDDSNode) getOwner()).take(topic);
+
+		topicIDTake.put(id, topic);
+		if (!isFirst)
+			((IDDSNode) getOwner()).take(topic);
+		getOwner().logMessage(LOGGER_TAG + "Fin Consommer topic : " + topic.getName());
+		return propagationPortToNextRoot.get(topic).consommer(topic, id, false);
+
+	}
+
 	@Override
 	public void finalise() throws Exception {
 		super.finalise();
@@ -274,11 +319,11 @@ public class DDSPlugin extends AbstractPlugin {
 			port.doDisconnection();
 		}
 
-		for (OutPortReadDDS port : readPortToRoot.values()) {
+		for (OutPortReadDDS port : readPortFromRoot.values()) {
 			port.doDisconnection();
 		}
 
-		for (OutPortWrite port : writePortToRoot.values()) {
+		for (OutPortWrite port : writePortFromRoot.values()) {
 			port.doDisconnection();
 		}
 
@@ -305,11 +350,11 @@ public class DDSPlugin extends AbstractPlugin {
 			port.unpublishPort();
 		}
 
-		for (OutPortReadDDS port : readPortToRoot.values()) {
+		for (OutPortReadDDS port : readPortFromRoot.values()) {
 			port.unpublishPort();
 		}
 
-		for (OutPortWrite port : writePortToRoot.values()) {
+		for (OutPortWrite port : writePortFromRoot.values()) {
 			port.unpublishPort();
 		}
 

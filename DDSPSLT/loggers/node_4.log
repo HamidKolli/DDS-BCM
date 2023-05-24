@@ -1,0 +1,40 @@
+1684932857992|DDSNode | Installer le plugin dds
+1684932858028|DDSNode | Connexion
+1684932858029|DDSNode | Fin connexion
+1684932859075|DDSPlugin |  getWriterURI
+1684932859075|DDSPlugin | Write topic : Notes
+1684932859075|DDSPlugin | Propager topic : Notes
+1684932859076|DDSNode | Write topic :Notes
+1684932859076|LockPlugin | Lock topic :Notes
+1684932859076|LockPlugin | Fin lock topic :Notes Succes : true
+1684932859076|LockPlugin | Unlock topic :Notes
+1684932859076|LockPlugin | fin unLock topic :Notes
+1684932859076|LockPlugin | unlock topic :Notes not found
+1684932859076|DDSNode | Fin Write topic :Notes
+1684932859085|DDSPlugin | Fin propager topic : Notes
+1684932859085|DDSPlugin | Fin write topic : Notes
+1684932859146|DDSPlugin | Propager topic : Notes
+1684932859147|DDSNode | Write topic :Notes
+1684932859147|LockPlugin | Lock topic :Notes
+1684932859147|LockPlugin | Fin lock topic :Notes Succes : true
+1684932859147|LockPlugin | Unlock topic :Notes
+1684932859147|LockPlugin | fin unLock topic :Notes
+1684932859147|LockPlugin | unlock topic :Notes not found
+1684932859147|DDSNode | Fin Write topic :Notes
+1684932859150|DDSPlugin | Fin propager topic : Notes
+1684932862094|DDSPlugin |  getReaderURI
+1684932862094|DDSPlugin |  read topic : Notes
+1684932862094|DDSNode | Read topic :Notes
+1684932862094|LockPlugin | Lock topic :Notes
+1684932862094|LockPlugin | Fin lock topic :Notes Succes : true
+1684932862094|LockPlugin | Unlock topic :Notes
+1684932862094|LockPlugin | fin unLock topic :Notes
+1684932862094|LockPlugin | unlock topic :Notes not found
+1684932862094|DDSNode | Fin read topic :Notes
+1684932862113|LockPlugin | Propagate Lock topic :Notification id = 67d4addc-ef4d-4c4f-9548-517b164a2d0b
+1684932862128|LockPlugin | Propagate unlock topic :Notification id propagation = 67d4addc-ef4d-4c4f-9548-517b164a2d0b id propagationUnlock = c1786184-278d-4ea6-9906-bec8dd4d15f2
+1684932862128|LockPlugin | Fin propagate unlock topic :Notification id propagation = 67d4addc-ef4d-4c4f-9548-517b164a2d0b id propagationUnlock = c1786184-278d-4ea6-9906-bec8dd4d15f2
+1684932862143|LockPlugin | Propagate Lock topic :Notification id = 0f65155a-43b3-4fce-9b4c-e24d6911eb9b
+1684932862146|LockPlugin | Propagate unlock topic :Notification id propagation = 0f65155a-43b3-4fce-9b4c-e24d6911eb9b id propagationUnlock = 8265fe3e-a7d0-4ef3-b2d1-1786c140d544
+1684932862146|LockPlugin | Fin propagate unlock topic :Notification id propagation = 0f65155a-43b3-4fce-9b4c-e24d6911eb9b id propagationUnlock = 8265fe3e-a7d0-4ef3-b2d1-1786c140d544
+1684932878067|DDSNode | Fin

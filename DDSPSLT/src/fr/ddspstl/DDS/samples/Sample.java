@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.TimeUnit;
 
 import org.omg.dds.core.ModifiableInstanceHandle;
 import org.omg.dds.core.ServiceEnvironment;
@@ -14,7 +15,9 @@ import org.omg.dds.sub.InstanceState;
 import org.omg.dds.sub.SampleState;
 import org.omg.dds.sub.ViewState;
 
-public class Sample<T> implements org.omg.dds.sub.Sample<T> {
+import fr.ddspstl.tools.QuickSort;
+
+public class Sample<T> implements org.omg.dds.sub.Sample<T>, Comparable<Sample<T>> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -116,20 +119,23 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 
 	@Override
 	public Sample<T> clone() {
-		return new Sample<T>(serviceEnvironment, data,sampleState,viewState,instanceState,time);
+		return new Sample<T>(serviceEnvironment, data, sampleState, viewState, instanceState, time);
 	}
 
-	public static class Iterator<T> implements org.omg.dds.sub.Sample.Iterator<T> {
+	public static class Iterator<T> implements org.omg.dds.sub.Sample.Iterator<T>, Cloneable {
 
 		private List<org.omg.dds.sub.Sample<T>> list;
 		private ListIterator<org.omg.dds.sub.Sample<T>> iterator;
 		private boolean close;
-		
 
 		public Iterator() {
-			super();
-			list = new ArrayList<>();
-			iterator = list.listIterator();
+			this(new ArrayList<>());
+
+		}
+
+		private Iterator(List<org.omg.dds.sub.Sample<T>> list) {
+			this.list = list;
+			this.iterator = list.listIterator();
 			close = false;
 		}
 
@@ -145,28 +151,28 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 
 		@Override
 		public synchronized org.omg.dds.sub.Sample<T> next() {
-			if(close)
+			if (close)
 				return null;
 			return iterator.next();
 		}
 
 		@Override
 		public int nextIndex() {
-			if(close)
+			if (close)
 				return -1;
 			return iterator.nextIndex();
 		}
 
 		@Override
 		public org.omg.dds.sub.Sample<T> previous() {
-			if(close)
+			if (close)
 				return null;
 			return iterator.previous();
 		}
 
 		@Override
 		public int previousIndex() {
-			if(close)
+			if (close)
 				return -1;
 			return iterator.previousIndex();
 		}
@@ -187,7 +193,7 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 			Collections.sort(list, new Comparator<org.omg.dds.sub.Sample<T>>() {
 				@Override
 				public int compare(org.omg.dds.sub.Sample<T> o1, org.omg.dds.sub.Sample<T> o2) {
-					return (o1.getSourceTimestamp().compareTo(o.getSourceTimestamp()));
+					return (o1.getSourceTimestamp().compareTo(o2.getSourceTimestamp()));
 				}
 			});
 			iterator = list.listIterator();
@@ -196,14 +202,27 @@ public class Sample<T> implements org.omg.dds.sub.Sample<T> {
 		@Override
 		public void add(org.omg.dds.sub.Sample<T> o) {
 			list.add(o);
-			Collections.sort(list, new Comparator<org.omg.dds.sub.Sample<T>>() {
-				@Override
-				public int compare(org.omg.dds.sub.Sample<T> o1, org.omg.dds.sub.Sample<T> o2) {
-					return (o1.getSourceTimestamp().compareTo(o.getSourceTimestamp()));
-				}
-			});
+			QuickSort.quickSort(list);
 			iterator = list.listIterator();
 		}
 
+		@Override
+		public Iterator<T> clone() throws CloneNotSupportedException {
+			return new Iterator<T>(list);
+		}
 	}
+
+	@Override
+	public int compareTo(Sample<T> o) {
+		assert o != null;
+		if (getSourceTimestamp().getTime(TimeUnit.MICROSECONDS) < o.getSourceTimestamp()
+				.getTime(TimeUnit.MICROSECONDS)) {
+			return -1;
+		} else if (getSourceTimestamp().getTime(TimeUnit.MICROSECONDS) > o.getSourceTimestamp()
+				.getTime(TimeUnit.MICROSECONDS)) {
+			return 1;
+		}
+		return 0;
+	}
+
 }

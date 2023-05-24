@@ -3,8 +3,8 @@ package fr.ddspstl.plugin;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.omg.dds.core.Time;
 import org.omg.dds.topic.TopicDescription;
@@ -23,11 +23,11 @@ public class LockPlugin extends AbstractPlugin {
 
 	public static final String LOGGER_TAG = "LockPlugin | ";
 
-	private ConcurrentMap<TopicDescription<?>, Lock> topicsLock;
+	private ConcurrentMap<TopicDescription<?>, Semaphore> topicsLock;
 	private InPortLock inPortLock;
 	private ConcurrentMap<INodeAddress, OutPortLock> ports;
-	private ConcurrentMap<TopicDescription<?>, String> topicsID;
-	private ConcurrentMap<TopicDescription<?>, String> topicsIDUnlock;
+	private ConcurrentMap<String, TopicDescription<?>> topicsID;
+	private ConcurrentMap<String, TopicDescription<?>> topicsIDUnlock;
 	private ConcurrentMap<TopicDescription<?>, Time> topicsTimestamp;
 	private Set<TopicDescription<?>> topics;
 	private INodeAddress address;
@@ -57,7 +57,7 @@ public class LockPlugin extends AbstractPlugin {
 		super.initialise();
 
 		for (TopicDescription<?> topic : topics) {
-			topicsLock.put(topic, new ReentrantLock());
+			topicsLock.put(topic, new Semaphore(1));
 		}
 
 		inPortLock = new InPortLock(address.getPropagationLockURI(), getOwner(), getPluginURI(), executorServiceURI);
@@ -89,17 +89,17 @@ public class LockPlugin extends AbstractPlugin {
 		getOwner().logMessage(LOGGER_TAG + "Try lock topic :" + topic.getName());
 		if (topicsLock.containsKey(topic)) {
 			getOwner().logMessage(LOGGER_TAG + "Fin try lock topic :" + topic.getName() + " Succes : true");
-			return topicsLock.get(topic).tryLock();
+			return topicsLock.get(topic).tryAcquire();
 		}
 		getOwner().logMessage(LOGGER_TAG + "Fin try lock topic :" + topic.getName() + " Succes : false");
 		return false;
 	}
 
-	public void lock(TopicDescription<?> topic) {
+	public void lock(TopicDescription<?> topic) throws Exception {
 
 		if (topicsLock.containsKey(topic)) {
 			getOwner().logMessage(LOGGER_TAG + "Lock topic :" + topic.getName());
-			topicsLock.get(topic).lock();
+			topicsLock.get(topic).acquire();
 			getOwner().logMessage(LOGGER_TAG + "Fin lock topic :" + topic.getName() + " Succes : true");
 			return;
 		}
@@ -110,7 +110,7 @@ public class LockPlugin extends AbstractPlugin {
 	public void unlock(TopicDescription<?> topic) {
 		if (topicsLock.containsKey(topic)) {
 			getOwner().logMessage(LOGGER_TAG + "Unlock topic :" + topic.getName());
-			topicsLock.get(topic).unlock();
+			topicsLock.get(topic).release();
 			getOwner().logMessage(LOGGER_TAG + "fin unLock topic :" + topic.getName());
 		}
 		getOwner().logMessage(LOGGER_TAG + "unlock topic :" + topic.getName() + " not found");
@@ -119,31 +119,40 @@ public class LockPlugin extends AbstractPlugin {
 	public boolean propagateLock(TopicDescription<?> topic, String idPropagation, Time timestamp) throws Exception {
 		getOwner().logMessage(LOGGER_TAG + "Propagate Lock topic :" + topic.getName() + " id = " + idPropagation);
 
-		if (topicsID.containsKey(topic) && topicsID.get(topic).equals(idPropagation))
+		if (topicsID.containsKey(idPropagation) && topicsID.get(idPropagation).equals(topic))
 			return true;
 
-		topicsID.put(topic, idPropagation);
+		topicsID.put(idPropagation, topic);
 
 		if (topicsLock.containsKey(topic)) {
-
+			System.out.println("trylock");
 			if (trylock(topic)) {
+				System.out.println("trylock true " + idPropagation );
 				topicsTimestamp.put(topic, timestamp);
+				
 			} else {
-				if (topicsTimestamp.get(topic).compareTo(timestamp) > 0) {
+				System.out.println("trylock false");
+				if (topicsTimestamp.get(topic).getTime(TimeUnit.MILLISECONDS) > timestamp.getTime(TimeUnit.MILLISECONDS)) {
+					System.out.println("lock "+ idPropagation );
 					lock(topic);
+					System.out.println("lock in");
 				} else {
+					System.out.println("return");
 					return false;
 				}
 			}
-		}
-		boolean b = true;
-		for (OutPortLock port : ports.values()) {
-			b &= port.lock(topic, idPropagation, timestamp);
-		}
-		getOwner().logMessage(
-				LOGGER_TAG + "Propagate Lock topic :" + topic.getName() + " id = " + idPropagation + " succes " + b);
+			boolean b = true;
+			for (OutPortLock port : ports.values()) {
+				b &= port.lock(topic, idPropagation, timestamp);
+			}
+			getOwner().logMessage(LOGGER_TAG + "Propagate Lock topic :" + topic.getName() + " id = " + idPropagation
+					+ " succes " + b);
 
-		return b;
+			return b;
+
+		}
+
+		return true;
 
 	}
 
@@ -152,20 +161,22 @@ public class LockPlugin extends AbstractPlugin {
 		getOwner().logMessage(LOGGER_TAG + "Propagate unlock topic :" + topic.getName() + " id propagation = "
 				+ idPropagation + " id propagationUnlock = " + idPropagationUnlock);
 
-		if (topicsIDUnlock.containsKey(topic) && topicsIDUnlock.get(topic).equals(idPropagationUnlock))
+		if (topicsIDUnlock.containsKey(idPropagationUnlock) && topicsIDUnlock.get(idPropagationUnlock).equals(topic))
 			return;
 
-		topicsIDUnlock.put(topic, idPropagationUnlock);
+		topicsIDUnlock.put(idPropagationUnlock, topic);
 
 		if (topicsLock.containsKey(topic)) {
-			if (topicsID.get(topic).equals(idPropagation)) {
+			if (topicsID.containsKey(idPropagation) && topicsID.get(idPropagation).equals(topic)) {
 				unlock(topic);
+				System.out.println("unlock "+ idPropagation );
 			} else {
 				return;
 			}
-		}
-		for (OutPortLock port : ports.values()) {
-			port.unlock(topic, idPropagation, idPropagationUnlock);
+
+			for (OutPortLock port : ports.values()) {
+				port.unlock(topic, idPropagation, idPropagationUnlock);
+			}
 		}
 		getOwner().logMessage(LOGGER_TAG + "Fin propagate unlock topic :" + topic.getName() + " id propagation = "
 				+ idPropagation + " id propagationUnlock = " + idPropagationUnlock);

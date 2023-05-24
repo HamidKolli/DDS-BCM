@@ -57,7 +57,8 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 	public void installOn(ComponentI owner) throws Exception {
 		super.installOn(owner);
 		this.addRequiredInterface(ReadCI.class);
-		this.addRequiredInterface(ConnectClient.class);
+		if (getOwner().getRequiredInterface(ConnectClient.class) == null)
+			this.addRequiredInterface(ConnectClient.class);
 
 	}
 
@@ -68,7 +69,7 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 		portRead.publishPort();
 		outPortConnectClient = new OutPortConnectClient(getOwner());
 		outPortConnectClient.publishPort();
-		
+
 	}
 
 	public void finalise() throws Exception {
@@ -224,22 +225,23 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 
 	public Iterator<T> read() {
 		try {
-			getOwner().doPortConnection(outPortConnectClient.getPortURI(), uriPortDDSnode, ConnectorClient.class.getCanonicalName());
+			getOwner().doPortConnection(outPortConnectClient.getPortURI(), uriPortDDSnode,
+					ConnectorClient.class.getCanonicalName());
 			String uriReader = outPortConnectClient.getReaderURI();
 			getOwner().doPortConnection(portRead.getPortURI(), uriReader, ConnectorRead.class.getCanonicalName());
-			
+
 			return this.portRead.read(topic);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			try {
 				portRead.doDisconnection();
 				outPortConnectClient.doDisconnection();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 		return null;
 	}
@@ -265,7 +267,25 @@ public class DataReader<T> extends AbstractPlugin implements org.omg.dds.sub.Dat
 	}
 
 	public Iterator<T> take() {
-		// TODO Auto-generated method stub
+		try {
+			getOwner().doPortConnection(outPortConnectClient.getPortURI(), uriPortDDSnode,
+					ConnectorClient.class.getCanonicalName());
+			String uriReader = outPortConnectClient.getReaderURI();
+			getOwner().doPortConnection(portRead.getPortURI(), uriReader, ConnectorRead.class.getCanonicalName());
+
+			return this.portRead.take(topic);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				portRead.doDisconnection();
+				outPortConnectClient.doDisconnection();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
 		return null;
 	}
 

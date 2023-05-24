@@ -11,17 +11,16 @@ import org.omg.dds.topic.TopicDescription;
  * 
  * @param <T> : le type de la donnée
  *
- * Interface implantée par un noeud DDS
+ *            Interface implantée par un noeud DDS
  */
 public interface IDDSNode {
-
 
 	/**
 	 * methode propager : s'occupe d'effectuer la propagation de la donnée
 	 * 
-	 * @param newObject : la nouvelle donnée à propager
-	 * @param topic : le topic auquel il appartient
-	 * @param id : l'identifiant de la requete
+	 * @param newObject      : la nouvelle donnée à propager
+	 * @param topic          : le topic auquel il appartient
+	 * @param id             : l'identifiant de la requete
 	 * @param modifiableTime : le timestamp
 	 * @throws Exception
 	 */
@@ -30,8 +29,8 @@ public interface IDDSNode {
 	/**
 	 * methode consommer : s'occupe de commencer le take
 	 * 
-	 * @param topic : le topic dans lequel on va chercher
-	 * @param id : l'identifiant de la requete
+	 * @param topic   : le topic dans lequel on va chercher
+	 * @param id      : l'identifiant de la requete
 	 * @param isFirst : true si c'est le noeud qui lance la requete, false sinon
 	 * @return Iterator<T> : la donnée lue
 	 * @throws Exception
@@ -46,5 +45,10 @@ public interface IDDSNode {
 	 * @throws Exception
 	 */
 	public <T> Iterator<T> read(TopicDescription<T> topic) throws Exception;
+
+	public <T> void write(TopicDescription<T> topicName, T newObject, Time time) throws Exception;
+
+	public <T> Iterator<T> take(TopicDescription<T> topic) throws Exception;
+
 
 }

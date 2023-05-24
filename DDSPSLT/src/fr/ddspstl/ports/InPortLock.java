@@ -19,7 +19,6 @@ public class InPortLock extends AbstractInboundPort implements PropagationLock {
 		super(uri, PropagationLock.class, owner, pluginURI, executorServiceURI);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public <T> boolean lock(TopicDescription<T> topic, String idPropagation,Time timestamp) throws Exception {
 		return getOwner().handleRequest(getExecutorServiceIndex(), (e) -> {
@@ -33,7 +32,6 @@ public class InPortLock extends AbstractInboundPort implements PropagationLock {
 
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public <T> void unlock(TopicDescription<T> topic, String idPropagation,String idPropagationUnlock) throws Exception {
 		getOwner().handleRequest(getExecutorServiceIndex(), (e) -> {
