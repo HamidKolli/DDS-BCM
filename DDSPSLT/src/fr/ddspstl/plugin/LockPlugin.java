@@ -178,19 +178,13 @@ public class LockPlugin extends AbstractPlugin {
 		topicsID.put(idPropagation, topic);
 
 		if (topicsLock.containsKey(topic)) {
-			System.out.println("trylock");
 			if (trylock(topic)) {
-				System.out.println("trylock true " + idPropagation );
 				topicsTimestamp.put(topic, timestamp);
 				
 			} else {
-				System.out.println("trylock false");
 				if (topicsTimestamp.get(topic).getTime(TimeUnit.MILLISECONDS) > timestamp.getTime(TimeUnit.MILLISECONDS)) {
-					System.out.println("lock "+ idPropagation );
 					lock(topic);
-					System.out.println("lock in");
 				} else {
-					System.out.println("return");
 					return false;
 				}
 			}
@@ -230,7 +224,6 @@ public class LockPlugin extends AbstractPlugin {
 		if (topicsLock.containsKey(topic)) {
 			if (topicsID.containsKey(idPropagation) && topicsID.get(idPropagation).equals(topic)) {
 				unlock(topic);
-				System.out.println("unlock "+ idPropagation );
 			} else {
 				return;
 			}

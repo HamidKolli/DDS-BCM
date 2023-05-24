@@ -25,8 +25,8 @@ public class QuickSort {
 	 * Constructeur
 	 * 
 	 * @param samples : liste des données à trier
-	 * @param low : .
-	 * @param high : .
+	 * @param low : l'indice du premier element de la sous liste
+	 * @param high : l'indice du dernier element de la sous liste
 	 */
 	private static <T> void quickSort(List<T> samples, int low, int high) {
 		if (low < high) {
@@ -41,8 +41,8 @@ public class QuickSort {
 	 * Methode partition
 	 * 
 	 * @param samples : liste des données
-	 * @param low : .
-	 * @param high : .
+	 * @param low : l'indice du premier element de la sous liste
+	 * @param high : l'indice du dernier element de la sous liste
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")

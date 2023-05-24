@@ -220,7 +220,7 @@ public class DDSPlugin extends AbstractPlugin {
 	 * Methode read : effectue un read
 	 * 
 	 * @param topic : le topic dans lequel lire
-	 * @return Iterator<T>: la donnée lue
+	 * @return Iterator(T): la donnée lue
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
@@ -248,7 +248,7 @@ public class DDSPlugin extends AbstractPlugin {
 	 * Methode take : effectue un take
 	 * 
 	 * @param topic : le topic dans lequel take
-	 * @return Iterator<T> : la donnée prise
+	 * @return Iterator(T) : la donnée prise
 	 * @throws Exception
 	 */
 	public Iterator<?> take(TopicDescription<?> topic) throws Exception {
@@ -413,7 +413,7 @@ public class DDSPlugin extends AbstractPlugin {
 	 * @param topic : le topic concerné
 	 * @param id : l'ID de la requete
 	 * @param isFirst : booleen regardant si cette requete est la premiere
-	 * @return Iterator<T> : la donnée consommée
+	 * @return Iterator(T) : la donnée consommée
 	 * @throws Exception
 	 */
 	public Iterator<?> consommer(TopicDescription<?> topic, String id, boolean isFirst) throws Exception {

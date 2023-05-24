@@ -1,80 +1,80 @@
-1684943049740|DDSNode | Installer le plugin dds
-1684943049777|DDSNode | Connexion
-1684943049788|DDSNode | Fin connexion
-1684943050806|DDSPlugin |  getWriterURI
-1684943050806|DDSPlugin | Write topic : Temperatures
-1684943050806|DDSPlugin | Propager topic : Temperatures
-1684943050806|DDSNode | Write topic :Temperatures
-1684943050806|LockPlugin | Lock topic :Temperatures
-1684943050806|LockPlugin | Fin lock topic :Temperatures Succes : true
-1684943050808|DDSPlugin |  getWriterURI
-1684943050808|DDSPlugin | Write topic : Notification
-1684943050809|LockPlugin | Unlock topic :Temperatures
-1684943050809|LockPlugin | fin unLock topic :Temperatures
-1684943050809|LockPlugin | unlock topic :Temperatures not found
-1684943050809|DDSNode | Fin Write topic :Temperatures
-1684943050810|DDSPlugin | Fin write topic : Notification
-1684943050810|DDSPlugin | Fin propager topic : Temperatures
-1684943050810|DDSPlugin | Fin write topic : Temperatures
-1684943050830|DDSPlugin | Propager topic : Notes
-1684943050830|DDSNode | Write topic :Notes
-1684943050830|LockPlugin | Lock topic :Notes
-1684943050830|LockPlugin | Fin lock topic :Notes Succes : true
-1684943050830|LockPlugin | Unlock topic :Notes
-1684943050830|LockPlugin | fin unLock topic :Notes
-1684943050830|LockPlugin | unlock topic :Notes not found
-1684943050830|DDSNode | Fin Write topic :Notes
-1684943050830|DDSPlugin | Fin propager topic : Notes
-1684943050847|DDSPlugin | Propager topic : Temperatures
-1684943050847|DDSNode | Write topic :Temperatures
-1684943050847|LockPlugin | Lock topic :Temperatures
-1684943050847|LockPlugin | Fin lock topic :Temperatures Succes : true
-1684943050847|LockPlugin | Unlock topic :Temperatures
-1684943050847|LockPlugin | fin unLock topic :Temperatures
-1684943050847|LockPlugin | unlock topic :Temperatures not found
-1684943050847|DDSNode | Fin Write topic :Temperatures
-1684943050848|DDSPlugin | Fin propager topic : Temperatures
-1684943050862|DDSPlugin | Propager topic : Notes
-1684943050862|DDSNode | Write topic :Notes
-1684943050862|LockPlugin | Lock topic :Notes
-1684943050862|LockPlugin | Fin lock topic :Notes Succes : true
-1684943050862|LockPlugin | Unlock topic :Notes
-1684943050862|LockPlugin | fin unLock topic :Notes
-1684943050862|LockPlugin | unlock topic :Notes not found
-1684943050863|DDSNode | Fin Write topic :Notes
-1684943050863|DDSPlugin | Fin propager topic : Notes
-1684943050889|DDSPlugin |  getWriterURI
-1684943050889|DDSPlugin | Write topic : Notification
-1684943050889|DDSPlugin | Fin write topic : Notification
-1684943053812|DDSPlugin |  getReaderURI
-1684943053812|DDSPlugin |  read topic : Temperatures
-1684943053812|DDSNode | Read topic :Temperatures
-1684943053812|LockPlugin | Lock topic :Temperatures
-1684943053812|LockPlugin | Fin lock topic :Temperatures Succes : true
-1684943053812|LockPlugin | Unlock topic :Temperatures
-1684943053812|LockPlugin | fin unLock topic :Temperatures
-1684943053812|LockPlugin | unlock topic :Temperatures not found
-1684943053812|DDSNode | Fin read topic :Temperatures
-1684943053813|DDSPlugin |  getReaderURI
-1684943053813|DDSPlugin | Take topic : Notification
-1684943053813|DDSPlugin | Take topic : Notification get from topic
-1684943053817|LockPlugin | Propagate Lock topic :Notification id = 377222e9-d1ec-41ac-a153-fecf83bbd7c8
-1684943053823|LockPlugin | Propagate Lock topic :Notification id = 377222e9-d1ec-41ac-a153-fecf83bbd7c8
-1684943053836|LockPlugin | Propagate unlock topic :Notification id propagation = 377222e9-d1ec-41ac-a153-fecf83bbd7c8 id propagationUnlock = a1b8c07f-416a-4def-9b42-7759451cbd77
-1684943053836|LockPlugin | Fin propagate unlock topic :Notification id propagation = 377222e9-d1ec-41ac-a153-fecf83bbd7c8 id propagationUnlock = a1b8c07f-416a-4def-9b42-7759451cbd77
-1684943053837|LockPlugin | Propagate unlock topic :Notification id propagation = 377222e9-d1ec-41ac-a153-fecf83bbd7c8 id propagationUnlock = a1b8c07f-416a-4def-9b42-7759451cbd77
-1684943053839|DDSPlugin | AcceptResult
-1684943053839|DDSPlugin | Fin acceptResult
-1684943053839|DDSPlugin | Fin take topic : Notification
-1684943053891|DDSPlugin |  getReaderURI
-1684943053891|DDSPlugin | Take topic : Notification
-1684943053891|DDSPlugin | Take topic : Notification get from topic
-1684943053891|LockPlugin | Propagate Lock topic :Notification id = 36d71683-6825-4c06-92a4-eb51ce72e0fd
-1684943053893|LockPlugin | Propagate Lock topic :Notification id = 36d71683-6825-4c06-92a4-eb51ce72e0fd
-1684943053894|LockPlugin | Propagate unlock topic :Notification id propagation = 36d71683-6825-4c06-92a4-eb51ce72e0fd id propagationUnlock = b7215df2-2b99-499a-b404-142f8351b98a
-1684943053894|LockPlugin | Fin propagate unlock topic :Notification id propagation = 36d71683-6825-4c06-92a4-eb51ce72e0fd id propagationUnlock = b7215df2-2b99-499a-b404-142f8351b98a
-1684943053895|LockPlugin | Propagate unlock topic :Notification id propagation = 36d71683-6825-4c06-92a4-eb51ce72e0fd id propagationUnlock = b7215df2-2b99-499a-b404-142f8351b98a
-1684943053895|DDSPlugin | AcceptResult
-1684943053895|DDSPlugin | Fin acceptResult
-1684943053895|DDSPlugin | Fin take topic : Notification
-1684943069756|DDSNode | Fin
+1684943626557|DDSNode | Installer le plugin dds
+1684943626603|DDSNode | Connexion
+1684943626605|DDSNode | Fin connexion
+1684943627623|DDSPlugin |  getWriterURI
+1684943627624|DDSPlugin | Write topic : Notification
+1684943627626|DDSPlugin | Propager topic : Notes
+1684943627626|DDSNode | Write topic :Notes
+1684943627626|LockPlugin | Lock topic :Notes
+1684943627627|LockPlugin | Fin lock topic :Notes Succes : true
+1684943627627|LockPlugin | Unlock topic :Notes
+1684943627627|LockPlugin | fin unLock topic :Notes
+1684943627627|LockPlugin | unlock topic :Notes not found
+1684943627627|DDSNode | Fin Write topic :Notes
+1684943627627|DDSPlugin | Fin propager topic : Notes
+1684943627634|DDSPlugin | Fin write topic : Notification
+1684943627639|DDSPlugin |  getWriterURI
+1684943627639|DDSPlugin | Write topic : Notification
+1684943627648|DDSPlugin | Propager topic : Temperatures
+1684943627648|DDSNode | Write topic :Temperatures
+1684943627648|LockPlugin | Lock topic :Temperatures
+1684943627648|LockPlugin | Fin lock topic :Temperatures Succes : true
+1684943627648|LockPlugin | Unlock topic :Temperatures
+1684943627648|LockPlugin | fin unLock topic :Temperatures
+1684943627648|LockPlugin | unlock topic :Temperatures not found
+1684943627648|DDSNode | Fin Write topic :Temperatures
+1684943627649|DDSPlugin | Fin write topic : Notification
+1684943627655|DDSPlugin | Fin propager topic : Temperatures
+1684943627695|DDSPlugin |  getWriterURI
+1684943627695|DDSPlugin | Write topic : Temperatures
+1684943627695|DDSPlugin | Propager topic : Temperatures
+1684943627696|DDSNode | Write topic :Temperatures
+1684943627696|LockPlugin | Lock topic :Temperatures
+1684943627696|LockPlugin | Fin lock topic :Temperatures Succes : true
+1684943627696|LockPlugin | Unlock topic :Temperatures
+1684943627696|LockPlugin | fin unLock topic :Temperatures
+1684943627696|LockPlugin | unlock topic :Temperatures not found
+1684943627696|DDSNode | Fin Write topic :Temperatures
+1684943627699|DDSPlugin | Propager topic : Notes
+1684943627699|DDSNode | Write topic :Notes
+1684943627699|LockPlugin | Lock topic :Notes
+1684943627699|LockPlugin | Fin lock topic :Notes Succes : true
+1684943627699|LockPlugin | Unlock topic :Notes
+1684943627699|LockPlugin | fin unLock topic :Notes
+1684943627699|LockPlugin | unlock topic :Notes not found
+1684943627699|DDSNode | Fin Write topic :Notes
+1684943627705|DDSPlugin | Fin propager topic : Temperatures
+1684943627705|DDSPlugin | Fin write topic : Temperatures
+1684943627706|DDSPlugin | Fin propager topic : Notes
+1684943630637|DDSPlugin |  getReaderURI
+1684943630637|DDSPlugin | Take topic : Notification
+1684943630637|DDSPlugin | Take topic : Notification get from topic
+1684943630641|LockPlugin | Propagate Lock topic :Notification id = 549aacf9-7f56-4861-86cd-0309e619f09d
+1684943630642|LockPlugin | Propagate Lock topic :Notification id = 549aacf9-7f56-4861-86cd-0309e619f09d
+1684943630652|DDSPlugin |  getReaderURI
+1684943630652|DDSPlugin | Take topic : Notification
+1684943630652|DDSPlugin | Take topic : Notification get from topic
+1684943630656|LockPlugin | Propagate unlock topic :Notification id propagation = 549aacf9-7f56-4861-86cd-0309e619f09d id propagationUnlock = e3caab80-8a76-4433-af4e-88f213aace8e
+1684943630656|LockPlugin | Fin propagate unlock topic :Notification id propagation = 549aacf9-7f56-4861-86cd-0309e619f09d id propagationUnlock = e3caab80-8a76-4433-af4e-88f213aace8e
+1684943630657|LockPlugin | Propagate Lock topic :Notification id = 5b5ae755-2eee-4225-b96e-f80d6f678797
+1684943630658|LockPlugin | Propagate unlock topic :Notification id propagation = 549aacf9-7f56-4861-86cd-0309e619f09d id propagationUnlock = e3caab80-8a76-4433-af4e-88f213aace8e
+1684943630659|LockPlugin | Propagate Lock topic :Notification id = 5b5ae755-2eee-4225-b96e-f80d6f678797
+1684943630659|DDSPlugin | AcceptResult
+1684943630659|DDSPlugin | Fin take topic : Notification
+1684943630660|DDSPlugin | Fin acceptResult
+1684943630661|LockPlugin | Propagate unlock topic :Notification id propagation = 5b5ae755-2eee-4225-b96e-f80d6f678797 id propagationUnlock = 87cf9c82-ae83-4c7a-a484-3b82d8e8eefe
+1684943630661|LockPlugin | Fin propagate unlock topic :Notification id propagation = 5b5ae755-2eee-4225-b96e-f80d6f678797 id propagationUnlock = 87cf9c82-ae83-4c7a-a484-3b82d8e8eefe
+1684943630662|LockPlugin | Propagate unlock topic :Notification id propagation = 5b5ae755-2eee-4225-b96e-f80d6f678797 id propagationUnlock = 87cf9c82-ae83-4c7a-a484-3b82d8e8eefe
+1684943630663|DDSPlugin | AcceptResult
+1684943630663|DDSPlugin | Fin take topic : Notification
+1684943630664|DDSPlugin | Fin acceptResult
+1684943630712|DDSPlugin |  getReaderURI
+1684943630712|DDSPlugin |  read topic : Temperatures
+1684943630713|DDSNode | Read topic :Temperatures
+1684943630713|LockPlugin | Lock topic :Temperatures
+1684943630713|LockPlugin | Fin lock topic :Temperatures Succes : true
+1684943630713|LockPlugin | Unlock topic :Temperatures
+1684943630713|LockPlugin | fin unLock topic :Temperatures
+1684943630713|LockPlugin | unlock topic :Temperatures not found
+1684943630713|DDSNode | Fin read topic :Temperatures
+1684943646627|DDSNode | Fin

@@ -36,7 +36,9 @@ public class Time extends org.omg.dds.core.Time{
 	}
 
 	/**
-	 * @see org.omg.dds.core.Time#compareTo(org.omg.dds.core.Time)
+	 * 
+	* @see java.lang.Comparable#compareTo(java.lang.Object)
+	*
 	 */
 	@Override
 	public int compareTo(org.omg.dds.core.Time o) {

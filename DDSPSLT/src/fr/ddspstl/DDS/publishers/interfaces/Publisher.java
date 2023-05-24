@@ -22,7 +22,7 @@ public interface Publisher extends org.omg.dds.pub.Publisher{
 	 * @param <TYPE> : le type de la donnée
 	 * @param topic : le topic
 	 * @param uriPortSortant : l'uri du port sortant
-	 * @return DataWriter<TYPE> : le Data Writer créé
+	 * @return DataWriter(TYPE) : le Data Writer créé
 	 */
 	public <TYPE> DataWriter<TYPE> createDataWriter(Topic<TYPE> topic, String uriPortSortant) ;
 }

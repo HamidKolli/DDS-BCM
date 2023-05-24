@@ -149,7 +149,6 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 		String propagationLockURI = AbstractPort.generatePortURI();
 
 		if (pluginLock.propagateLock(topic, propagationLockURI, new fr.ddspstl.time.Time((new Date()).getTime()))) {
-			System.out.println("haaaaaaaaa");
 			Iterator<T> result = (Iterator<T>) plugin.consommer(topic, id, isFirst);
 			pluginLock.propagateUnlock(topic, propagationLockURI, AbstractPort.generatePortURI());
 

@@ -38,7 +38,7 @@ public class Datas<T>  {
 	/**
 	 * methode read : effectue un read sur la donnée
 	 * 
-	 * @return Sample.Iterator<T> : la donnée retournée
+	 * @return Sample.Iterator(T) : la donnée retournée
 	 * @throws CloneNotSupportedException 
 	 */
 	public Sample.Iterator<T> read() throws CloneNotSupportedException {
@@ -48,7 +48,7 @@ public class Datas<T>  {
 	/**
 	 * methode take : effectue un take sur la donnée
 	 * 
-	 * @return Sample.Iterator<T> : la donnée retournée
+	 * @return Sample.Iterator(T) : la donnée retournée
 	 */
 	public Sample.Iterator<T> take() {
 		Sample.Iterator<T> tmp = samplesData;

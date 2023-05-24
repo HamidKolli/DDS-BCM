@@ -28,7 +28,7 @@ public class InPortPropagation extends AbstractInboundPort implements Propagatio
 	 * @param uri : l'uri du port
 	 * @param owner : l'owner du port
 	 * @param pluginURI : l'uri du plugin
-	 * @param executorServiceURI : l'uri de l'executor service
+	 * @param executorServicePropagationURI : l'uri de l'executor service
 	 * @throws Exception
 	 */
 	public InPortPropagation(String uri,ComponentI owner,String pluginURI ,String executorServicePropagationURI) throws Exception {

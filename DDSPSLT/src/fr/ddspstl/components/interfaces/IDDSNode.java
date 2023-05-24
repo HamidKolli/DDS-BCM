@@ -32,7 +32,7 @@ public interface IDDSNode {
 	 * @param topic   : le nom du topic dans lequel on va chercher
 	 * @param id      : l'identifiant de la requete
 	 * @param isFirst : true si c'est le noeud qui lance la requete, false sinon
-	 * @return Iterator<T> : la donnée lue
+	 * @return Iterator(T) : la donnée lue
 	 * @throws Exception
 	 */
 	public <T> Iterator<T> consommer(TopicDescription<T> topic, String id, boolean isFirst) throws Exception;
@@ -41,7 +41,7 @@ public interface IDDSNode {
 	 * methode read : s'occupe de lire la donnée
 	 * 
 	 * @param topic : le nom du topic dans lequel on va chercher
-	 * @return Iterator<T> : la donnée lue
+	 * @return Iterator(T) : la donnée lue
 	 * @throws Exception
 	 */
 	public <T> Iterator<T> read(TopicDescription<T> topic) throws Exception;
@@ -58,7 +58,7 @@ public interface IDDSNode {
 
 	/**
 	 * @param topic : le nom du topic dans lequel on va take
-	 * @return Iterator<T> : la donnée lue
+	 * @return Iterator(T) : la donnée lue
 	 * @throws Exception
 	 */
 	public <T> Iterator<T> take(TopicDescription<T> topic) throws Exception;

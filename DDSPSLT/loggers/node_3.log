@@ -1,94 +1,94 @@
-1684943049693|DDSNode | Installer le plugin dds
-1684943049774|DDSNode | Connexion
-1684943049788|DDSNode | Fin connexion
-1684943050811|DDSPlugin | Write topic : Notification
-1684943050811|DDSPlugin | Propager topic : Notification
-1684943050811|DDSNode | Write topic :Notification
-1684943050811|LockPlugin | Lock topic :Notification
-1684943050811|LockPlugin | Fin lock topic :Notification Succes : true
-1684943050811|LockPlugin | Unlock topic :Notification
-1684943050811|LockPlugin | fin unLock topic :Notification
-1684943050811|LockPlugin | unlock topic :Notification not found
-1684943050811|DDSNode | Fin Write topic :Notification
-1684943050811|DDSPlugin | Fin propager topic : Notification
-1684943050811|DDSPlugin | Fin write topic : Notification
-1684943050818|DDSPlugin |  getWriterURI
-1684943050818|DDSPlugin | Write topic : Notes
-1684943050819|DDSPlugin | Propager topic : Notes
-1684943050819|DDSNode | Write topic :Notes
-1684943050819|LockPlugin | Lock topic :Notes
-1684943050819|LockPlugin | Fin lock topic :Notes Succes : true
-1684943050819|LockPlugin | Unlock topic :Notes
-1684943050819|LockPlugin | fin unLock topic :Notes
-1684943050819|LockPlugin | unlock topic :Notes not found
-1684943050819|DDSNode | Fin Write topic :Notes
-1684943050820|DDSPlugin | Fin propager topic : Notes
-1684943050820|DDSPlugin | Fin write topic : Notes
-1684943050863|DDSPlugin | Propager topic : Notes
-1684943050863|DDSNode | Write topic :Notes
-1684943050863|LockPlugin | Lock topic :Notes
-1684943050863|LockPlugin | Fin lock topic :Notes Succes : true
-1684943050863|LockPlugin | Unlock topic :Notes
-1684943050863|LockPlugin | fin unLock topic :Notes
-1684943050863|LockPlugin | unlock topic :Notes not found
-1684943050863|DDSNode | Fin Write topic :Notes
-1684943050864|DDSPlugin | Fin propager topic : Notes
-1684943050889|DDSPlugin | Write topic : Notification
-1684943050890|DDSPlugin | Propager topic : Notification
-1684943050890|DDSNode | Write topic :Notification
-1684943050892|LockPlugin | Lock topic :Notification
-1684943050892|LockPlugin | Fin lock topic :Notification Succes : true
-1684943050893|LockPlugin | Unlock topic :Notification
-1684943050894|LockPlugin | fin unLock topic :Notification
-1684943050894|LockPlugin | unlock topic :Notification not found
-1684943050894|DDSNode | Fin Write topic :Notification
-1684943050894|DDSPlugin | Fin propager topic : Notification
-1684943050894|DDSPlugin | Fin write topic : Notification
-1684943053815|DDSPlugin | Take root topic : Notification
-1684943053815|DDSNode | Consommer topic :Notification
-1684943053815|LockPlugin | Propagate Lock topic :Notification id = 377222e9-d1ec-41ac-a153-fecf83bbd7c8
-1684943053815|LockPlugin | Try lock topic :Notification
-1684943053815|LockPlugin | Fin try lock topic :Notification Succes : true
-1684943053820|LockPlugin | Propagate Lock topic :Notification id = 377222e9-d1ec-41ac-a153-fecf83bbd7c8
-1684943053823|DDSPlugin |  getReaderURI
-1684943053824|DDSPlugin |  read topic : Notes
-1684943053824|DDSNode | Read topic :Notes
-1684943053824|LockPlugin | Lock topic :Notes
-1684943053824|LockPlugin | Fin lock topic :Notes Succes : true
-1684943053824|LockPlugin | Unlock topic :Notes
-1684943053824|LockPlugin | fin unLock topic :Notes
-1684943053824|LockPlugin | unlock topic :Notes not found
-1684943053824|DDSNode | Fin read topic :Notes
-1684943053828|LockPlugin | Propagate Lock topic :Notification id = 377222e9-d1ec-41ac-a153-fecf83bbd7c8 succes true
-1684943053829|DDSPlugin | Consommer topic : Notification
-1684943053829|DDSPlugin | Fin Consommer topic : Notification
-1684943053833|DDSPlugin | Consommer topic : Notification
-1684943053833|DDSNode | Take topic :Notification
-1684943053833|DDSNode | Fin Take topic :Notification
-1684943053834|LockPlugin | Propagate unlock topic :Notification id propagation = 377222e9-d1ec-41ac-a153-fecf83bbd7c8 id propagationUnlock = a1b8c07f-416a-4def-9b42-7759451cbd77
-1684943053834|LockPlugin | Unlock topic :Notification
-1684943053834|LockPlugin | fin unLock topic :Notification
-1684943053834|LockPlugin | unlock topic :Notification not found
-1684943053837|LockPlugin | Propagate unlock topic :Notification id propagation = 377222e9-d1ec-41ac-a153-fecf83bbd7c8 id propagationUnlock = a1b8c07f-416a-4def-9b42-7759451cbd77
-1684943053838|LockPlugin | Fin propagate unlock topic :Notification id propagation = 377222e9-d1ec-41ac-a153-fecf83bbd7c8 id propagationUnlock = a1b8c07f-416a-4def-9b42-7759451cbd77
-1684943053839|DDSPlugin | Fin take root topic : Notification
-1684943053891|DDSPlugin | Take root topic : Notification
-1684943053891|DDSNode | Consommer topic :Notification
-1684943053891|LockPlugin | Propagate Lock topic :Notification id = 36d71683-6825-4c06-92a4-eb51ce72e0fd
-1684943053891|LockPlugin | Try lock topic :Notification
-1684943053891|LockPlugin | Fin try lock topic :Notification Succes : true
-1684943053892|LockPlugin | Propagate Lock topic :Notification id = 36d71683-6825-4c06-92a4-eb51ce72e0fd
-1684943053893|LockPlugin | Propagate Lock topic :Notification id = 36d71683-6825-4c06-92a4-eb51ce72e0fd succes true
-1684943053893|DDSPlugin | Consommer topic : Notification
-1684943053893|DDSPlugin | Fin Consommer topic : Notification
-1684943053894|DDSPlugin | Consommer topic : Notification
-1684943053894|DDSNode | Take topic :Notification
-1684943053894|DDSNode | Fin Take topic :Notification
-1684943053894|LockPlugin | Propagate unlock topic :Notification id propagation = 36d71683-6825-4c06-92a4-eb51ce72e0fd id propagationUnlock = b7215df2-2b99-499a-b404-142f8351b98a
-1684943053894|LockPlugin | Unlock topic :Notification
-1684943053894|LockPlugin | fin unLock topic :Notification
-1684943053894|LockPlugin | unlock topic :Notification not found
-1684943053895|LockPlugin | Propagate unlock topic :Notification id propagation = 36d71683-6825-4c06-92a4-eb51ce72e0fd id propagationUnlock = b7215df2-2b99-499a-b404-142f8351b98a
-1684943053895|LockPlugin | Fin propagate unlock topic :Notification id propagation = 36d71683-6825-4c06-92a4-eb51ce72e0fd id propagationUnlock = b7215df2-2b99-499a-b404-142f8351b98a
-1684943053895|DDSPlugin | Fin take root topic : Notification
-1684943069754|DDSNode | Fin
+1684943626518|DDSNode | Installer le plugin dds
+1684943626590|DDSNode | Connexion
+1684943626592|DDSNode | Fin connexion
+1684943627615|DDSPlugin |  getWriterURI
+1684943627615|DDSPlugin | Write topic : Notes
+1684943627616|DDSPlugin | Propager topic : Notes
+1684943627616|DDSNode | Write topic :Notes
+1684943627616|LockPlugin | Lock topic :Notes
+1684943627616|LockPlugin | Fin lock topic :Notes Succes : true
+1684943627621|LockPlugin | Unlock topic :Notes
+1684943627621|LockPlugin | fin unLock topic :Notes
+1684943627621|LockPlugin | unlock topic :Notes not found
+1684943627621|DDSNode | Fin Write topic :Notes
+1684943627623|DDSPlugin | Fin propager topic : Notes
+1684943627623|DDSPlugin | Fin write topic : Notes
+1684943627636|DDSPlugin | Write topic : Notification
+1684943627636|DDSPlugin | Propager topic : Notification
+1684943627636|DDSNode | Write topic :Notification
+1684943627636|LockPlugin | Lock topic :Notification
+1684943627636|LockPlugin | Fin lock topic :Notification Succes : true
+1684943627636|LockPlugin | Unlock topic :Notification
+1684943627636|LockPlugin | fin unLock topic :Notification
+1684943627636|LockPlugin | unlock topic :Notification not found
+1684943627636|DDSNode | Fin Write topic :Notification
+1684943627640|DDSPlugin | Fin propager topic : Notification
+1684943627640|DDSPlugin | Fin write topic : Notification
+1684943627653|DDSPlugin | Write topic : Notification
+1684943627653|DDSPlugin | Propager topic : Notification
+1684943627653|DDSNode | Write topic :Notification
+1684943627653|LockPlugin | Lock topic :Notification
+1684943627653|LockPlugin | Fin lock topic :Notification Succes : true
+1684943627653|LockPlugin | Unlock topic :Notification
+1684943627653|LockPlugin | fin unLock topic :Notification
+1684943627653|LockPlugin | unlock topic :Notification not found
+1684943627654|DDSNode | Fin Write topic :Notification
+1684943627656|DDSPlugin | Fin propager topic : Notification
+1684943627656|DDSPlugin | Fin write topic : Notification
+1684943627707|DDSPlugin | Propager topic : Notes
+1684943627707|DDSNode | Write topic :Notes
+1684943627707|LockPlugin | Lock topic :Notes
+1684943627708|LockPlugin | Fin lock topic :Notes Succes : true
+1684943627708|LockPlugin | Unlock topic :Notes
+1684943627708|LockPlugin | fin unLock topic :Notes
+1684943627708|LockPlugin | unlock topic :Notes not found
+1684943627708|DDSNode | Fin Write topic :Notes
+1684943627715|DDSPlugin | Fin propager topic : Notes
+1684943630631|DDSPlugin |  getReaderURI
+1684943630632|DDSPlugin |  read topic : Notes
+1684943630632|DDSNode | Read topic :Notes
+1684943630632|LockPlugin | Lock topic :Notes
+1684943630632|LockPlugin | Fin lock topic :Notes Succes : true
+1684943630632|LockPlugin | Unlock topic :Notes
+1684943630632|LockPlugin | fin unLock topic :Notes
+1684943630632|LockPlugin | unlock topic :Notes not found
+1684943630632|DDSNode | Fin read topic :Notes
+1684943630639|DDSPlugin | Take root topic : Notification
+1684943630639|DDSNode | Consommer topic :Notification
+1684943630639|LockPlugin | Propagate Lock topic :Notification id = 549aacf9-7f56-4861-86cd-0309e619f09d
+1684943630639|LockPlugin | Try lock topic :Notification
+1684943630639|LockPlugin | Fin try lock topic :Notification Succes : true
+1684943630642|LockPlugin | Propagate Lock topic :Notification id = 549aacf9-7f56-4861-86cd-0309e619f09d
+1684943630647|LockPlugin | Propagate Lock topic :Notification id = 549aacf9-7f56-4861-86cd-0309e619f09d succes true
+1684943630647|DDSPlugin | Consommer topic : Notification
+1684943630647|DDSPlugin | Fin Consommer topic : Notification
+1684943630650|DDSPlugin | Consommer topic : Notification
+1684943630650|DDSNode | Take topic :Notification
+1684943630650|DDSNode | Fin Take topic :Notification
+1684943630651|LockPlugin | Propagate unlock topic :Notification id propagation = 549aacf9-7f56-4861-86cd-0309e619f09d id propagationUnlock = e3caab80-8a76-4433-af4e-88f213aace8e
+1684943630651|LockPlugin | Unlock topic :Notification
+1684943630651|LockPlugin | fin unLock topic :Notification
+1684943630651|LockPlugin | unlock topic :Notification not found
+1684943630655|DDSPlugin | Take root topic : Notification
+1684943630655|DDSNode | Consommer topic :Notification
+1684943630655|LockPlugin | Propagate Lock topic :Notification id = 5b5ae755-2eee-4225-b96e-f80d6f678797
+1684943630655|LockPlugin | Try lock topic :Notification
+1684943630655|LockPlugin | Fin try lock topic :Notification Succes : true
+1684943630658|LockPlugin | Propagate unlock topic :Notification id propagation = 549aacf9-7f56-4861-86cd-0309e619f09d id propagationUnlock = e3caab80-8a76-4433-af4e-88f213aace8e
+1684943630658|LockPlugin | Fin propagate unlock topic :Notification id propagation = 549aacf9-7f56-4861-86cd-0309e619f09d id propagationUnlock = e3caab80-8a76-4433-af4e-88f213aace8e
+1684943630659|LockPlugin | Propagate Lock topic :Notification id = 5b5ae755-2eee-4225-b96e-f80d6f678797
+1684943630659|DDSPlugin | Fin take root topic : Notification
+1684943630659|LockPlugin | Propagate Lock topic :Notification id = 5b5ae755-2eee-4225-b96e-f80d6f678797 succes true
+1684943630659|DDSPlugin | Consommer topic : Notification
+1684943630659|DDSPlugin | Fin Consommer topic : Notification
+1684943630660|DDSPlugin | Consommer topic : Notification
+1684943630660|DDSNode | Take topic :Notification
+1684943630660|DDSNode | Fin Take topic :Notification
+1684943630660|LockPlugin | Propagate unlock topic :Notification id propagation = 5b5ae755-2eee-4225-b96e-f80d6f678797 id propagationUnlock = 87cf9c82-ae83-4c7a-a484-3b82d8e8eefe
+1684943630660|LockPlugin | Unlock topic :Notification
+1684943630660|LockPlugin | fin unLock topic :Notification
+1684943630660|LockPlugin | unlock topic :Notification not found
+1684943630662|LockPlugin | Propagate unlock topic :Notification id propagation = 5b5ae755-2eee-4225-b96e-f80d6f678797 id propagationUnlock = 87cf9c82-ae83-4c7a-a484-3b82d8e8eefe
+1684943630662|LockPlugin | Fin propagate unlock topic :Notification id propagation = 5b5ae755-2eee-4225-b96e-f80d6f678797 id propagationUnlock = 87cf9c82-ae83-4c7a-a484-3b82d8e8eefe
+1684943630663|DDSPlugin | Fin take root topic : Notification
+1684943646614|DDSNode | Fin

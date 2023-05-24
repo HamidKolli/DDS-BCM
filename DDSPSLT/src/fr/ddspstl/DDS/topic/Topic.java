@@ -166,7 +166,9 @@ public class Topic<T> implements org.omg.dds.topic.Topic<T> {
 
 
 	/**
-	 * @see org.omg.dds.topic.Topic#hashCode()
+	 * 
+	* @see java.lang.Object#hashCode()
+	*
 	 */
 	@Override
 	public int hashCode() {
@@ -179,7 +181,9 @@ public class Topic<T> implements org.omg.dds.topic.Topic<T> {
 
 
 	/**
-	 * @see org.omg.dds.topic.Topic#equals(Object)
+	 * 
+	* @see java.lang.Object#equals(java.lang.Object)
+	*
 	 */
 	@Override
 	public boolean equals(Object obj) {
