@@ -19,8 +19,11 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
  * @author Hamid KOLLI
  * @author Yanis ALAYOUD
  *
- *         Composant représentant un Client
+ * @param <T> : le type de la donnée
+ * 
+ * Composant représentant un Client
  */
+
 public class ClientComponent<T> extends AbstractComponent {
 
 	private static final String TAG_NAME = "CLIENT | ";
@@ -63,6 +66,11 @@ public class ClientComponent<T> extends AbstractComponent {
 
 	}
 
+	/**
+	 * 
+	 * @see fr.sorbonne_u.components.AbstractComponent#start()
+	 *
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized void start() throws ComponentStartException {
@@ -90,6 +98,12 @@ public class ClientComponent<T> extends AbstractComponent {
 		super.start();
 	}
 
+	
+	/**
+	 * 
+	 * @see fr.sorbonne_u.components.AbstractComponent#execute()
+	 *
+	 */
 	@Override
 	public void execute() throws Exception {
 

@@ -185,6 +185,10 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 		logMessage(LOGGER_TAG + "Fin connexion");
 	}
 
+	/**
+	 * @see fr.ddspstl.components.interfaces.IDDSNode#write(TopicDescription, Object, Time)
+	 *
+	 */
 	@Override
 	public <T> void write(TopicDescription<T> topic, T newObject, Time time) throws Exception {
 		logMessage(LOGGER_TAG + "Write topic :" + topic.getName());
@@ -198,6 +202,10 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 		logMessage(LOGGER_TAG + "Fin Write topic :" + topic.getName());
 	}
 
+	/**
+	 * @see fr.ddspstl.components.interfaces.IDDSNode#take(TopicDescription)
+	 *
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> Iterator<T> take(TopicDescription<T> topic) throws Exception {
@@ -207,6 +215,11 @@ public class DDSNode extends AbstractComponent implements IDDSNode {
 		return result;
 	}
 
+	/**
+	 * 
+	 * @see fr.sorbonne_u.components.AbstractComponent#finalise()
+	 *
+	 */
 	@Override
 	public synchronized void finalise() throws Exception {
 		logMessage(LOGGER_TAG + "Fin");

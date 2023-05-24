@@ -2,12 +2,32 @@ package fr.ddspstl.tools;
 
 import java.util.List;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ *
+ * Classe QuickSort permettant de trier une liste
+ */
 public class QuickSort {
+	/**
+	 * Constructeur
+	 * 
+	 * @param samples : liste des données à trier
+	 */
 	public  static <T> void quickSort(List<T> samples) {
 		
 		quickSort(samples, 0, samples.size() - 1);
 	}
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param samples : liste des données à trier
+	 * @param low : .
+	 * @param high : .
+	 */
 	private static <T> void quickSort(List<T> samples, int low, int high) {
 		if (low < high) {
 			int pivotIndex = partition(samples, low, high);
@@ -17,6 +37,14 @@ public class QuickSort {
 		}
 	}
 
+	/**
+	 * Methode partition
+	 * 
+	 * @param samples : liste des données
+	 * @param low : .
+	 * @param high : .
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	private static <T> int partition(List<T> samples, int low, int high) {
 		T pivot = samples.get(high);
@@ -34,6 +62,13 @@ public class QuickSort {
 		return i + 1;
 	}
 
+	/**
+	 * Methode swap : inverse deux elements de la liste
+	 * 
+	 * @param samples : liste des données
+	 * @param i : indice du 1er element
+	 * @param j : indice du 2e element
+	 */
 	private static <T> void swap(List<T> samples, int i, int j) {
 		T temp = samples.get(i);
 		samples.set(i, samples.get(j));

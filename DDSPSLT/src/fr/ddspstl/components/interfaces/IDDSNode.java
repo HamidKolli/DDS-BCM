@@ -29,7 +29,7 @@ public interface IDDSNode {
 	/**
 	 * methode consommer : s'occupe de commencer le take
 	 * 
-	 * @param topic   : le topic dans lequel on va chercher
+	 * @param topic   : le nom du topic dans lequel on va chercher
 	 * @param id      : l'identifiant de la requete
 	 * @param isFirst : true si c'est le noeud qui lance la requete, false sinon
 	 * @return Iterator<T> : la donnée lue
@@ -40,14 +40,27 @@ public interface IDDSNode {
 	/**
 	 * methode read : s'occupe de lire la donnée
 	 * 
-	 * @param topic : le topic dans lequel on va chercher
+	 * @param topic : le nom du topic dans lequel on va chercher
 	 * @return Iterator<T> : la donnée lue
 	 * @throws Exception
 	 */
 	public <T> Iterator<T> read(TopicDescription<T> topic) throws Exception;
 
+	/**
+	 * methode write : s'occupe d'ecrire une donnée dans un topic
+	 * 
+	 * @param topicName : le nom du topic dans lequel on va écrire
+	 * @param newObject : la donnée à écrire
+	 * @param time : le TimeStamp de l'ecriture
+	 * @throws Exception
+	 */
 	public <T> void write(TopicDescription<T> topicName, T newObject, Time time) throws Exception;
 
+	/**
+	 * @param topic : le nom du topic dans lequel on va take
+	 * @return Iterator<T> : la donnée lue
+	 * @throws Exception
+	 */
 	public <T> Iterator<T> take(TopicDescription<T> topic) throws Exception;
 
 

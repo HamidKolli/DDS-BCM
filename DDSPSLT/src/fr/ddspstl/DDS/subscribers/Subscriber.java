@@ -20,12 +20,25 @@ import org.omg.dds.topic.TopicQos;
 
 import fr.ddspstl.DDS.subscribers.data.DataReader;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ *
+ * Classe représentant un Subscriber
+ */
 public class Subscriber implements fr.ddspstl.DDS.subscribers.interfaces.Subscriber {
 
 	private DomainParticipant domainParticipant;
 	private Map<String, org.omg.dds.sub.DataReader<Object>> dataReaders;
 	
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param domainParticipant : le Domaine Participant
+	 */
 	public Subscriber(DomainParticipant domainParticipant) {
 		super();
 		this.domainParticipant = domainParticipant;
@@ -98,18 +111,26 @@ public class Subscriber implements fr.ddspstl.DDS.subscribers.interfaces.Subscri
 
 	}
 
+	/**
+	 * @see fr.ddspstl.DDS.subscribers.interfaces.Subscriber#getEnvironment()
+	 */
 	@Override
 	public ServiceEnvironment getEnvironment() {
 		return domainParticipant.getEnvironment();
 	}
 
-	
+	/**
+	 * @see fr.ddspstl.DDS.subscribers.interfaces.Subscriber#lookupDataReader(String)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> org.omg.dds.sub.DataReader<TYPE> lookupDataReader(String topicName) {
 		return (org.omg.dds.sub.DataReader<TYPE>) dataReaders.get(topicName);
 	}
 
+	/**
+	 * @see fr.ddspstl.DDS.subscribers.interfaces.Subscriber#lookupDataReader(TopicDescription)
+	 */
 	@Override
 	public <TYPE> org.omg.dds.sub.DataReader<TYPE> lookupDataReader(TopicDescription<TYPE> topicName) {
 		return lookupDataReader(topicName.getName());
@@ -176,6 +197,9 @@ public class Subscriber implements fr.ddspstl.DDS.subscribers.interfaces.Subscri
 		return null;
 	}
 
+	/**
+	 * @see fr.ddspstl.DDS.subscribers.interfaces.Subscriber#getParent()
+	 */
 	@Override
 	public DomainParticipant getParent() {
 		return domainParticipant;
@@ -203,6 +227,9 @@ public class Subscriber implements fr.ddspstl.DDS.subscribers.interfaces.Subscri
 		return null;
 	}
 
+	/**
+	 * @see fr.ddspstl.DDS.subscribers.interfaces.Subscriber#createDataReader(TopicDescription, String)
+	 */
 	public <TYPE> org.omg.dds.sub.DataReader<TYPE> createDataReader(TopicDescription<TYPE> topic, String uriPortDDSNode) {
 		DataReader<TYPE> data = new DataReader<>(topic, this, uriPortDDSNode);
 		dataReaders.put(topic.getName(), (org.omg.dds.sub.DataReader<Object>) data);

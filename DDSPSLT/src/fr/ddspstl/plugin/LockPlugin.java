@@ -17,6 +17,14 @@ import fr.ddspstl.ports.OutPortLock;
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ *
+ * Plugin pour les lock
+ */
 public class LockPlugin extends AbstractPlugin {
 
 	private static final long serialVersionUID = 1L;
@@ -33,6 +41,14 @@ public class LockPlugin extends AbstractPlugin {
 	private INodeAddress address;
 	private String executorServiceURI;
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param address : l'adresse du noeud
+	 * @param topics : l'ensemble des topics
+	 * @param executorServiceURI : l'uri de l'executorService
+	 * @throws Exception
+	 */
 	public LockPlugin(INodeAddress address, Set<TopicDescription<?>> topics, String executorServiceURI)
 			throws Exception {
 		this.topics = topics;
@@ -45,6 +61,9 @@ public class LockPlugin extends AbstractPlugin {
 		topicsIDUnlock = new ConcurrentHashMap<>();
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#installOn(ComponentI)
+	 */
 	@Override
 	public void installOn(ComponentI owner) throws Exception {
 		super.installOn(owner);
@@ -52,6 +71,9 @@ public class LockPlugin extends AbstractPlugin {
 		this.addRequiredInterface(PropagationLock.class);
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#initialise()
+	 */
 	@Override
 	public void initialise() throws Exception {
 		super.initialise();
@@ -64,7 +86,10 @@ public class LockPlugin extends AbstractPlugin {
 		inPortLock.publishPort();
 
 	}
-
+	
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#finalise()
+	 */
 	@Override
 	public void finalise() throws Exception {
 		super.finalise();
@@ -74,6 +99,9 @@ public class LockPlugin extends AbstractPlugin {
 		}
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.AbstractPlugin#uninstall()
+	 */
 	@Override
 	public void uninstall() throws Exception {
 		super.uninstall();
@@ -85,6 +113,12 @@ public class LockPlugin extends AbstractPlugin {
 
 	}
 
+	/**
+	 * Methode tryLock : verifie si un topic est deja lock ou non
+	 * 
+	 * @param topic : le nom du topic
+	 * @return booleen : le resultat du try
+	 */
 	public boolean trylock(TopicDescription<?> topic) {
 		getOwner().logMessage(LOGGER_TAG + "Try lock topic :" + topic.getName());
 		if (topicsLock.containsKey(topic)) {
@@ -95,6 +129,11 @@ public class LockPlugin extends AbstractPlugin {
 		return false;
 	}
 
+	/**
+	 * Methode Lock : lock un topic
+	 * 
+	 * @param topic : le topic a lock
+	 */
 	public void lock(TopicDescription<?> topic) throws Exception {
 
 		if (topicsLock.containsKey(topic)) {
@@ -107,6 +146,11 @@ public class LockPlugin extends AbstractPlugin {
 
 	}
 
+	/**
+	 * Methode unlock : unlock un topic
+	 * 
+	 * @param topic : le topic a unlock
+	 */
 	public void unlock(TopicDescription<?> topic) {
 		if (topicsLock.containsKey(topic)) {
 			getOwner().logMessage(LOGGER_TAG + "Unlock topic :" + topic.getName());
@@ -116,6 +160,15 @@ public class LockPlugin extends AbstractPlugin {
 		getOwner().logMessage(LOGGER_TAG + "unlock topic :" + topic.getName() + " not found");
 	}
 
+	/**
+	 * Methode propagateLock : propage le lock
+	 * 
+	 * @param topic : le topic
+	 * @param idPropagation : l'ID de la propagation
+	 * @param timestamp : le timeStamp de la propagation
+	 * @return boolean : booleen retournant si la propagation apu se faire
+	 * @throws Exception
+	 */
 	public boolean propagateLock(TopicDescription<?> topic, String idPropagation, Time timestamp) throws Exception {
 		getOwner().logMessage(LOGGER_TAG + "Propagate Lock topic :" + topic.getName() + " id = " + idPropagation);
 
@@ -156,6 +209,14 @@ public class LockPlugin extends AbstractPlugin {
 
 	}
 
+	/**
+	 * Methode propagateUnlock : propage le Unlock
+	 * 
+	 * @param topic : le topic
+	 * @param idPropagation : l'id de la propagation
+	 * @param idPropagationUnlock : l'id de la propagation du unlock
+	 * @throws Exception
+	 */
 	public void propagateUnlock(TopicDescription<?> topic, String idPropagation, String idPropagationUnlock)
 			throws Exception {
 		getOwner().logMessage(LOGGER_TAG + "Propagate unlock topic :" + topic.getName() + " id propagation = "
@@ -183,6 +244,12 @@ public class LockPlugin extends AbstractPlugin {
 
 	}
 
+	/**
+	 * Methode Connect
+	 * 
+	 * @param address : l'adresse du noeud auquel se connecter
+	 * @throws Exception
+	 */
 	public void connect(INodeAddress address) throws Exception {
 		if (ports.containsKey(address))
 			return;

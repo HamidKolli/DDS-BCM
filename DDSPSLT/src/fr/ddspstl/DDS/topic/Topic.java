@@ -14,12 +14,29 @@ import org.omg.dds.topic.TopicListener;
 import org.omg.dds.topic.TopicQos;
 import org.omg.dds.type.TypeSupport;
 
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ * @param <T> : type de la donnée
+ *
+ * Classe représentant un Topic
+ */
 public class Topic<T> implements org.omg.dds.topic.Topic<T> {
 	private TypeSupport<T> typeSupport;
 	private ServiceEnvironment serviceEnvironment;
 	private String typeName;
 	private DomainParticipant domainParticipant;
 
+	/**
+	 * constructeur
+	 * 
+	 * @param type : le TypeSupport
+	 * @param serviceEnvironment : le Service Environment
+	 * @param typeName : le nom du type
+	 * @param domainParticipant : le DomainParticipant
+	 */
 	public Topic(TypeSupport<T> type, ServiceEnvironment serviceEnvironment, String typeName,
 			DomainParticipant domainParticipant) {
 		super();
@@ -30,21 +47,31 @@ public class Topic<T> implements org.omg.dds.topic.Topic<T> {
 	}
 
 
+	/**
+	 * @see org.omg.dds.topic.Topic#getTypeSupport()
+	 */
 	@Override
 	public TypeSupport<T> getTypeSupport() {
 		return typeSupport;
 	}
+
 
 	@Override
 	public <OTHER> TopicDescription<OTHER> cast() {
 		return null;
 	}
 
+	/**
+	 * @see org.omg.dds.topic.Topic#getTypeName()
+	 */
 	@Override
 	public String getTypeName() {
 		return typeSupport.getTypeName();
 	}
 
+	/**
+	 * @see org.omg.dds.topic.Topic#getName()
+	 */
 	@Override
 	public String getName() {
 		return typeName;
@@ -54,6 +81,9 @@ public class Topic<T> implements org.omg.dds.topic.Topic<T> {
 	public void close() {
 	}
 
+	/**
+	 * @see org.omg.dds.topic.Topic#getEnvironment()
+	 */
 	@Override
 	public ServiceEnvironment getEnvironment() {
 		return serviceEnvironment;
@@ -126,12 +156,18 @@ public class Topic<T> implements org.omg.dds.topic.Topic<T> {
 		return null;
 	}
 
+	/**
+	 * @see org.omg.dds.topic.Topic#getParent()
+	 */
 	@Override
 	public DomainParticipant getParent() {
 		return domainParticipant;
 	}
 
 
+	/**
+	 * @see org.omg.dds.topic.Topic#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -142,6 +178,9 @@ public class Topic<T> implements org.omg.dds.topic.Topic<T> {
 	}
 
 
+	/**
+	 * @see org.omg.dds.topic.Topic#equals(Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {

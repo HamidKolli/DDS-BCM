@@ -22,11 +22,25 @@ import org.omg.dds.topic.TopicQos;
 
 import fr.ddspstl.DDS.publishers.data.DataWriter;
 
+
+/**
+ * 
+ * @author Hamid KOLLI
+ * @author Yanis ALAYOUD
+ * 
+ *
+ * Classe représentant un publisher
+ */
 public class Publisher implements fr.ddspstl.DDS.publishers.interfaces.Publisher {
 
 	private DomainParticipant domainParticipant;
 	private Map<String, org.omg.dds.pub.DataWriter<Object>> dataWriters;
 
+	/**
+	 * Constructeur
+	 * 
+	 * @param domainParticipant : le DomainParticipant
+	 */
 	public Publisher(DomainParticipant domainParticipant) {
 		super();
 		this.domainParticipant = domainParticipant;
@@ -98,6 +112,9 @@ public class Publisher implements fr.ddspstl.DDS.publishers.interfaces.Publisher
 
 	}
 
+	/**
+	 * @see fr.ddspstl.DDS.publishers.interfaces.Publisher#getEnvironment()
+	 */
 	@Override
 	public ServiceEnvironment getEnvironment() {
 		return domainParticipant.getEnvironment();
@@ -105,12 +122,18 @@ public class Publisher implements fr.ddspstl.DDS.publishers.interfaces.Publisher
 
 
 
+	/**
+	 * @see fr.ddspstl.DDS.publishers.interfaces.Publisher#lookupDataWriter(String)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> DataWriter<TYPE> lookupDataWriter(String topicName) {
 		return (DataWriter<TYPE>) dataWriters.get(topicName);
 	}
 
+	/**
+	 * @see fr.ddspstl.DDS.publishers.interfaces.Publisher#lookupDataWriter(Topic)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <TYPE> DataWriter<TYPE> lookupDataWriter(Topic<TYPE> topic) {
@@ -183,11 +206,17 @@ public class Publisher implements fr.ddspstl.DDS.publishers.interfaces.Publisher
 		return null;
 	}
 
+	/**
+	 * @see fr.ddspstl.DDS.publishers.interfaces.Publisher#getParent()
+	 */
 	@Override
 	public DomainParticipant getParent() {
 		return domainParticipant;
 	}
 
+	/**
+	 * @see fr.ddspstl.DDS.publishers.interfaces.Publisher#createDataWriter(Topic, String)
+	 */
 	@SuppressWarnings("unchecked")
 	public <TYPE> DataWriter<TYPE>  createDataWriter(Topic<TYPE>  topic, String uriPortSortant) {
 		DataWriter<TYPE> d = new DataWriter<>(topic, this,uriPortSortant);
